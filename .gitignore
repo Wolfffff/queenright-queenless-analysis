@@ -162,3 +162,4 @@ cython_debug/
 # Custom
 
 raw_data/
+.DS_Store
