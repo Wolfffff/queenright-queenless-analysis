@@ -241,9 +241,9 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
+import numpy as np
 
 GROUPS =  ["RooibosTea_QR_1216_1646", "RooibosTea_QL_1216_1646", "MexHotChoc_QR_1216_1646", "MexHotChoc_QL_1216_1646", "20230213_1745_AlmdudlerGspritzt_C1", "20230213_1745_AlmdudlerGspritzt_C0", "20221209_1613_QR", "20221209_1613_QL", "20221123_1543_AmericanoLatte_QR", "20221123_1543_AmericanoLatte_QL"]
-import matplotlib.pyplot as plt
 from matplotlib import colors
 from scipy.cluster.hierarchy import linkage, dendrogram
 from scipy.spatial.distance import pdist, squareform
@@ -261,48 +261,101 @@ for group in GROUPS:
     row_sum = np.sum(adj, axis=1)
     col_sum = np.sum(adj, axis=0)
 
-    rows_to_keep = np.where(row_sum >= 100000)[0]
-    cols_to_keep = np.where(col_sum >= 100000)[0]
+    rows_to_keep = np.where(row_sum >= 9600)[0]
+    cols_to_keep = np.where(col_sum >= 9600)[0]
 
     adj = adj.iloc[rows_to_keep, cols_to_keep]
+    
+    # Step 1: Community detection
+    state = gt.minimize_blockmodel_dl(g, state=gt.ModularityState)
+    print(f"Modularity for {group}: {state.modularity()}")
+    
+    clustering = gt.local_clustering(g)
+    print(f"Clustering coef for {group}: {clustering}")
+    # This function returns a state object that contains the detected community structure
+    
+    # # Compute the distances and linkage
+    # distances = pdist(adj, metric='euclidean')
+    # linkage_matrix = linkage(distances, method='complete')
 
-    # Compute the distances and linkage
-    distances = pdist(adj, metric='euclidean')
-    linkage_matrix = linkage(distances, method='complete')
+    # # Create the dendrogram
+    # dendro = dendrogram(linkage_matrix, no_plot=True)
 
-    # Create the dendrogram
-    dendro = dendrogram(linkage_matrix, no_plot=True)
+    # # Reorder the adjacency matrix
+    # reordered_adj = adj.iloc[dendro['leaves'], dendro['leaves']]
 
-    # Reorder the adjacency matrix
-    reordered_adj = adj.iloc[dendro['leaves'], dendro['leaves']]
+    # # Create the figure and axes
+    # fig, ax = plt.subplots(figsize=(10, 10))
 
-    # Create the figure and axes
-    fig, ax = plt.subplots(figsize=(10, 10))
+    # # Create the heatmap
+    # cax = ax.imshow(reordered_adj, cmap='viridis', norm=norm)
 
-    # Create the heatmap
-    cax = ax.imshow(reordered_adj, cmap='viridis', norm=norm)
+    # # Get the position of the heatmap axes
+    # pos = ax.get_position()
 
-    # Get the position of the heatmap axes
-    pos = ax.get_position()
+    # # Create a new axes for the colorbar that matches the height of the heatmap axes
+    # cbar_ax = fig.add_axes([pos.x1+0.01, pos.y0, 0.02, pos.height])
 
-    # Create a new axes for the colorbar that matches the height of the heatmap axes
-    cbar_ax = fig.add_axes([pos.x1+0.01, pos.y0, 0.02, pos.height])
+    # # Create the colorbar
+    # cbar = fig.colorbar(cax, cax=cbar_ax)
 
-    # Create the colorbar
-    cbar = fig.colorbar(cax, cax=cbar_ax)
+    # # Set the title
+    # ax.set_title(f'Clustered Adjacency Matrix for Colony: {group}', pad=20)
 
-    # Set the title
-    ax.set_title(f'Clustered Adjacency Matrix for Colony: {group}', pad=20)
+    # # Modify x and y ticks
+    # xlabels = [label.split('#')[1] for label in reordered_adj.columns]
+    # ylabels = [label.split('#')[1] for label in reordered_adj.index]
 
-    # Modify x and y ticks
-    xlabels = [label.split('#')[1] for label in reordered_adj.columns]
-    ylabels = [label.split('#')[1] for label in reordered_adj.index]
+    # ax.set_xticks(range(len(xlabels)))
+    # ax.set_xticklabels(xlabels, rotation=90)
 
-    ax.set_xticks(range(len(xlabels)))
-    ax.set_xticklabels(xlabels, rotation=90)
+    # ax.set_yticks(range(len(ylabels)))
+    # ax.set_yticklabels(ylabels, rotation=0)
 
-    ax.set_yticks(range(len(ylabels)))
-    ax.set_yticklabels(ylabels, rotation=0)
+    # # Save figure with high resolution
+    # plt.savefig(f'../figures/clustered_adjacency_matrix_{group}.png', dpi=300, bbox_inches='tight')
 
-    # Save figure with high resolution
-    plt.savefig(f'clustered_adjacency_matrix_{group}.png', dpi=300, bbox_inches='tight')
+
+def calculate_metrics_and_visualize(g):
+    # Calculate Betweenness Centrality
+    vertex_betweenness, edge_betweenness = gt.betweenness(g)
+    g.vertex_properties["vertex_betweenness"] = vertex_betweenness
+    g.edge_properties["edge_betweenness"] = edge_betweenness
+
+    # Calculate Closeness Centrality
+    closeness = gt.closeness(g)
+    g.vertex_properties["closeness"] = closeness
+
+    # Community Detection (Louvain Method)
+    state = gt.minimize_blockmodel_dl(g)
+    blocks = state.get_blocks()
+    g.vertex_properties["blocks"] = blocks
+
+    # Prepare for visualization
+    # Normalize betweenness for visualization purposes
+    norm_vertex_betweenness = g.new_vertex_property("double")
+    max_vertex_betweenness = max(vertex_betweenness.a)
+    for v in g.vertices():
+        norm_vertex_betweenness[v] = (vertex_betweenness[v] / max_vertex_betweenness) * 10  # Scaling for visibility
+    
+    return g, norm_vertex_betweenness, blocks
+
+g, nvb,b = calculate_metrics_and_visualize(g)
+
+# plot all vertex_betweenness
+plt.hist(nvb.a, bins=20)
+
+
+def visualize_graph(g, norm_vertex_betweenness, blocks):
+    # Map the blocks to a continuous range of colors
+    block_color = g.new_vertex_property("vector<double>")
+    for v in g.vertices():
+        block_color[v] = plt.cm.jet(blocks[v] / float(max(blocks.a) + 1))
+
+    # Draw the graph
+    gt.graph_draw(g, vertex_fill_color=block_color, vertex_size=norm_vertex_betweenness,
+                  output_size=(1000, 1000), output="graph_visualization.pdf")
+    
+visualize_graph(g,nvb,b)
+
+# 

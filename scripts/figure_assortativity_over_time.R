@@ -70,6 +70,7 @@ ggplot(data = TotalAss, aes(x = as.integer(Hour), y = values, group = interactio
 ggsave("../figures/fig3_assortativity_over_time.jpg", width = 8.5, height = 4, dpi = 600)
 
 
+
 fm <- lmer(formula = values ~ 1 + QR + Day + Day:QR +(1|Col), data = TotalAss) #to run the model
 fm.null <- lmer(formula = values ~ 1 + Day + (1|Col), data = TotalAss) #to run the model
 anova(fm, fm.null)
