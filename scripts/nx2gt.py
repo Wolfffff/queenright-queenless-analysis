@@ -274,46 +274,46 @@ for group in GROUPS:
     print(f"Clustering coef for {group}: {clustering}")
     # This function returns a state object that contains the detected community structure
     
-    # # Compute the distances and linkage
-    # distances = pdist(adj, metric='euclidean')
-    # linkage_matrix = linkage(distances, method='complete')
+    # Compute the distances and linkage
+    distances = pdist(adj, metric='euclidean')
+    linkage_matrix = linkage(distances, method='complete')
 
-    # # Create the dendrogram
-    # dendro = dendrogram(linkage_matrix, no_plot=True)
+    # Create the dendrogram
+    dendro = dendrogram(linkage_matrix, no_plot=True)
 
-    # # Reorder the adjacency matrix
-    # reordered_adj = adj.iloc[dendro['leaves'], dendro['leaves']]
+    # Reorder the adjacency matrix
+    reordered_adj = adj.iloc[dendro['leaves'], dendro['leaves']]
 
-    # # Create the figure and axes
-    # fig, ax = plt.subplots(figsize=(10, 10))
+    # Create the figure and axes
+    fig, ax = plt.subplots(figsize=(10, 10))
 
-    # # Create the heatmap
-    # cax = ax.imshow(reordered_adj, cmap='viridis', norm=norm)
+    # Create the heatmap
+    cax = ax.imshow(reordered_adj, cmap='viridis', norm=norm)
 
-    # # Get the position of the heatmap axes
-    # pos = ax.get_position()
+    # Get the position of the heatmap axes
+    pos = ax.get_position()
 
-    # # Create a new axes for the colorbar that matches the height of the heatmap axes
-    # cbar_ax = fig.add_axes([pos.x1+0.01, pos.y0, 0.02, pos.height])
+    # Create a new axes for the colorbar that matches the height of the heatmap axes
+    cbar_ax = fig.add_axes([pos.x1+0.01, pos.y0, 0.02, pos.height])
 
-    # # Create the colorbar
-    # cbar = fig.colorbar(cax, cax=cbar_ax)
+    # Create the colorbar
+    cbar = fig.colorbar(cax, cax=cbar_ax)
 
-    # # Set the title
-    # ax.set_title(f'Clustered Adjacency Matrix for Colony: {group}', pad=20)
+    # Set the title
+    ax.set_title(f'Clustered Adjacency Matrix for Colony: {group}', pad=20)
 
-    # # Modify x and y ticks
-    # xlabels = [label.split('#')[1] for label in reordered_adj.columns]
-    # ylabels = [label.split('#')[1] for label in reordered_adj.index]
+    # Modify x and y ticks
+    xlabels = [label.split('#')[1] for label in reordered_adj.columns]
+    ylabels = [label.split('#')[1] for label in reordered_adj.index]
 
-    # ax.set_xticks(range(len(xlabels)))
-    # ax.set_xticklabels(xlabels, rotation=90)
+    ax.set_xticks(range(len(xlabels)))
+    ax.set_xticklabels(xlabels, rotation=90)
 
-    # ax.set_yticks(range(len(ylabels)))
-    # ax.set_yticklabels(ylabels, rotation=0)
+    ax.set_yticks(range(len(ylabels)))
+    ax.set_yticklabels(ylabels, rotation=0)
 
-    # # Save figure with high resolution
-    # plt.savefig(f'../figures/clustered_adjacency_matrix_{group}.png', dpi=300, bbox_inches='tight')
+    # Save figure with high resolution
+    plt.savefig(f'../figures/clustered_adjacency_matrix_{group}.png', dpi=300, bbox_inches='tight')
 
 
 def calculate_metrics_and_visualize(g):

@@ -6,18 +6,17 @@ for(p in list_of_packages){
 }
 
 
-prefixes = c("RooibosTea_QR_1216_1646", "RooibosTea_QL_1216_1646", "MexHotChoc_QR_1216_1646", "MexHotChoc_QL_1216_1646", "20230213_1745_AlmdudlerGspritzt_C1", "20230213_1745_AlmdudlerGspritzt_C0", "20221209_1613_QR", "20221209_1613_QL", "20221123_1543_AmericanoLatte_QR", "20221123_1543_AmericanoLatte_QL")
-Day = 1
-Day1 = c("016", "017", "018", "019", "020", "021", "022", "023", "024")
-Day2 = c("040", "041", "042", "043", "044", "045", "046", "047", "048")
-Day3 = c("064", "065", "066", "067", "068", "069", "070", "071", "072")
-Day4 = c("088", "089", "090", "091", "092", "093", "094", "095")
-Days = c(Day1, Day2, Day3, Day4)
-Start = 0 
+prefixes <- c("RooibosTea_QR_1216_1646", "RooibosTea_QL_1216_1646", "MexHotChoc_QR_1216_1646", "MexHotChoc_QL_1216_1646", "20230213_1745_AlmdudlerGspritzt_C1", "20230213_1745_AlmdudlerGspritzt_C0", "20221209_1613_QR", "20221209_1613_QL", "20221123_1543_AmericanoLatte_QR", "20221123_1543_AmericanoLatte_QL")
+Day <- 1
+Day1 <- c("001","002","003","004","005","006","007","008", "009","010","011","012","013","014","015","016", "017", "018", "019", "020", "021", "022", "023", "024")
+Day2 <- c("025","026","027","028","029","030","031","032", "033","034","035","036","037","038","039","040", "041", "042", "043", "044", "045", "046", "047", "048")
+Day3 <- c("049","050","051","052","053","054","055","056", "057","058","059","060","061","062","063","064", "065", "066", "067", "068", "069", "070", "071", "072")
+Day4 <- c("073","074","075","076","077","078","079","080", "081","082","083","084","085","086","087","088", "089", "090", "091", "092", "093", "094", "095", "096")
+Days <- c(Day1, Day2, Day3, Day4)
+Start <- 0
 
-Start = 0
 for(i in 1:10){
-  for(j in 1:34){
+  for(j in 1:96){
     if(file.exists(paste(prefixes[i],Days[j],"Assort.csv",sep = "_"))) {
       Assort = read.csv(paste(prefixes[i],Days[j],"Assort.csv",sep = "_"))
       Assort$Day = floor((j-1)/9)+1
@@ -67,7 +66,7 @@ ggplot(data = TotalAss, aes(x = as.integer(Hour), y = values, group = interactio
   labs(title = "Assortativity Over Time", color = "") +
   xlab("Time (Hour)") + ylab("Assortativity")
 
-ggsave("../figures/fig3_assortativity_over_time.jpg", width = 8.5, height = 4, dpi = 600)
+ggsave("../figures/fig3_assortativity_over_time.jpg", width = 8.5, height = 3, dpi = 600)
 
 
 

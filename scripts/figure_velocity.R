@@ -54,18 +54,22 @@ ggplot(TotalVel, aes(x = Hour, y = move_perc, group = ID)) +
 
 
 # Create the plot
+total_vel_no_queen <- TotalVel[!TotalVel$Queen, ]
 ggplot(TotalVel, aes(x = as.integer(Hour), y = move_perc, group = ID)) +
   geom_smooth(aes(group = interaction(QR, Queen), color = interaction(QR, Queen))) +
-  # scale_color_manual(values = c("#4a6741", "#EECA58"), labels = c("Head-Body", "Head-Head"), guide = guide_legend(direction = "horizontal")) +
-  scale_x_continuous(breaks = c(0, seq(24, 96, by = 24)), limits = c(0, NA)) + # Expand limits to include 0
-  scale_y_log10() +
-  labs(color = "Metric") +
+  scale_x_continuous(breaks = c(0, seq(24, 96, by = 24)), limits = c(0, NA),expand=c(0,0)) + # Expand limits to include 0
+  labs(color = element_blank()) +
   xlab("Hour") +
-  ylab("Interaction Count") +
+  ylab("Fraction of Time Spent Moving") +
+  scale_color_manual(
+    labels = c("Queenless Worker", "Queenright Worker", "Queen"),
+    values = c("#CEB175", "#629CC0", "#E54E21"),
+    guide = guide_legend(direction = "horizontal")
+  ) + 
   theme_minimal() +
   theme(
     plot.title = element_text(hjust = 0.5),
-    legend.position = c(1, .25), # Move legend to top right
+    legend.position = c(1, 1), # Move legend to top right
     legend.justification = c(1, 1), # Align legend to top right
     legend.background = element_rect(fill = alpha("white", 0.8)),
     legend.title = element_text(size = 8, face = "bold"),
@@ -76,11 +80,14 @@ ggplot(TotalVel, aes(x = as.integer(Hour), y = move_perc, group = ID)) +
     panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
     axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
     axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
-    strip.text = element_text(size = 10, face = "bold") # Make facet plot titles larger and bold
+    strip.text = element_text(size = 10, face = "bold"), # Make facet plot titles larger and bold
+    panel.grid = element_blank(),
+    panel.border = element_blank()
   ) +
-  guides(alpha="none")
+  guides(alpha = "none", color="none") +
+  coord_cartesian(ylim = c(0.65, 0.9))
 
-ggsave("../figures/vel.jpg", width = 8.5, height = 2.75, dpi = 600)
+ggsave("../figures/qlqr_vel_over_time.jpg", width = 4.25, height = 4.25*(2/3), dpi = 600)
 
 
 ggplot(TotalVel, aes(x = Hour, y = move_perc, group = ID)) +
@@ -93,9 +100,11 @@ ggplot(TotalVel, aes(x = Hour, y = move_perc, group = ID)) +
   scale_color_manual(
     name = "Bee",
     labels = c("Queenless Worker", "Queenright Worker", "Queen"),
-    values = c("#5785C1", "#629CC0", "#FBA72A")
+    values = c("#CEB175", "#629CC0", "#E54E21")
   )
 
+ggsave("../figures/move_perc.jpg", width = 8.5, height = 2.75, dpi = 600)
+
 ggplot(TotalVel, aes(x = Hour, y = move_perc, group = ID)) +
   geom_jitter(aes(color = interaction(QR, Queen), alpha = Queen)) +
   geom_smooth(aes(group = interaction(QR, Queen), color = interaction(QR, Queen))) +
@@ -106,7 +115,7 @@ ggplot(TotalVel, aes(x = Hour, y = move_perc, group = ID)) +
   scale_color_manual(
     name = "Bee",
     labels = c("Queenless Worker", "Queenright Worker", "Queen"),
-    values = c("#5785C1", "#629CC0", "#FBA72A")
+    values = c("#CEB175", "#629CC0", "#E54E21")
   ) +
   facet_wrap(~Col, nrow = 5)
 
@@ -120,8 +129,10 @@ ggplot(TotalVel, aes(x = Hour, y = mean_vel, group = ID)) +
   scale_color_manual(
     name = "Bee",
     labels = c("Queenless Worker", "Queenright Worker", "Queen"),
-    values = c("#5785C1", "#629CC0", "#FBA72A")
+    values = c("#CEB175", "#629CC0", "#E54E21")
   )
+
+ggsave("../figures/mean_vel_2.jpg", width = 8.5, height = 2.75, dpi = 600)
 
 ggplot(TotalVel, aes(x = Hour, y = mean_vel, group = ID)) +
   geom_line(aes(color = interaction(QR, Queen), alpha = Queen)) +
@@ -132,5 +143,7 @@ ggplot(TotalVel, aes(x = Hour, y = mean_vel, group = ID)) +
   scale_color_manual(
     name = "Bee",
     labels = c("Queenless Worker", "Queenright Worker", "Queen"),
-    values = c("#5785C1", "#629CC0", "#FBA72A")
+    values = c("#CEB175", "#629CC0", "#E54E21")
   )
+
+ggsave("../figures/mean_vel_3.jpg", width = 8.5, height = 2.75, dpi = 600)
