@@ -66,7 +66,17 @@ for (i in 1:10) {
 }
 
 # A few tags (82 and 88) that spuriously appear, get rid of them.
+
 TotalDeg <- TotalDeg[TotalDeg$Degree > 100, ]
+
+# Regress out Col if we want...
+# fm <- lmer(formula = Degree ~ 1 + (1 | Col), data = TotalDeg)
+# TotalDeg$Degree <- residuals(fm)
+
+# TotalDeg <- TotalDeg %>%
+#   group_by(Col, Hour) %>%
+#   mutate(Degree = scale(Degree)) %>%
+#   ungroup()
 
 # Degree — Head-Head vs Head-Body -----------------------------------------------------------
 # Add a new column to TotalDeg to indicate the group
