@@ -137,7 +137,13 @@ ggplot(TotalCentSum, aes(x = AverageWidth, y = Degree, colour = factor(Treatment
 ggsave("../figures/fig4_ovary_plot.jpg", width = 4.25, height = 4.25, dpi = 600)
 
 
-
-
 # Spearman correlation between degree and average width
 cor.test(TotalCentSum$Degree, TotalCentSum$AverageWidth, method = "spearman")
+
+# lme4
+library(lme4)
+library(lmerTest)
+
+# Get pvals
+mod <- lmer(Degree ~ 1 + AverageWidth + (1 | Treatment) + (1 | Colony), data = TotalCentSum)
+summary(mod)
