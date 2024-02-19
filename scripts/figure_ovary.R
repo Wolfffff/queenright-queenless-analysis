@@ -85,7 +85,7 @@ TotalCentSum <- TotalCent %>%
 TotalCentSum <- merge(TotalCentSum, Ovaries, by = "ID")
 
 # Swap levels of QR to match the first plot
-TotalCentSum$Treatment <- ifelse(TotalCentSum$QR == 0, "Queenright Worker", "Queenless Worker")
+TotalCentSum$Treatment <- ifelse(TotalCentSum$QR == 0, "Queenless Worker", "Queenright Worker")
 # Keep only first of duplicates
 TotalCentSum <- TotalCentSum[!duplicated(TotalCentSum$ID), ]
 
