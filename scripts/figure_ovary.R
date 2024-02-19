@@ -14,6 +14,9 @@ Day4 <- c("073", "074", "075", "076", "077", "078", "079", "080", "081", "082", 
 Days <- c(Day1, Day2, Day3, Day4)
 Start <- 0
 
+
+QUEEN_LIST <- c("RooibosTea_QR_1216_1646_ArUcoTag#52", "MexHotChoc_QR_1216_1646_ArUcoTag#13", "20230213_1745_AlmdudlerGspritzt_C1_ArUcoTag#24", "20221209_1613_QR_ArUcoTag#47", "20221123_1543_AmericanoLatte_QR_ArUcoTag#43")
+
 Start <- 0
 for (i in 1:10) {
   for (j in 1:96) {
@@ -89,6 +92,10 @@ TotalCentSum$Treatment <- ifelse(TotalCentSum$QR == 0, "Queenless Worker", "Quee
 # Keep only first of duplicates
 TotalCentSum <- TotalCentSum[!duplicated(TotalCentSum$ID), ]
 
+TotalCentSum[which(TotalCentSum$Degree == max(TotalCentSum$Degree)), ]
+
+# Drop queens
+TotalCentSum <- TotalCentSum[!(TotalCentSum$ID %in% QUEEN_LIST), ]
 
 
 ggplot(TotalCentSum, aes(x = AverageWidth, y = Degree, colour = factor(Treatment))) +
