@@ -1,9 +1,10 @@
-from itertools import permutations
 import sys
-import networkx as nx
-import pandas as pd
+from itertools import permutations
+
 import matplotlib.pyplot as plt
+import networkx as nx
 import numpy as np
+import pandas as pd
 
 df = pd.read_table(sys.argv[1])
 df_onetype = df[df["Interaction Name"] == sys.argv[4]]

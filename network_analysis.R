@@ -1,11 +1,8 @@
 # Load Degree Data — Head And Body ----------------------------------------
-list_of_packages = c("lme4","ggplot2","sp","tidyverse","car", "raster","ggthemes","dplyr")
-pak::pkg_install(list_of_packages)
-for(p in list_of_packages){
-  library(p, character.only = TRUE)
-}
 
-
+library(lme4)
+library(tidyverse)
+setwd("~/Downloads/IBRGData_110123")
 prefixes = c("RooibosTea_QR_1216_1646", "RooibosTea_QL_1216_1646", "MexHotChoc_QR_1216_1646", "MexHotChoc_QL_1216_1646", "20230213_1745_AlmdudlerGspritzt_C1", "20230213_1745_AlmdudlerGspritzt_C0", "20221209_1613_QR", "20221209_1613_QL", "20221123_1543_AmericanoLatte_QR", "20221123_1543_AmericanoLatte_QL")
 Day = 1
 Day1 = c("016", "017", "018", "019", "020", "021", "022", "023", "024")
@@ -65,14 +62,12 @@ for(i in 1:10){
   }
 }
 
-# Few tags (82 and 88) that spuriously appear, get rid of them.
 TotalDeg = TotalDeg[TotalDeg$Degree > 100,]
 
 # Degree — Head-Head vs Head-Body -----------------------------------------------------------
 
 QRDeg = TotalDeg[TotalDeg$QR == TRUE,]
 QRDeg = QRDeg[QRDeg$Queen == FALSE,]
-
 ggplot(QRDeg, aes(x=Hour, y=Degree, group=ID)) + 
   #geom_line(aes(group=Mod, color = Mod), alpha=0.1) + 
   geom_smooth(aes(group=Mod, color = Mod)) + 
@@ -111,29 +106,23 @@ ggplot(QueenDeg, aes(x=Hour, y=Degree, group=ID)) +
   scale_color_manual(values=c("#4a6741", "#EECA58"))
 
 ggplot(QueenDeg, aes(x=Hour, y=Degree, group=interaction(ID, Mod))) + 
-  geom_smooth(aes(group=Mod, color = Mod), size = 1.5, se = TRUE, linetype = 1, method = "loess") + 
-  theme_minimal() + 
-  labs(title="Queen Worker Degree Head-Head vs Head-Body Unstandardized", color = "Model") +
-  scale_color_manual(values=c("#4a6741", "#EECA58"), labels = c("Head-Body", "Head-Head")) +
-  theme(legend.position="bottom", 
-        legend.box.background = element_rect(color="black", size=0.5),
-        legend.box.margin = margin(6, 6, 6, 6),
-        legend.title = element_text(size=12, face="bold"),
-        legend.text = element_text(size=11)) +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  scale_x_continuous(breaks = seq(min(QueenDeg$Hour), max(QueenDeg$Hour), by = 24)) +
-  theme(panel.grid.major = element_line(color = "grey", linetype = "dashed"),
-        panel.grid.minor = element_line(color = "grey", linetype = "dotted"))
-ggsave("../figures/queen_worker_interaction_type_unstandardized.jpg", width = 8.5, height = 4, dpi = 300)
+  geom_line(aes(color=Mod), alpha=0.5) + 
+  geom_smooth(aes(group=Mod, color = Mod)) + 
+  theme_classic() + 
+  labs(title="Queen Worker Degree Head_Head vs Head_Body Unstandardized") +
+  scale_color_manual(values=c("#4a6741", "#EECA58"))
 
 fm <- lmer(formula = Degree ~ 1 + Mod + Hour + (1|Col), data = QRDeg) #to run the model
 fm.null <- lmer(formula = Degree ~ 1 + Hour + (1|Col), data = QRDeg) #to run the model
 
+library(dplyr)
 
 TotalDegComb %>% 
   group_by(ID) %>% 
   summarise(across(starts_with("Var"), ~sum(., na.rm = TRUE)))
 
+# Modality Prop by Degree-----
+library(dplyr)
 Start=0
 for(i in 1:10){
   for(j in 1:35){
@@ -270,7 +259,7 @@ ggplot(BodyDeg, aes(x=Hour, y=Degree, group=ID)) +
 
 # Load Velocity Data  ----------------------------------------
 
-
+setwd("~/Downloads/IBRGData_110123")
 prefixes = c("RooibosTea_QR_1216_1646", "RooibosTea_QL_1216_1646", "MexHotChoc_QR_1216_1646", "MexHotChoc_QL_1216_1646", "20230213_1745_AlmdudlerGspritzt_C1", "20230213_1745_AlmdudlerGspritzt_C0", "20221209_1613_QR", "20221209_1613_QL", "20221123_1543_AmericanoLatte_QR", "20221123_1543_AmericanoLatte_QL")
 Day = 1
 Day1 = c("016", "017", "018", "019", "020", "021", "022", "023", "024")
@@ -609,7 +598,7 @@ ggplot(MHCQRVelCirc, aes(x=Hour, y=move_perc, group=ID)) +
 
 # Individual Variation -------------
 
-
+setwd("~/Downloads/IBRGData_110123")
 
 Start = 0
 for(i in 1:10){
@@ -791,7 +780,7 @@ ddply(TotalCentMean, .(Col), summarise, corr=(cor.test(Betweenness, Degree, alte
 
 # NWP -------------
 
-
+setwd("~/Downloads/IBRGData_110123")
 
 Start = 0
 for(i in 1:10){
@@ -919,7 +908,7 @@ anova(fm, fm.null)
 
 # Assort -------------
 
-
+setwd("~/Downloads/IBRGData_110123")
 
 Start = 0
 for(i in 1:10){
@@ -966,7 +955,7 @@ fm.null <- lmer(formula = values ~ 1 + Day + (1|Col), data = TotalAss) #to run t
 anova(fm, fm.null)
 # Directional -------
 
-
+setwd("~/Downloads/IBRGData_110123")
 
 Start = 0
 for(i in 1:10){
@@ -1064,7 +1053,7 @@ ggplot(TotalDirCentMean, aes(x=Valency, y=Sum)) +
 
 
 # DirNWP--------
-
+setwd("~/Downloads/IBRGData_110123")
 
 Start = 0
 for(i in 1:10){
@@ -1168,20 +1157,287 @@ ggplot(DegVelMeanDayRT, aes(x=move_perc, y=Degree)) +
   labs(title="Degree vs Movement Speed by Day (Rooibos)")+
   facet_wrap(~ Day, nrow = 1)
 
-# Top10 -----------
+# Top10 and Ovaries -----------
 library(tidyr)
-
-# Get rid of 82 and 88 for spurious
+TotalCentMeanRanked = DegVelMean %>%
+  group_by(Col) %>%
+  top_n(10)
 TotalCentMeanRanked = TotalCentMeanRanked[TotalCentMeanRanked$Degree > 200,]
 TotalCentMeanRanked = TotalCentMeanRanked[!grepl("#82", TotalCentMeanRanked$ID),]
 TotalCentMeanRanked = TotalCentMeanRanked[!grepl("#88", TotalCentMeanRanked$ID),]
 
-top10 <- top_n(TotalCentMeanRanked,10,Degree)
-bottom10 <- top_n(TotalCentMeanRanked,-10,Degree)
+top11 <- top_n(TotalCentMeanRanked,11,Degree)
+bottom11 <- top_n(TotalCentMeanRanked,-11,Degree)
 
 top10RT <- top_n(DegVelMeanDayRT[DegVelMeanDayRT$Day==1,],10,Degree)
 
-#DispersionVsDegree
+Ovaries = read.csv('OvaryMeasurements.csv')
+Ovaries$AverageLength = (Ovaries$LongestOocyteLength1..mm. + Ovaries$LongestOocyteLength2..mm.) / 2
+Ovaries$AverageWidth = (Ovaries$LongestOocyteWidth1..mm. + Ovaries$LongestOocyteWidth2..mm.) / 2
+
+ggplot(Ovaries, aes(x=AverageLength)) + 
+  geom_histogram(aes(color = factor(Treatment)))+
+  theme_classic() + 
+  labs(title="Average Length of Longest Oocyte")+
+  scale_color_manual(name   ="Bee",
+                     labels = c("QL", "QR"),
+                     values = c("#161414", "#629CC0"))+
+  facet_wrap(~ Treatment, nrow = 2)
+
+
+ggplot(Ovaries, aes(x=AverageWidth)) + 
+  geom_histogram(aes(color = factor(Treatment)))+
+  theme_classic() + 
+  labs(title="Average Width of Longest Oocyte")+
+  scale_color_manual(name   ="Bee",
+                     labels = c("QL", "QR"),
+                     values = c("#161414", "#629CC0"))+
+  facet_wrap(~ Treatment, nrow = 2)
+
+ggplot(Ovaries, aes(x=AverageWidth)) + 
+  geom_boxplot(aes(color = factor(Treatment)))+
+  theme_classic(base_size=16) + 
+  labs(title="Average Width of Longest Oocyte")+
+  scale_color_manual(name   ="Bee",
+                     labels = c("QL", "QR"),
+                     values = c("#161414", "#629CC0"))+
+  facet_wrap(~ Treatment, nrow = 2)
+
+
+ggplot(Ovaries, aes(x=AverageLength, y=AverageWidth)) + 
+  geom_point() + 
+  geom_smooth(method   = lm,
+              se       = T, 
+              size     = 1.5, 
+              linetype = 1, 
+              alpha    = .7,
+              aes(color    = factor(Treatment)))+
+  theme_classic() + 
+  labs(title="Avg Length vs Avg Width")+
+  scale_color_manual(name   ="Bee",
+                     labels = c("QL", "QR"),
+                     values = c("#161414", "#629CC0"))+
+  facet_wrap(~ Treatment, nrow = 2)
+
+Ovaries$ID = paste("RooibosTea_",Ovaries$Treatment,"_1216_1646_ArUcoTag#",Ovaries$Tag,sep="")
+DegVelMeanRT = DegVelMean[DegVelMean$Col == 'RooibosTea_QR_1216_1646' | DegVelMean$Col == 'RooibosTea_QL_1216_1646',]
+DegOvMeanRT = merge(DegVelMeanRT, Ovaries, by='ID')
+DegOvMeanRT$Queen = DegOvMeanRT$ID %in% c("RooibosTea_QR_1216_1646_ArUcoTag#52", "MexHotChoc_QR_1216_1646_ArUcoTag#13", "20230213_1745_AlmdudlerGspritzt_C1_ArUcoTag#24", "20221209_1613_QR_ArUcoTag#47", "20221123_1543_AmericanoLatte_QR_ArUcoTag#43")
+
+
+ggplot(DegOvMeanRT, aes(x=AverageWidth, y=Degree)) + 
+  geom_point() + 
+  geom_smooth(method   = lm,
+              se       = T, 
+              size     = 1.5, 
+              linetype = 1, 
+              alpha    = .7,
+              aes(color    = factor(Treatment)))+
+  theme_classic(base_size = 16) + 
+  labs(title="RooTea: Degree vs Avg Width")+
+  scale_color_manual(name   ="Bee",
+                     labels = c("QL", "QR"),
+                     values = c("#161414", "#629CC0"))+
+  facet_wrap(~ Treatment, nrow = 2)
+
+ddply(DegOvMeanRT, .(Col), summarise,
+      corr=(cor.test(AverageWidth, Degree,
+                     alternative="two.sided", method="spearman")), name=names(corr) )
+
+ggplot(DegOvMeanRT, aes(x=AverageWidth, y=move_perc)) + 
+  geom_point() + 
+  geom_smooth(method   = lm,
+              se       = T, 
+              size     = 1.5, 
+              linetype = 1, 
+              alpha    = .7,
+              aes(color    = factor(Treatment)))+
+  theme_classic() + 
+  labs(title="Velocity vs Avg Width")+
+  scale_color_manual(name   ="Bee",
+                     labels = c("QL", "QR"),
+                     values = c("#161414", "#629CC0"))+
+  facet_wrap(~ Treatment, nrow = 2)
+
+ddply(DegOvMeanRT, .(Col), summarise,
+      corr=(cor.test(AverageWidth, move_perc,
+                     alternative="two.sided", method="spearman")), name=names(corr) )
+
+ggplot(DegOvMeanRT, aes(x=AverageWidth, y=mean_vel)) + 
+  geom_point() + 
+  geom_smooth(method   = lm,
+              se       = T, 
+              size     = 1.5, 
+              linetype = 1, 
+              alpha    = .7,
+              aes(color    = factor(Treatment)))+
+  theme_classic() + 
+  labs(title="Velocity vs Avg Width")+
+  scale_color_manual(name   ="Bee",
+                     labels = c("QL", "QR"),
+                     values = c("#161414", "#629CC0"))+
+  facet_wrap(~ Treatment, nrow = 2)
+
+HBVelMeanRT = HBVelMean[HBVelMean$Col == 'RooibosTea_QR_1216_1646' | HBVelMean$Col == 'RooibosTea_QL_1216_1646',]
+HBOvMeanRT = merge(HBVelMeanRT, Ovaries, by='ID')
+HBOvMeanRT$Queen = HBOvMeanRT$ID %in% c("RooibosTea_QR_1216_1646_ArUcoTag#52", "MexHotChoc_QR_1216_1646_ArUcoTag#13", "20230213_1745_AlmdudlerGspritzt_C1_ArUcoTag#24", "20221209_1613_QR_ArUcoTag#47", "20221123_1543_AmericanoLatte_QR_ArUcoTag#43")
+
+ggplot(HBOvMeanRT, aes(x=AverageWidth, y=Sum)) + 
+  geom_point() + 
+  geom_smooth(method   = lm,
+              se       = T, 
+              size     = 1.5, 
+              linetype = 1, 
+              alpha    = .7,
+              aes(color    = factor(Treatment)))+
+  theme_classic() + 
+  labs(title="RooTea: Degree vs Avg Width, Head-Body")+
+  scale_color_manual(name   ="Bee",
+                     labels = c("QL", "QR"),
+                     values = c("#161414", "#629CC0"))+
+  facet_wrap(~ Treatment, nrow = 2)
+
+ggplot(HBOvMeanRT, aes(x=AverageWidth, y=InDegree)) + 
+  geom_point() + 
+  geom_smooth(method   = lm,
+              se       = T, 
+              size     = 1.5, 
+              linetype = 1, 
+              alpha    = .7,
+              aes(color    = factor(Treatment)))+
+  theme_classic() + 
+  labs(title="InDegree vs Avg Width, Head-Body")+
+  scale_color_manual(name   ="Bee",
+                     labels = c("QL", "QR"),
+                     values = c("#161414", "#629CC0"))+
+  facet_wrap(~ Treatment, nrow = 2)
+
+ggplot(HBOvMeanRT, aes(x=AverageWidth, y=OutDegree)) + 
+  geom_point() + 
+  geom_smooth(method   = lm,
+              se       = T, 
+              size     = 1.5, 
+              linetype = 1, 
+              alpha    = .7,
+              aes(color    = factor(Treatment)))+
+  theme_classic() + 
+  labs(title="OutDegree vs Avg Width, Head-Body")+
+  scale_color_manual(name   ="Bee",
+                     labels = c("QL", "QR"),
+                     values = c("#161414", "#629CC0"))+
+  facet_wrap(~ Treatment, nrow = 2)
+
+
+ddply(HBOvMeanRT, .(Col), summarise,
+      corr=(cor.test(AverageWidth, Sum,
+                     alternative="two.sided", method="spearman")), name=names(corr) )
+
+
+OvariesAM = Ovaries[Ovaries$Colony=="ArgentinanMate",]
+OvariesAM$ID = paste("20221209_1613_",OvariesAM$Treatment,"_ArUcoTag#",OvariesAM$Tag,sep="")
+
+DegVelMeanAM = DegVelMean[DegVelMean$Col == '20221209_1613_QR' | DegVelMean$Col == '20221209_1613_QL',]
+DegOvMeanAM = merge(DegVelMeanAM, OvariesAM, by='ID')
+DegOvMeanAM$Queen = DegOvMeanAM$ID %in% c("RooibosTea_QR_1216_1646_ArUcoTag#52", "MexHotChoc_QR_1216_1646_ArUcoTag#13", "20230213_1745_AlmdudlerGspritzt_C1_ArUcoTag#24", "20221209_1613_QR_ArUcoTag#47", "20221123_1543_AmericanoLatte_QR_ArUcoTag#43")
+
+ggplot(DegOvMeanAM, aes(x=AverageWidth, y=Degree)) + 
+  geom_point() + 
+  geom_smooth(method   = lm,
+              se       = T, 
+              size     = 1.5, 
+              linetype = 1, 
+              alpha    = .7,
+              aes(color    = factor(Treatment)))+
+  theme_classic() + 
+  labs(title="ArgMat: Degree vs Avg Width")+
+  scale_color_manual(name   ="Bee",
+                     labels = c("QL", "QR"),
+                     values = c("#161414", "#629CC0"))+
+  facet_wrap(~ Treatment, nrow = 2)
+
+ddply(DegOvMeanAM, .(Col), summarise,
+      corr=(cor.test(AverageWidth, Degree,
+                     alternative="two.sided", method="spearman")), name=names(corr) )
+
+
+OvariesAG = Ovaries[Ovaries$Colony=="AlmdudlerGspritzt",]
+OvariesAG$ID = paste("20230213_1745_AlmdudlerGspritzt_",OvariesAG$Treatment,"_ArUcoTag#",OvariesAG$Tag,sep="")
+
+DegVelMeanAG = DegVelMean[DegVelMean$Col == '20230213_1745_AlmdudlerGspritzt_C0' | DegVelMean$Col == '20230213_1745_AlmdudlerGspritzt_C1',]
+DegOvMeanAG = merge(DegVelMeanAG, OvariesAG, by='ID')
+DegOvMeanAG$Queen = DegOvMeanAG$ID %in% c("RooibosTea_QR_1216_1646_ArUcoTag#52", "MexHotChoc_QR_1216_1646_ArUcoTag#13", "20230213_1745_AlmdudlerGspritzt_C1_ArUcoTag#24", "20221209_1613_QR_ArUcoTag#47", "20221123_1543_AmericanoLatte_QR_ArUcoTag#43")
+DegOvMeanAGWorker  = DegOvMeanAG[DegOvMeanAG$Queen == FALSE,]
+ggplot(DegOvMeanAGWorker, aes(x=AverageWidth, y=Degree)) + 
+  geom_point() + 
+  geom_smooth(method   = lm,
+              se       = T, 
+              size     = 1.5, 
+              linetype = 1, 
+              alpha    = .7,
+              aes(color    = factor(Treatment)))+
+  theme_classic() + 
+  labs(title="AlmGsp: Degree vs Avg Width")+
+  scale_color_manual(name   ="Bee",
+                     labels = c("QL", "QR"),
+                     values = c("#161414", "#629CC0"))+
+  facet_wrap(~ Treatment, nrow = 2)
+
+ddply(DegOvMeanAGWorker, .(Col), summarise,
+      corr=(cor.test(AverageWidth, Degree,
+                     alternative="two.sided", method="spearman")), name=names(corr) )
+
+OvariesAL = Ovaries[Ovaries$Colony=="AmericanoLatte",]
+OvariesAL$ID = paste("20221123_1543_AmericanoLatte_",OvariesAL$Treatment,"_ArUcoTag#",OvariesAL$Tag,sep="")
+
+DegVelMeanAL = DegVelMean[DegVelMean$Col == '20221123_1543_AmericanoLatte_QL' | DegVelMean$Col == '20221123_1543_AmericanoLatte_QR',]
+DegOvMeanAL = merge(DegVelMeanAL, OvariesAL, by='ID')
+DegOvMeanAL$Queen = DegOvMeanAL$ID %in% c("RooibosTea_QR_1216_1646_ArUcoTag#52", "MexHotChoc_QR_1216_1646_ArUcoTag#13", "20230213_1745_AlmdudlerGspritzt_C1_ArUcoTag#24", "20221209_1613_QR_ArUcoTag#47", "20221123_1543_AmericanoLatte_QR_ArUcoTag#43")
+DegOvMeanALWorker  = DegOvMeanAL[DegOvMeanAL$Queen == FALSE,]
+ggplot(DegOvMeanALWorker, aes(x=AverageWidth, y=Degree)) + 
+  geom_point() + 
+  geom_smooth(method   = lm,
+              se       = T, 
+              size     = 1.5, 
+              linetype = 1, 
+              alpha    = .7,
+              aes(color    = factor(Treatment)))+
+  theme_classic() + 
+  labs(title="AmLat: Degree vs Avg Width")+
+  scale_color_manual(name   ="Bee",
+                     labels = c("QL", "QR"),
+                     values = c("#161414", "#629CC0"))+
+  facet_wrap(~ Treatment, nrow = 2)
+
+ddply(DegOvMeanALWorker, .(Col), summarise,
+      corr=(cor.test(AverageWidth, Degree,
+                     alternative="two.sided", method="spearman")), name=names(corr) )
+
+OvariesMHC = Ovaries[Ovaries$Colony=="MexicanHotChocolate",]
+OvariesMHC$ID = paste("MexHotChoc_",OvariesMHC$Treatment,"_1216_1646_ArUcoTag#",OvariesMHC$Tag,sep="")
+
+DegVelMeanMHC = DegVelMean[DegVelMean$Col == 'MexHotChoc_QL_1216_1646' | DegVelMean$Col == 'MexHotChoc_QR_1216_1646',]
+DegOvMeanMHC = merge(DegVelMeanMHC, OvariesMHC, by='ID')
+DegOvMeanMHC$Queen = DegOvMeanMHC$ID %in% c("RooibosTea_QR_1216_1646_ArUcoTag#52", "MexHotChoc_QR_1216_1646_ArUcoTag#13", "20230213_1745_AlmdudlerGspritzt_C1_ArUcoTag#24", "20221209_1613_QR_ArUcoTag#47", "20221123_1543_AmericanoLatte_QR_ArUcoTag#43")
+DegOvMeanMHCWorker  = DegOvMeanMHC[DegOvMeanMHC$Queen == FALSE,]
+ggplot(DegOvMeanMHCWorker, aes(x=AverageWidth, y=Degree)) + 
+  geom_point() + 
+  geom_smooth(method   = lm,
+              se       = T, 
+              size     = 1.5, 
+              linetype = 1, 
+              alpha    = .7,
+              aes(color    = factor(Treatment)))+
+  theme_classic() + 
+  labs(title="MHC: Degree vs Avg Width")+
+  scale_color_manual(name   ="Bee",
+                     labels = c("QL", "QR"),
+                     values = c("#161414", "#629CC0"))+
+  facet_wrap(~ Treatment, nrow = 2)
+
+ddply(DegOvMeanMHCWorker, .(Col), summarise,
+      corr=(cor.test(AverageWidth, Degree,
+                     alternative="two.sided", method="spearman")), name=names(corr) )
+# DispersionVsDegree -----
 TotalDisp=TotalDisp
 TotalDisp$Day <- as.factor(sub("Day", "", TotalDisp$Day))
 DegVelMeanDay$Day = as.factor(DegVelMeanDay$Day)
@@ -1235,44 +1491,42 @@ ggplot(DegVelDisp, aes(x=N90, y=mean_vel)) +
 
 # BodyBody ---------
 
-Start=0
+Start = 0
 for(i in 1:10){
   for(j in 1:35){
-    if(file.exists(paste(prefixes[i],Days[j],"DegHeadHead.csv",sep = "_"))) {
-      Deg = read.csv(paste(prefixes[i],Days[j],"DegHeadHead.csv",sep = "_"))
-      Deg$Node = sub('\\.0','',Deg$Node)
-      Deg$Day = floor((j-1)/9)+1
-      Deg$Hour = Days[j]
-      Deg$Col = prefixes[i]
-      Deg$QR = i %% 2 == 1
-      Deg$ID = paste(Deg$Col, Deg$Node, sep='_')
-      Deg$Mod = "Head_Head"
-      Deg$Trial = str_extract(Deg$Col, ".+?(?=_)")
-      Deg$Queen = Deg$ID %in% c("RooibosTea_QR_1216_1646_ArUcoTag#52", "MexHotChoc_QR_1216_1646_ArUcoTag#13", "20230213_1745_AlmdudlerGspritzt_C1_ArUcoTag#24", "20221209_1613_QR_ArUcoTag#47", "20221123_1543_AmericanoLatte_QR_ArUcoTag#43")
+    if(file.exists(paste(prefixes[i],Days[j],"HHSpeedDirCent.csv",sep = "_"))) {
+      DirCent = read.csv(paste(prefixes[i],Days[j],"HHSpeedDirCent.csv",sep = "_"))
+      DirCent = select(DirCent, -4:-5)
+      DirCent$Node = sub('\\.0','',DirCent$X)
+      DirCent$Day = floor((j-1)/9)+1
+      DirCent$Hour = Days[j]
+      DirCent$Col = prefixes[i]
+      DirCent$QR = i %% 2 == 1
+      DirCent$ID = paste(DirCent$Col, DirCent$Node, sep='_')
+      DirCent$Mod = "Head_Head"
+      DirCent$Queen = DirCent$ID %in% c("RooibosTea_QR_1216_1646_ArUcoTag#52", "MexHotChoc_QR_1216_1646_ArUcoTag#13", "20230213_1745_AlmdudlerGspritzt_C1_ArUcoTag#24", "20221209_1613_QR_ArUcoTag#47", "20221123_1543_AmericanoLatte_QR_ArUcoTag#43")
       if(Start == 1){
-        TotalDeg3Mod = rbind(TotalDeg3Mod, Deg)
+        TotalDeg3Mod = rbind(TotalDeg3Mod, DirCent)
       }
       if(Start == 0){
-        TotalDeg3Mod = Deg
+        TotalDeg3Mod = DirCent
         Start = 1
       }
     }
   }
 }
-
-Start = 0
 for(i in 1:10){
   for(j in 1:35){
     if(file.exists(paste(prefixes[i],Days[j],"HBSpeedDirCent.csv",sep = "_"))) {
       Deg = read.csv(paste(prefixes[i],Days[j],"HBSpeedDirCent.csv",sep = "_"))
+      Deg = select(Deg, -4:-5)
       Deg$Node = sub('\\.0','',Deg$X)
       Deg$Day = floor((j-1)/9)+1
       Deg$Hour = Days[j]
       Deg$Col = prefixes[i]
       Deg$QR = i %% 2 == 1
       Deg$ID = paste(Deg$Col, Deg$Node, sep='_')
-      Deg$Mod = "Head_Head"
-    
+      Deg$Mod = "Head_Body"
       Deg$Queen = Deg$ID %in% c("RooibosTea_QR_1216_1646_ArUcoTag#52", "MexHotChoc_QR_1216_1646_ArUcoTag#13", "20230213_1745_AlmdudlerGspritzt_C1_ArUcoTag#24", "20221209_1613_QR_ArUcoTag#47", "20221123_1543_AmericanoLatte_QR_ArUcoTag#43")
       if(Start == 1){
         TotalDeg3Mod = rbind(TotalDeg3Mod, Deg)
@@ -1290,6 +1544,9 @@ for(i in 1:10){
   for(j in 1:35){
     if(file.exists(paste(prefixes[i],Days[j],"DegBodyBody.csv",sep = "_"))) {
       Deg = read.csv(paste(prefixes[i],Days[j],"DegBodyBody.csv",sep = "_"))
+      Deg$InDegree = Deg$Degree/2
+      Deg$OutDegree = Deg$Degree/2
+      Deg = select(Deg, -3)
       Deg$Node = sub('\\.0','',Deg$Node)
       Deg$Day = floor((j-1)/9)+1
       Deg$Hour = Days[j]
@@ -1329,96 +1586,48 @@ ggplot(TotalDeg3Mod, aes(fill=Mod, y=Degree, x=interaction(Queen,QR))) +
 
 
 # HeadBodyDirectionality-----
-
-
-Start = 0
-for(i in 1:10){
-  for(j in 1:35){
-    if(file.exists(paste(prefixes[i],Days[j],"HBSpeedDirCent.csv",sep = "_"))) {
-      SpeedDirCent = read.csv(paste(prefixes[i],Days[j],"HBSpeedDirCent.csv",sep = "_"))
-      SpeedDirCent$Node = sub('\\.0','',SpeedDirCent$X)
-      SpeedDirCent$Day = floor((j-1)/9)+1
-      SpeedDirCent$Hour = Days[j]
-      SpeedDirCent$Col = prefixes[i]
-      SpeedDirCent$QR = i %% 2 == 1
-      SpeedDirCent$ID = paste(SpeedDirCent$Col, SpeedDirCent$Node, sep='_')
-      SpeedDirCent$Queen = SpeedDirCent$ID %in% c("RooibosTea_QR_1216_1646_ArUcoTag#52", "MexHotChoc_QR_1216_1646_ArUcoTag#13", "20230213_1745_AlmdudlerGspritzt_C1_ArUcoTag#24", "20221209_1613_QR_ArUcoTag#47", "20221123_1543_AmericanoLatte_QR_ArUcoTag#43")
-      if(Start == 1){
-        TotalSpeedDirCent = rbind(TotalSpeedDirCent, SpeedDirCent)
-      }
-      if(Start == 0){
-        TotalSpeedDirCent = SpeedDirCent
-        Start = 1
-      }
-    }
-  }
-}
-
-TotalSpeedDirCent = TotalSpeedDirCent[TotalSpeedDirCent$OutDegree > 50,]
-TotalSpeedDirCent$Valency = TotalSpeedDirCent$OutDegree / (TotalSpeedDirCent$InDegree + TotalSpeedDirCent$OutDegree)
+setwd("~/Downloads/IBRGData_110123")
 
 
 Start = 0
 for(i in 1:10){
   for(j in 1:35){
     if(file.exists(paste(prefixes[i],Days[j],"HBBodyDirCent.csv",sep = "_"))) {
-      BodyDirCent = read.csv(paste(prefixes[i],Days[j],"HBBodyDirCent.csv",sep = "_"))
-      BodyDirCent$Node = sub('\\.0','',BodyDirCent$X)
-      BodyDirCent$Day = floor((j-1)/9)+1
-      BodyDirCent$Hour = Days[j]
-      BodyDirCent$Col = prefixes[i]
-      BodyDirCent$QR = i %% 2 == 1
-      BodyDirCent$ID = paste(BodyDirCent$Col, BodyDirCent$Node, sep='_')
-      BodyDirCent$Queen = BodyDirCent$ID %in% c("RooibosTea_QR_1216_1646_ArUcoTag#52", "MexHotChoc_QR_1216_1646_ArUcoTag#13", "20230213_1745_AlmdudlerGspritzt_C1_ArUcoTag#24", "20221209_1613_QR_ArUcoTag#47", "20221123_1543_AmericanoLatte_QR_ArUcoTag#43")
+      HeadButt = read.csv(paste(prefixes[i],Days[j],"HBBodyDirCent.csv",sep = "_"))
+      HeadButt$Node = sub('\\.0','',HeadButt$X)
+      HeadButt$Day = floor((j-1)/9)+1
+      HeadButt$Hour = Days[j]
+      HeadButt$Col = prefixes[i]
+      HeadButt$QR = i %% 2 == 1
+      HeadButt$ID = paste(HeadButt$Col, HeadButt$Node, sep='_')
+      HeadButt$Queen = HeadButt$ID %in% c("RooibosTea_QR_1216_1646_ArUcoTag#52", "MexHotChoc_QR_1216_1646_ArUcoTag#13", "20230213_1745_AlmdudlerGspritzt_C1_ArUcoTag#24", "20221209_1613_QR_ArUcoTag#47", "20221123_1543_AmericanoLatte_QR_ArUcoTag#43")
       if(Start == 1){
-        TotalBodyDirCent = rbind(TotalBodyDirCent, BodyDirCent)
+        TotalHeadButt = rbind(TotalHeadButt, HeadButt)
       }
       if(Start == 0){
-        TotalBodyDirCent = BodyDirCent
+        TotalHeadButt = HeadButt
         Start = 1
       }
     }
   }
 }
 
-TotalBodyDirCent = TotalBodyDirCent[TotalBodyDirCent$OutDegree > 50,]
-TotalBodyDirCent$Valency = TotalBodyDirCent$OutDegree / (TotalBodyDirCent$InDegree + TotalBodyDirCent$OutDegree)
+TotalHeadButt = TotalHeadButt[TotalHeadButt$OutDegree > 50,]
+TotalHeadButt$Valency = TotalHeadButt$OutDegree / (TotalHeadButt$InDegree + TotalHeadButt$OutDegree)
 
 
-TotalSpeedDirCentMean <- aggregate(cbind(InDegree,OutDegree,Closeness,Betweenness, Valency,QR, Queen) ~ ID+Col, TotalSpeedDirCent, mean)
-TotalSpeedDirCentMean$MethodSpeed = TotalSpeedDirCentMean$Valency
-TotalBodyDirCentMean <- aggregate(cbind(InDegree,OutDegree,Closeness,Betweenness, Valency,QR, Queen) ~ ID+Col, TotalBodyDirCent, mean)
-TotalBodyDirCentMean$MethodBody = TotalBodyDirCentMean$Valency
-MethodMean <- TotalBodyDirCentMean %>% right_join(TotalSpeedDirCentMean, by=c("ID", "QR", "Queen"))
-MethodMean = MethodMean[!grepl("#82", MethodMean$ID),]
-MethodMean = MethodMean[!grepl("#88", MethodMean$ID),]
-MethodMean = MethodMean[!grepl("#84", MethodMean$ID),]
-MethodMean$Col <- sub("_[^_]+$", "", MethodMean$ID)
-
-ggplot(MethodMean, aes(x=MethodSpeed, y=MethodBody)) + 
-  geom_point(aes(shape    = factor(Queen))) + 
-  geom_smooth(method   = lm,
-              se       = T, 
-              size     = 1.5, 
-              linetype = 1, 
-              alpha    = .7,
-              aes(color    = factor(QR)))+
-  theme_classic() + 
-  labs(title="Degree vs Movement Speed")+
-  scale_color_manual(name   ="Bee",
-                     labels = c("QL", "QR"),
-                     values = c("#161414", "#629CC0"))+
-  facet_wrap(~ QR+ Col, nrow = 2)
-ddply(MethodMean, .(Col), summarise,
-      corr=(cor.test(MethodSpeed, MethodBody,
-                     alternative="two.sided", method="kendall")), name=names(corr) )
+TotalHeadButtMean <- aggregate(cbind(InDegree,OutDegree,Closeness,Betweenness, Valency,QR, Queen) ~ ID+Col, TotalHeadButt, mean)
+TotalHeadButtMean = TotalHeadButtMean[!grepl("#82", TotalHeadButtMean$ID),]
+TotalHeadButtMean = TotalHeadButtMean[!grepl("#88", TotalHeadButtMean$ID),]
+TotalHeadButtMean = TotalHeadButtMean[!grepl("#84", TotalHeadButtMean$ID),]
+TotalHeadButtMean$Col <- sub("_[^_]+$", "", TotalHeadButtMean$ID)
 
 VelMean <- aggregate(cbind(move_perc,mean_vel) ~ ID, TotalVel, mean)
 
-InitVelMean <- MethodMean %>% right_join(VelMean, by=c("ID"))
-InitVelMean <- InitVelMean %>% drop_na()
+HBVelMean <- TotalHeadButtMean %>% right_join(VelMean, by=c("ID"))
+HBVelMean <- HBVelMean %>% drop_na()
 
-ggplot(InitVelMean, aes(x=MethodSpeed, y=move_perc)) + 
+ggplot(HBVelMean, aes(x=Valency, y=move_perc)) + 
   geom_point(aes(shape    = factor(Queen))) + 
   geom_smooth(method   = lm,
               se       = T, 
@@ -1434,7 +1643,7 @@ ggplot(InitVelMean, aes(x=MethodSpeed, y=move_perc)) +
   facet_wrap(~ QR+ Col, nrow = 2)
 
 
-ggplot(InitVelMean, aes(x=MethodSpeed, y=mean_vel)) + 
+ggplot(HBVelMean, aes(x=Valency, y=mean_vel)) + 
   geom_point(aes(shape    = factor(Queen))) + 
   geom_smooth(method   = lm,
               se       = T, 
@@ -1448,13 +1657,13 @@ ggplot(InitVelMean, aes(x=MethodSpeed, y=mean_vel)) +
                      labels = c("QL", "QR"),
                      values = c("#161414", "#629CC0"))+
   facet_wrap(~ QR+ Col, nrow = 2)
-ddply(InitVelMean, .(Col), summarise,
-      corr=(cor.test(MethodSpeed, mean_vel,
+ddply(HBVelMean, .(Col), summarise,
+      corr=(cor.test(Valency, mean_vel,
                      alternative="two.sided", method="kendall")), name=names(corr) )
 
-InitVelMean$Sum = InitVelMean$InDegree.x + InitVelMean$InDegree.y
+HBVelMean$Sum = HBVelMean$InDegree + HBVelMean$OutDegree
 
-ggplot(InitVelMean, aes(x=MethodSpeed, y=Sum)) + 
+ggplot(HBVelMean, aes(x=Valency, y=Sum)) + 
   geom_point(aes(shape    = factor(Queen))) + 
   geom_smooth(method   = lm,
               se       = T, 
@@ -1463,16 +1672,62 @@ ggplot(InitVelMean, aes(x=MethodSpeed, y=Sum)) +
               alpha    = .7,
               aes(color    = factor(QR)))+
   theme_classic() + 
-  labs(title="Initiation vs Movement Speed")+
+  labs(title="Initiation vs Degree")+
   scale_color_manual(name   ="Bee",
                      labels = c("QL", "QR"),
                      values = c("#161414", "#629CC0"))+
   facet_wrap(~ QR+ Col, nrow = 2)
 
-ddply(InitVelMean, .(Col), summarise,
+HBVelWorkers = HBVelMean[HBVelMean$Queen == 0,]
+ggplot(HBVelWorkers, aes(x=Valency, y=Sum)) + 
+  geom_point(aes(shape    = factor(Queen))) + 
+  geom_smooth(method   = lm,
+              se       = T, 
+              size     = 1.5, 
+              linetype = 1, 
+              alpha    = .7,
+              aes(color    = factor(QR)))+
+  theme_classic() + 
+  labs(title="Initiation vs Degree")+
+  scale_color_manual(name   ="Bee",
+                     labels = c("QL", "QR"),
+                     values = c("#161414", "#629CC0"))+
+  facet_wrap(~ QR+ Col, nrow = 2)
+
+
+ddply(HBVelMean, .(Col), summarise,
       corr=(cor.test(MethodSpeed, Sum,
                      alternative="two.sided", method="kendall")), name=names(corr) )
 
-library("car") 
+HBMeanDay <- aggregate(cbind(InDegree,OutDegree,Closeness,Betweenness, Valency,QR, Queen) ~ ID+Col+Day, TotalHeadButt, mean)
+HBMeanDay$Sum = HBMeanDay$InDegree + HBMeanDay$OutDegree
+
+HBMeanDayAL <- HBMeanDay[HBMeanDay$Col=="20221123_1543_AmericanoLatte_QL",]
+
+ggplot(HBMeanDayAL, aes(x=Sum, y=Valency)) + 
+  geom_point() + 
+  geom_smooth(method   = lm,
+              se       = T, 
+              size     = 1.5, 
+              linetype = 1, 
+              alpha    = .7,
+              color    = "black")+
+  theme_classic() + 
+  labs(title="Degree vs Movement Speed by Day (Americano)")+
+  facet_wrap(~ Day, nrow = 1)
+
+HBMeanDayRT <- HBMeanDay[HBMeanDay$Col=="RooibosTea_QL_1216_1646",]
+
+ggplot(HBMeanDayRT, aes(x=Sum, y=Valency)) + 
+  geom_point() + 
+  geom_smooth(method   = lm,
+              se       = T, 
+              size     = 1.5, 
+              linetype = 1, 
+              alpha    = .7,
+              color    = "black")+
+  theme_classic() + 
+  labs(title="Degree vs Movement Speed by Day (Rooibos)")+
+  facet_wrap(~ Day, nrow = 1)
 
 

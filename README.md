@@ -12,5 +12,3 @@
 ## Figure 4: Ovaries
 **Big Takeaway:** Queen doesn’t suppress ovary variation (not enough time) but does suppress behavioral variation associated with ovary size
 
-
-#
