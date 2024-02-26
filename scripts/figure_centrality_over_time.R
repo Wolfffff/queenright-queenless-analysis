@@ -160,3 +160,30 @@ ggplot(TotalCentMean, aes(x = Degree, y = Closeness)) +
 fm <- lmer(formula = values ~ 1 + QR + Day + Day:QR + (1 | Col), data = TotalAss) # to run the model
 fm.null <- lmer(formula = values ~ 1 + Day + (1 | Col), data = TotalAss) # to run the model
 anova(fm, fm.null)
+
+
+# Assuming 'degree' is the column you want to plot
+list_of_cols <- unique(TotalCentMeanRanked$Col)
+
+for (col in list_of_cols) {
+
+  subset_data <- subset(TotalCentMeanRanked, Col == col)
+  
+  # Sum 'Degree' by 'ID'
+  sum_data <- subset_data %>%
+    group_by(ID) %>%
+    summarise(Degree = sum(Degree, na.rm = TRUE),
+              Queen = first(Queen))
+  
+  p <- ggplot(sum_data, aes(x = Degree, y = ID,color = as.factor(Queen))) +
+    geom_point() +
+    labs(title = paste("Cleveland Dot Plot for", col),
+         x = "Degree",
+         y = "ID") +
+    theme_minimal() +
+    xlim(0, max(sum_data$Degree))
+
+  ggsave(paste0("../figures/cleveland_dot_plot_", col, ".jpg"), plot = p, width = 8.5, height = 5, dpi = 600)
+  
+  print(p)
+}

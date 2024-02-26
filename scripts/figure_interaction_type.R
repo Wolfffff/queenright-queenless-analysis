@@ -134,3 +134,12 @@ fm.null <- lmer(formula = Degree ~ 1 + Hour + (1 | Col), data = TotalDeg)
 
 anova(fm, fm.null)
 summary(fm)
+
+
+
+
+# Filter out with grepl, not containing #82, #84, and #88
+
+test <- TotalDeg %>% filter(!grepl("82", ID), !grepl("84", ID), !grepl("88", ID))
+# Get num of unique tags per group
+test %>% group_by(Col, QR) %>% summarise(n = n_distinct(ID)) %>% ungroup() %>% spread(QR, n)

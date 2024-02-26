@@ -1,5 +1,5 @@
 # Load Degree Data — Head And Body ----------------------------------------
-list_of_packages <- c("lme4", "ggplot2", "sp", "tidyverse", "car", "raster", "ggthemes", "ggExtra", "pak")
+list_of_packages <- c("lme4", "ggplot2", "sp", "tidyverse", "car", "raster", "ggthemes", "ggExtra", "pak", "ggside")
 pak::pkg_install(list_of_packages)
 for (p in list_of_packages) {
   library(p, character.only = TRUE)
@@ -40,7 +40,7 @@ for (i in 1:10) {
   }
 }
 
-TotalCent <- TotalCent[TotalCent$Degree > 100, ]
+# TotalCent <- TotalCent[TotalCent$Degree > 100, ]
 TotalCentMean <- aggregate(cbind(Degree, Closeness, Betweenness, QR, Queen) ~ ID, TotalCent, mean)
 
 TotalCentMean$Col <- sub("_[^_]+$", "", TotalCentMean$ID)
@@ -50,10 +50,8 @@ TotalCentMeanRanked <- TotalCentMean %>%
   group_by(Col) %>%
   mutate(Rank = order(order(Degree, decreasing = TRUE)))
 
-
-TotalCentMeanRanked <- TotalCentMeanRanked[TotalCentMeanRanked$Degree > 200, ]
-TotalCentMeanRanked <- TotalCentMeanRanked[!grepl("#82", TotalCentMeanRanked$ID), ]
-TotalCentMeanRanked <- TotalCentMeanRanked[!grepl("#88", TotalCentMeanRanked$ID), ]
+TotalCentMeanRanked <- TotalCentMeanRanked[order(TotalCentMeanRanked$Degree), ]
+dim(TotalCentMeanRanked)
 
 
 Ovaries <- read.csv("OvaryMeasurements.csv")
@@ -73,6 +71,20 @@ OvariesAG$ID = paste("20230213_1745_AlmdudlerGspritzt_",OvariesAG$Treatment,"_Ar
 OvariesAL = Ovaries[Ovaries$Colony=="AmericanoLatte",]
 OvariesAL$ID = paste("20221123_1543_AmericanoLatte_",OvariesAL$Treatment,"_ArUcoTag#",OvariesAL$Tag,sep="")
 
+
+TotalCentMeanRanked <- TotalCentMeanRanked[TotalCentMeanRanked$Degree > 200, ]
+TotalCentMeanRanked <- TotalCentMeanRanked[!grepl("#82", TotalCentMeanRanked$ID), ]
+TotalCentMeanRanked <- TotalCentMeanRanked[!grepl("#88", TotalCentMeanRanked$ID), ]
+TotalCentMeanRanked <- TotalCentMeanRanked[!grepl("#84", TotalCentMeanRanked$ID), ]
+
+# Print shape
+dim(TotalCentMeanRanked)
+
+# ALQR#45, MHCQR#16
+
+TotalCentMeanRanked <- TotalCentMeanRanked[!grepl("20221123_1543_AmericanoLatte_QR_ArUcoTag#45", TotalCentMeanRanked$ID), ]
+TotalCentMeanRanked <- TotalCentMeanRanked[!grepl("MexHotChoc_QR_1216_1646_ArUcoTag#16", TotalCentMeanRanked$ID), ]
+dim(TotalCentMeanRanked)
 
 # Merge the data
 Ovaries <- rbind(OvariesRT, OvariesMHC, OvariesAM, OvariesAG, OvariesAL)
