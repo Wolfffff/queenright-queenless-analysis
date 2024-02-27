@@ -42,7 +42,6 @@ for (i in 1:10) {
 
 # TotalCent <- TotalCent[TotalCent$Degree > 100, ]
 TotalCentMean <- aggregate(cbind(Degree, Closeness, Betweenness, QR, Queen) ~ ID, TotalCent, mean)
-
 TotalCentMean$Col <- sub("_[^_]+$", "", TotalCentMean$ID)
 
 
@@ -95,7 +94,7 @@ Ovaries$AverageWidth <- (Ovaries$LongestOocyteWidth1..mm. + Ovaries$LongestOocyt
 
 TotalCentSum <- TotalCent %>%
   group_by(ID) %>%
-  summarise(Degree = sum(Degree), QR = first(QR))
+  summarise(Degree = sum(Degree), QR = first(QR),Col = first(Col), Queen = first(Queen))
 
 TotalCentSum <- merge(TotalCentSum, Ovaries, by = "ID")
 
@@ -149,6 +148,15 @@ ggplot(TotalCentSum, aes(x = AverageWidth, y = Degree, colour = factor(Treatment
 ggsave("../figures/fig4_ovary_plot.jpg", width = 4.25, height = 4.25, dpi = 600)
 
 
+# Assuming 'Col' is the column you want to extract prefixes from
+prefixes <- c("RooibosTea", "MexHotChoc", "20221209_1613", "20230213_1745_AlmdudlerGspritzt_")
+
+# 
+TotalCentSum <- TotalCentSum %>%
+  mutate(source_colony = ifelse(str_detect(Col, paste(prefixes, collapse = "|")), 
+                                Col, 
+                                NA))
+
 # Spearman correlation between degree and average width
 cor.test(TotalCentSum$Degree, TotalCentSum$AverageWidth, method = "spearman")
 
@@ -157,5 +165,10 @@ library(lme4)
 library(lmerTest)
 
 # Get pvals
-mod <- lmer(Degree ~ 1 + AverageWidth + (1 | Treatment) + (1 | Colony), data = TotalCentSum)
+
+TotalCentSum$parent_colony <- TotalCentSum$source_colony
+TotalCentSum$group_id <- TotalCentSum$Colony
+
+mod <- lmer(Degree ~ 1 + AverageWidth + Treatment + (1 | group_id) + (1 | parent_colony), data = TotalCentSum)
 summary(mod)
+
