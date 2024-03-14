@@ -242,6 +242,7 @@ for group in GROUPS:
 #     # Convert zeros to NaNs for masking
 #     masked_matrix = np.ma.masked_where(adj_matrix == 0, adj_matrix)
 
+
 #     # Plotting with fixed color scale
 #     if ax.images:
 #         # remove the old colorbar
@@ -306,7 +307,7 @@ for group in GROUPS:
 
     clustering = gt.local_clustering(g)
     print(f"Clustering coef for {group}: {clustering}")
-    # This function returns a state object that contains the detected community structure
+    # This function returns a state object that contains the detected structure
 
     # Compute the distances and linkage
     distances = pdist(adj, metric="euclidean")
@@ -339,6 +340,9 @@ for group in GROUPS:
     # Modify x and y ticks
     xlabels = [label.split("#")[1] for label in reordered_adj.columns]
     ylabels = [label.split("#")[1] for label in reordered_adj.index]
+    
+    # Save matrix to csv with x and y labs
+    reordered_adj.to_csv(f"../results/clustered_adjacency_matrix_{group}.csv")
 
     ax.set_xticks(range(len(xlabels)))
     ax.set_xticklabels(xlabels, rotation=90)

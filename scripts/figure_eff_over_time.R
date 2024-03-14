@@ -7,6 +7,7 @@ for (p in list_of_packages) {
 
 
 prefixes <- c("RooibosTea_QR_1216_1646", "RooibosTea_QL_1216_1646", "MexHotChoc_QR_1216_1646", "MexHotChoc_QL_1216_1646", "20230213_1745_AlmdudlerGspritzt_C1", "20230213_1745_AlmdudlerGspritzt_C0", "20221209_1613_QR", "20221209_1613_QL", "20221123_1543_AmericanoLatte_QR", "20221123_1543_AmericanoLatte_QL")
+
 Day <- 1
 Day1 <- c("001", "002", "003", "004", "005", "006", "007", "008", "009", "010", "011", "012", "013", "014", "015", "016", "017", "018", "019", "020", "021", "022", "023", "024")
 Day2 <- c("025", "026", "027", "028", "029", "030", "031", "032", "033", "034", "035", "036", "037", "038", "039", "040", "041", "042", "043", "044", "045", "046", "047", "048")
@@ -15,31 +16,32 @@ Day4 <- c("073", "074", "075", "076", "077", "078", "079", "080", "081", "082", 
 Days <- c(Day1, Day2, Day3, Day4)
 Start <- 0
 
-for (i in 1:10) {
-  for (j in 1:96) {
-    if (file.exists(paste(prefixes[i], Days[j], "Assort.csv", sep = "_"))) {
-      Assort <- read.csv(paste(prefixes[i], Days[j], "Assort.csv", sep = "_"))
-      Assort$Day <- floor((j - 1) / 9) + 1
-      Assort$Hour <- Days[j]
-      Assort$Col <- prefixes[i]
-      Assort$QR <- i %% 2 == 1
-      Assort$Mod <- "Head_Head"
-      if (Start == 1) {
-        TotalAss <- rbind(TotalAss, Assort)
+Start = 0
+for(i in 1:10){
+  for(j in 1:96){
+    if(file.exists(paste(prefixes[i],Days[j],"NWP.csv",sep = "_"))) {
+      NWP = read.csv(paste(prefixes[i],Days[j],"NWP.csv",sep = "_"))
+      NWP$Day = floor((j-1)/9)+1
+      NWP$Hour = Days[j]
+      NWP$Col = prefixes[i]
+      NWP$QR = i %% 2 == 1
+      NWP$Mod = "Head_Head"
+      if(Start == 1){
+        TotalNWP = rbind(TotalNWP, NWP)
       }
-      if (Start == 0) {
-        TotalAss <- Assort
-        Start <- 1
+      if(Start == 0){
+        TotalNWP = NWP
+        Start = 1
       }
     }
   }
 }
 
-TotalAss$QR <- factor(TotalAss$QR, levels = rev(levels(factor(TotalAss$QR))))
-
+Eff = TotalNWP[TotalNWP$params ==  "GlobalEfficiency",]
+EffMean <- aggregate(values ~ Hour + QR, Eff, mean)
 
 # Assortativity Plotting ------------------------------------------------
-ggplot(data = TotalAss, aes(x = as.integer(Hour), y = values, group = interaction(Col, Mod))) +
+ggplot(data = EffMean, aes(x = as.integer(Hour), y = values, group = interaction(Col, Mod))) +
   geom_jitter(aes(color = QR), size = 1, alpha = 0.8, width = 0.2) +
   geom_smooth(aes(group = QR, color = QR),
     method = lm,
@@ -66,14 +68,46 @@ ggplot(data = TotalAss, aes(x = as.integer(Hour), y = values, group = interactio
     axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
     strip.text = element_text(size = 14, face = "bold") # Make facet plot titles larger and bold
   ) +
-  labs(title = "Assortativity Over Time", color = "") +
+  labs(title = "Efficiency Over Time", color = "") +
   xlab("Time (Hour)") +
-  ylab("Assortativity")
+  ylab("Efficiency")
 
-ggsave("../figures/fig3_assortativity_over_time.jpg", width = 8.5, height = 3, dpi = 600)
+ggsave("../figures/si_efficiency_over_time.jpg", width = 8.5, height = 3, dpi = 600)
 
 
 
 fm <- lmer(formula = values ~ 1 + QR + Day + Day:QR + (1 | Col), data = TotalAss) # to run the model
 fm.null <- lmer(formula = values ~ 1 + Day + (1 | Col), data = TotalAss) # to run the model
 anova(fm, fm.null)
+
+
+
+
+
+
+
+Eff = TotalNWP[TotalNWP$params ==  “GlobalEfficiency”,]
+EffMean <- aggregate(values ~ Hour + QR, Eff, mean)
+fm <- lmer(formula = values ~ 1 + QR + Day + QR:Day + (1|Col), data = Eff) #to run the model
+#plot(as.numeric(dfQL$values) - as.numeric(dfQR$values), main=“MHC”, xlab=“Hour”, ylab=“Difference in Average Clustering Coefficient”)
+#t.test(as.numeric(dfQL$values), as.numeric(dfQR$values), paired = TRUE, alternative = “two.sided”)
+ggplot(data = EffMean,
+       aes(x   = Hour,
+           y   = values,
+           group = as.factor(QR)))+
+  geom_line(aes(color=QR),
+            size     = 1,
+            alpha    = .7)+
+  geom_smooth(aes(color=QR),method   = lm,
+              se       = T,
+              size     = 1.5,
+              linetype = 1,
+              alpha    = .7)+
+  theme_classic()+
+  ylab(“Mean Weighted Efficiency”)+
+  scale_color_manual(name   =” Treatment”,
+                     labels = c(“QL”, “QR”),
+                     values = c(“#161414”, “#629CC0"))
+Deg = TotalNWP[TotalNWP$params ==  “Sum”,]
+DegMean <- aggregate(values ~ Hour + QR + Col, Deg, mean)
+fm <- lmer(formula = values ~ 1 + QR + Day + QR:Day + (1|Col), data = Eff)
