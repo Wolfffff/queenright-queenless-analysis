@@ -1,3 +1,5 @@
+library(readr)
+
 #' Process Tags and Identify the "Queen" Per Group from a CSV File
 #'
 #' This function reads a CSV file where each row represents a tag with its membership
@@ -23,10 +25,10 @@
 #' # processed_data <- process_tags_to_list_and_queen_per_group(file_location)
 #' # group_tags <- processed_data$tags
 #' # group_queens <- processed_data$queens
+#' @import readr
 #' 
 #' @export
 process_tags_to_list_and_queen_per_group <- function(file_location) {
-    library(readr)
     df <- read_csv(file_location, col_types = cols(Tags = "i", .default = "c"))
     df[is.na(df)] <- "0"
     group_lists <- list()
