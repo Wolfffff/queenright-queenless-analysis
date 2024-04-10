@@ -1,0 +1,14 @@
+[tool.poetry]
+name = "queenright-queenless"
+version = "0.1"
+description = "Queenright Queenless Analysis"
+repository = "https://github.com/Wolfffff/queenright-queenless-analysis/"
+authors = ["Scott Wolf"]
+readme = "README.md"
+packages = []
+
+[tool.poetry.dependencies]
+python = "^3.10"
+psycopg = "^3.1.18"
+pandas = "^2.2.1"
+tqdm = "^4.66.2"
