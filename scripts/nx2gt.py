@@ -62,7 +62,6 @@ def nx2gt(nxG):
     # Add the node properties first
     nprops = set()  # cache keys to only add properties once
     for node, data in nxG.nodes(data=True):
-
         # Go through all the properties if not seen and add them.
         for key, val in data.items():
             if key in nprops:
@@ -85,7 +84,6 @@ def nx2gt(nxG):
     # Add the edge properties second
     eprops = set()  # cache keys to only add properties once
     for src, dst, data in nxG.edges(data=True):
-
         # Go through all the edge properties if not seen and add them.
         for key, val in data.items():
             if key in eprops:
@@ -104,7 +102,6 @@ def nx2gt(nxG):
     # Add the nodes
     vertices = {}  # vertex mapping for tracking edges later
     for node, data in nxG.nodes(data=True):
-
         # Create the vertex and annotate for our edges later
         v = gtG.add_vertex()
         vertices[node] = v
@@ -116,7 +113,6 @@ def nx2gt(nxG):
 
     # Add the edges
     for src, dst, data in nxG.edges(data=True):
-
         # Look up the vertex structs from our vertices mapping and add edge.
         e = gtG.add_edge(vertices[src], vertices[dst])
 
@@ -204,60 +200,6 @@ for group in GROUPS:
 
     graphs[group] = group_graphs
 
-# g = graphs['20221123_1543_AmericanoLatte_QR']['aggregate']
-
-# import matplotlib.animation as animation
-# import matplotlib.pyplot as plt
-# import seaborn as sns
-# import numpy as np
-# import graph_tool.all as gt
-
-
-# # Assuming 'graphs' is your dictionary and it's populated as described
-# group_names = list(graphs.keys())
-# group = group_names[0]  # Get the first group name
-
-# # Precompute global min and max for consistent color scaling
-# global_min, global_max = float('inf'), float('-inf')
-
-# for hour in graphs[group]:
-#     graph = graphs[group][hour]
-#     adj_matrix = gt.adjacency(graph, weight=graph.ep.weight).todense()
-#     local_min, local_max = adj_matrix.min(), adj_matrix.max()
-#     global_min = min(global_min, local_min)
-#     global_max = max(global_max, local_max)
-
-# import matplotlib.colors as colors
-
-# fig, ax = plt.subplots(figsize=(8, 6))
-# cbar_ax = fig.add_axes([.91, .3, .03, .4])  # Create a colorbar outside the heatmap, which can be reused
-
-# def update(hour):
-#     ax.clear()
-#     graph = graphs[group][hour]  # Get the graph of the specified hour
-
-#     # Generate the adjacency matrix
-#     adj_matrix = gt.adjacency(graph, weight=graph.ep.weight).todense()
-
-#     # Convert zeros to NaNs for masking
-#     masked_matrix = np.ma.masked_where(adj_matrix == 0, adj_matrix)
-
-
-#     # Plotting with fixed color scale
-#     if ax.images:
-#         # remove the old colorbar
-#         fig.delaxes(fig.axes[-1])
-#     sns.heatmap(masked_matrix, annot=False, cmap='viridis', cbar=True, norm=colors.LogNorm(vmin=masked_matrix.min(), vmax=masked_matrix.max()), ax=ax, cbar_ax=cbar_ax)
-#     ax.set_title(f'Interaction Matrix for Group {group}, Hour {hour}')
-#     ax.set_xlabel('Node Index')
-#     ax.set_ylabel('Node Index')
-
-# # Create the animation with a fixed frame range if necessary
-# ani = animation.FuncAnimation(fig, update, frames=sorted(graphs[group].keys()))
-
-# # Save the animation
-# ani.save('graph_evolution.mp4', writer='ffmpeg')
-
 import matplotlib.colors as colors
 import matplotlib.pyplot as plt
 import numpy as np
@@ -340,7 +282,7 @@ for group in GROUPS:
     # Modify x and y ticks
     xlabels = [label.split("#")[1] for label in reordered_adj.columns]
     ylabels = [label.split("#")[1] for label in reordered_adj.index]
-    
+
     # Save matrix to csv with x and y labs
     reordered_adj.to_csv(f"../results/clustered_adjacency_matrix_{group}.csv")
 
