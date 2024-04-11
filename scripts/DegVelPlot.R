@@ -1,7 +1,7 @@
 # Load Velocity Data  ----------------------------------------
 
 library(tidyverse)
-setwd("~/Downloads/IBRGData_110123")
+# setwd("~/Downloads/IBRGData_110123")
 prefixes <- c("RooibosTea_QR_1216_1646", "RooibosTea_QL_1216_1646", "MexHotChoc_QR_1216_1646", "MexHotChoc_QL_1216_1646", "20230213_1745_AlmdudlerGspritzt_C1", "20230213_1745_AlmdudlerGspritzt_C0", "20221209_1613_QR", "20221209_1613_QL", "20221123_1543_AmericanoLatte_QR", "20221123_1543_AmericanoLatte_QL")
 Day <- 1
 Day1 <- c("001", "002", "003", "004", "005", "006", "007", "008", "009", "010", "011", "012", "013", "014", "015", "016", "017", "018", "019", "020", "021", "022", "023", "024")
@@ -100,7 +100,7 @@ ggplot(DegVelMean, aes(x = move_perc, y = Degree, colour = interaction(QR, Queen
     axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
     aspect.ratio = 1
   ) +
-  theme_classic()+
+  theme_classic()
 
 DegVelMean = DegVelMean[DegVelMean$move_perc > 0.25,]
 ggplot(DegVelMean, aes(x = move_perc, y = Degree, colour = interaction(QR, Queen))) +

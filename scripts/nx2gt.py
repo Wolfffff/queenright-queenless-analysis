@@ -1,9 +1,14 @@
 import ast
+
 import glob
 import gzip
 
 import graph_tool.all as gt
+import matplotlib.colors as colors
+import matplotlib.pyplot as plt
 import networkx as nx
+import numpy as np
+import pandas as pd
 
 
 def get_prop_type(value, key=None):
@@ -200,12 +205,6 @@ for group in GROUPS:
 
     graphs[group] = group_graphs
 
-import matplotlib.colors as colors
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
-import seaborn as sns
-
 GROUPS = [
     "RooibosTea_QR_1216_1646",
     "RooibosTea_QL_1216_1646",
@@ -220,7 +219,7 @@ GROUPS = [
 ]
 from matplotlib import colors
 from scipy.cluster.hierarchy import dendrogram, linkage
-from scipy.spatial.distance import pdist, squareform
+from scipy.spatial.distance import pdist
 
 # Normalize color scale
 norm = colors.LogNorm()
@@ -351,4 +350,3 @@ def visualize_graph(g, norm_vertex_betweenness, blocks):
 
 visualize_graph(g, nvb, b)
 
-#
