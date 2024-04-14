@@ -5,6 +5,9 @@ for (p in list_of_packages) {
   library(p, character.only = TRUE)
 }
 
+source("../scripts/utils/base_utils.R")
+tags <- process_tags_to_list_and_queen_per_group("/Users/wolf/git/queenright-queenless-analysis/meta/experimental_tag_list.csv")
+
 prefixes <- c("RooibosTea_QR_1216_1646", "RooibosTea_QL_1216_1646", "MexHotChoc_QR_1216_1646", "MexHotChoc_QL_1216_1646", "20230213_1745_AlmdudlerGspritzt_C1", "20230213_1745_AlmdudlerGspritzt_C0", "20221209_1613_QR", "20221209_1613_QL", "20221123_1543_AmericanoLatte_QR", "20221123_1543_AmericanoLatte_QL")
 Day <- 1
 Day1 <- c("001", "002", "003", "004", "005", "006", "007", "008", "009", "010", "011", "012", "013", "014", "015", "016", "017", "018", "019", "020", "021", "022", "023", "024")
@@ -15,7 +18,7 @@ Days <- c(Day1, Day2, Day3, Day4)
 Start <- 0
 
 
-QUEEN_LIST <- c("RooibosTea_QR_1216_1646_ArUcoTag#52", "MexHotChoc_QR_1216_1646_ArUcoTag#13", "20230213_1745_AlmdudlerGspritzt_C1_ArUcoTag#24", "20221209_1613_QR_ArUcoTag#47", "20221123_1543_AmericanoLatte_QR_ArUcoTag#43")
+# QUEEN_LIST <- c("RooibosTea_QR_1216_1646_ArUcoTag#52", "MexHotChoc_QR_1216_1646_ArUcoTag#13", "20230213_1745_AlmdudlerGspritzt_C1_ArUcoTag#24", "20221209_1613_QR_ArUcoTag#47", "20221123_1543_AmericanoLatte_QR_ArUcoTag#43")
 
 Start <- 0
 for (i in 1:10) {
@@ -28,7 +31,7 @@ for (i in 1:10) {
       Cent$Col <- prefixes[i]
       Cent$QR <- i %% 2 == 1
       Cent$ID <- paste(Cent$Col, Cent$Node, sep = "_")
-      Cent$Queen <- Cent$ID %in% c("RooibosTea_QR_1216_1646_ArUcoTag#52", "MexHotChoc_QR_1216_1646_ArUcoTag#13", "20230213_1745_AlmdudlerGspritzt_C1_ArUcoTag#24", "20221209_1613_QR_ArUcoTag#47", "20221123_1543_AmericanoLatte_QR_ArUcoTag#43")
+      # Cent$Queen <- Cent$ID %in% c("RooibosTea_QR_1216_1646_ArUcoTag#52", "MexHotChoc_QR_1216_1646_ArUcoTag#13", "20230213_1745_AlmdudlerGspritzt_C1_ArUcoTag#24", "20221209_1613_QR_ArUcoTag#47", "20221123_1543_AmericanoLatte_QR_ArUcoTag#43")
       if (Start == 1) {
         TotalCent <- rbind(TotalCent, Cent)
       }
@@ -40,8 +43,28 @@ for (i in 1:10) {
   }
 }
 
+# Set ID to be only part after # in ID
+TotalCent$tag_id <- as.integer(sub(".*#", "", TotalCent$ID))
+
+total_cent_tmp <- list()
+
+for (col in unique(TotalCent$Col)) {
+  if (col %in% names(tags$tags)) {
+    total_cent_tmp[[col]] <- TotalCent[TotalCent$Col == col & TotalCent$tag_id %in% tags$tags[[col]], ]
+
+    # If tag is in $tags$queens[[col]], set Queen to TRUE
+    if (col %in% names(tags$queens)) {
+      total_cent_tmp[[col]]$Queen <- total_cent_tmp[[col]]$tag_id %in% tags$queens[[col]]
+    } else {
+      total_cent_tmp[[col]]$Queen <- FALSE
+    }
+  }
+}
+
+TotalCent <- do.call(rbind, total_cent_tmp)
+
 # TotalCent <- TotalCent[TotalCent$Degree > 100, ]
-TotalCentMean <- aggregate(cbind(Degree, Closeness, Betweenness, QR, Queen) ~ ID, TotalCent, mean)
+TotalCentMean <- aggregate(cbind(Degree, Closeness, Betweenness, QR, Queen,tag_id) ~ ID, TotalCent, mean)
 TotalCentMean$Col <- sub("_[^_]+$", "", TotalCentMean$ID)
 
 
@@ -55,35 +78,21 @@ dim(TotalCentMeanRanked)
 
 Ovaries <- read.csv("OvaryMeasurements.csv")
 
-OvariesRT = Ovaries[Ovaries$Colony=="RooibosTea",]
+OvariesRT <- Ovaries[Ovaries$Colony == "RooibosTea", ]
 OvariesRT$ID <- paste("RooibosTea_", OvariesRT$Treatment, "_1216_1646_ArUcoTag#", OvariesRT$Tag, sep = "")
 
-OvariesMHC = Ovaries[Ovaries$Colony=="MexicanHotChocolate",]
-OvariesMHC$ID = paste("MexHotChoc_",OvariesMHC$Treatment,"_1216_1646_ArUcoTag#",OvariesMHC$Tag,sep="")
+OvariesMHC <- Ovaries[Ovaries$Colony == "MexicanHotChocolate", ]
+OvariesMHC$ID <- paste("MexHotChoc_", OvariesMHC$Treatment, "_1216_1646_ArUcoTag#", OvariesMHC$Tag, sep = "")
 
-OvariesAM = Ovaries[Ovaries$Colony=="ArgentinanMate",]
-OvariesAM$ID = paste("20221209_1613_",OvariesAM$Treatment,"_ArUcoTag#",OvariesAM$Tag,sep="")
+OvariesAM <- Ovaries[Ovaries$Colony == "ArgentinanMate", ]
+OvariesAM$ID <- paste("20221209_1613_", OvariesAM$Treatment, "_ArUcoTag#", OvariesAM$Tag, sep = "")
 
-OvariesAG = Ovaries[Ovaries$Colony=="AlmdudlerGspritzt",]
-OvariesAG$ID = paste("20230213_1745_AlmdudlerGspritzt_",OvariesAG$Treatment,"_ArUcoTag#",OvariesAG$Tag,sep="")
+OvariesAG <- Ovaries[Ovaries$Colony == "AlmdudlerGspritzt", ]
+OvariesAG$ID <- paste("20230213_1745_AlmdudlerGspritzt_", OvariesAG$Treatment, "_ArUcoTag#", OvariesAG$Tag, sep = "")
 
-OvariesAL = Ovaries[Ovaries$Colony=="AmericanoLatte",]
-OvariesAL$ID = paste("20221123_1543_AmericanoLatte_",OvariesAL$Treatment,"_ArUcoTag#",OvariesAL$Tag,sep="")
+OvariesAL <- Ovaries[Ovaries$Colony == "AmericanoLatte", ]
+OvariesAL$ID <- paste("20221123_1543_AmericanoLatte_", OvariesAL$Treatment, "_ArUcoTag#", OvariesAL$Tag, sep = "")
 
-
-TotalCentMeanRanked <- TotalCentMeanRanked[TotalCentMeanRanked$Degree > 200, ]
-TotalCentMeanRanked <- TotalCentMeanRanked[!grepl("#82", TotalCentMeanRanked$ID), ]
-TotalCentMeanRanked <- TotalCentMeanRanked[!grepl("#88", TotalCentMeanRanked$ID), ]
-TotalCentMeanRanked <- TotalCentMeanRanked[!grepl("#84", TotalCentMeanRanked$ID), ]
-
-# Print shape
-dim(TotalCentMeanRanked)
-
-# ALQR#45, MHCQR#16
-
-TotalCentMeanRanked <- TotalCentMeanRanked[!grepl("20221123_1543_AmericanoLatte_QR_ArUcoTag#45", TotalCentMeanRanked$ID), ]
-TotalCentMeanRanked <- TotalCentMeanRanked[!grepl("MexHotChoc_QR_1216_1646_ArUcoTag#16", TotalCentMeanRanked$ID), ]
-dim(TotalCentMeanRanked)
 
 # Merge the data
 Ovaries <- rbind(OvariesRT, OvariesMHC, OvariesAM, OvariesAG, OvariesAL)
@@ -94,7 +103,7 @@ Ovaries$AverageWidth <- (Ovaries$LongestOocyteWidth1..mm. + Ovaries$LongestOocyt
 
 TotalCentSum <- TotalCent %>%
   group_by(ID) %>%
-  summarise(Degree = sum(Degree), QR = first(QR),Col = first(Col), Queen = first(Queen))
+  summarise(Degree = sum(Degree), QR = first(QR), Col = first(Col), Queen = first(Queen))
 
 TotalCentSum <- merge(TotalCentSum, Ovaries, by = "ID")
 
@@ -112,12 +121,12 @@ TotalCentSum <- TotalCentSum[!(TotalCentSum$ID %in% QUEEN_LIST), ]
 prefixes <- c("RooibosTea", "MexHotChoc", "20221209_1613", "20230213_1745_AlmdudlerGspritzt_")
 
 # get value before first _ in source_colony
-TotalCentSum$source_colony <- sapply(strsplit(TotalCentSum$Col, "_"), `[`, 1)                  
+TotalCentSum$source_colony <- sapply(strsplit(TotalCentSum$Col, "_"), `[`, 1)
 
-# Get mean per colony 
+# Get mean per colony
 TotalCentSum <- TotalCentSum %>%
   group_by(Col, Treatment) %>%
-  summarise(AverageWidth = mean(AverageWidth),source_colony = first(source_colony))
+  summarise(AverageWidth = mean(AverageWidth), source_colony = first(source_colony))
 
 library(wesanderson)
 library(forcats)
@@ -125,12 +134,12 @@ library(forcats)
 unique(TotalCentSum$source_colony)
 TotalCentSum$source_colony_fct <- factor(TotalCentSum$source_colony, levels = c("RooibosTea", "MexHotChoc", "20230213", "20221209", "20221123"))
 
-ggplot(TotalCentSum, aes(x = fct_rev(Treatment), y = AverageWidth)) + 
-  geom_line(aes(group = source_colony_fct),color="darkgray") +
+ggplot(TotalCentSum, aes(x = fct_rev(Treatment), y = AverageWidth)) +
+  geom_line(aes(group = source_colony_fct), color = "darkgray") +
   geom_point(aes(color = source_colony_fct), size = 5) +
   scale_color_manual(values = wes_palette("Cavalcanti1")) +
   xlab("") +
-  labs(color="Source Colony") +
+  labs(color = "Source Colony") +
   ylab("Mean of Mean Max Oocyte Width (mm)") + # Adjust axis labels
   theme_minimal() +
   theme(
@@ -151,4 +160,3 @@ ggplot(TotalCentSum, aes(x = fct_rev(Treatment), y = AverageWidth)) +
 
 
 ggsave("../figures/ovary_boxplot.jpg", width = 6.25, height = 6.25, dpi = 600)
-
