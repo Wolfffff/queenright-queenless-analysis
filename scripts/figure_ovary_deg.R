@@ -5,6 +5,10 @@ for (p in list_of_packages) {
   library(p, character.only = TRUE)
 }
 
+source("../scripts/utils/base_utils.R")
+tags <- process_tags_to_list_and_queen_per_group("/Users/wolf/git/queenright-queenless-analysis/meta/experimental_tag_list.csv")
+
+
 prefixes <- c("RooibosTea_QR_1216_1646", "RooibosTea_QL_1216_1646", "MexHotChoc_QR_1216_1646", "MexHotChoc_QL_1216_1646", "20230213_1745_AlmdudlerGspritzt_C1", "20230213_1745_AlmdudlerGspritzt_C0", "20221209_1613_QR", "20221209_1613_QL", "20221123_1543_AmericanoLatte_QR", "20221123_1543_AmericanoLatte_QL")
 Day <- 1
 Day1 <- c("001", "002", "003", "004", "005", "006", "007", "008", "009", "010", "011", "012", "013", "014", "015", "016", "017", "018", "019", "020", "021", "022", "023", "024")
@@ -15,7 +19,7 @@ Days <- c(Day1, Day2, Day3, Day4)
 Start <- 0
 
 
-QUEEN_LIST <- c("RooibosTea_QR_1216_1646_ArUcoTag#52", "MexHotChoc_QR_1216_1646_ArUcoTag#13", "20230213_1745_AlmdudlerGspritzt_C1_ArUcoTag#24", "20221209_1613_QR_ArUcoTag#47", "20221123_1543_AmericanoLatte_QR_ArUcoTag#43")
+# QUEEN_LIST <- c("RooibosTea_QR_1216_1646_ArUcoTag#52", "MexHotChoc_QR_1216_1646_ArUcoTag#13", "20230213_1745_AlmdudlerGspritzt_C1_ArUcoTag#24", "20221209_1613_QR_ArUcoTag#47", "20221123_1543_AmericanoLatte_QR_ArUcoTag#43")
 
 Start <- 0
 for (i in 1:10) {
@@ -39,6 +43,32 @@ for (i in 1:10) {
     }
   }
 }
+
+# Set ID to be only part after # in ID
+TotalCent$tag_id <- as.integer(sub(".*#", "", TotalCent$ID))
+
+total_cent_tmp <- list()
+
+for (col in unique(TotalCent$Col)) {
+  if (col %in% names(tags$tags)) {
+    total_cent_tmp[[col]] <- TotalCent[TotalCent$Col == col & TotalCent$tag_id %in% tags$tags[[col]], ]
+
+    # If tag is in $tags$queens[[col]], set Queen to TRUE
+    if (col %in% names(tags$queens)) {
+      total_cent_tmp[[col]]$Queen <- total_cent_tmp[[col]]$tag_id %in% tags$queens[[col]]
+    } else {
+      total_cent_tmp[[col]]$Queen <- FALSE
+    }
+  }
+}
+
+TotalCent <- do.call(rbind, total_cent_tmp)
+
+
+# Get unique ids by group in TotalCent
+TotalCent %>%
+  group_by(Col) %>%
+  summarise(Unique = length(unique(ID)))
 
 # TotalCent <- TotalCent[TotalCent$Degree > 100, ]
 TotalCentMean <- aggregate(cbind(Degree, Closeness, Betweenness, QR, Queen) ~ ID, TotalCent, mean)
