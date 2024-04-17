@@ -1,76 +1,53 @@
 # Load Degree Data — Head And Body ----------------------------------------
 list_of_packages <- c("lme4", "ggplot2", "sp", "tidyverse", "car", "ggthemes", "dplyr", "dineq", "plyr")
-pak::pkg_install(list_of_packages)
+# pak::pkg_install(list_of_packages)
 for (p in list_of_packages) {
   library(p, character.only = TRUE)
 }
+source("../scripts/utils/base_utils.R")
+agg_df <- process_files(suffix = "Cent.csv")
+filtered_df <- filter_data("/Users/wolf/git/queenright-queenless-analysis/meta/experimental_tag_list.csv", agg_df)
 
-
-prefixes <- c("RooibosTea_QR_1216_1646", "RooibosTea_QL_1216_1646", "MexHotChoc_QR_1216_1646", "MexHotChoc_QL_1216_1646", "20230213_1745_AlmdudlerGspritzt_C1", "20230213_1745_AlmdudlerGspritzt_C0", "20221209_1613_QR", "20221209_1613_QL", "20221123_1543_AmericanoLatte_QR", "20221123_1543_AmericanoLatte_QL")
-Day <- 1
-Day1 <- c("001","002","003","004","005","006","007","008", "009","010","011","012","013","014","015","016", "017", "018", "019", "020", "021", "022", "023", "024")
-Day2 <- c("025","026","027","028","029","030","031","032", "033","034","035","036","037","038","039","040", "041", "042", "043", "044", "045", "046", "047", "048")
-Day3 <- c("049","050","051","052","053","054","055","056", "057","058","059","060","061","062","063","064", "065", "066", "067", "068", "069", "070", "071", "072")
-Day4 <- c("073","074","075","076","077","078","079","080", "081","082","083","084","085","086","087","088", "089", "090", "091", "092", "093", "094", "095", "096")
-Days <- c(Day1, Day2, Day3, Day4)
-Start <- 0
-
-QUEEN_LIST <- c("RooibosTea_QR_1216_1646_ArUcoTag#52", "MexHotChoc_QR_1216_1646_ArUcoTag#13", "20230213_1745_AlmdudlerGspritzt_C1_ArUcoTag#24", "20221209_1613_QR_ArUcoTag#47", "20221123_1543_AmericanoLatte_QR_ArUcoTag#43")
-
-Start <- 0
-for (i in 1:10) {
-  for (j in 1:96) {
-    if (file.exists(paste(prefixes[i], Days[j], "Cent.csv", sep = "_"))) {
-      Cent <- read.csv(paste(prefixes[i], Days[j], "Cent.csv", sep = "_"))
-      Cent$Node <- sub("\\.0", "", Cent$X)
-      Cent$Day <- floor((j - 1) / 9) + 1
-      Cent$Hour <- Days[j]
-      Cent$Col <- prefixes[i]
-      Cent$QR <- i %% 2 == 1
-      Cent$ID <- paste(Cent$Col, Cent$Node, sep = "_")
-      Cent$Queen <- Cent$ID %in% QUEEN_LIST
-      if (Start == 1) {
-        TotalCent <- rbind(TotalCent, Cent)
-      }
-      if (Start == 0) {
-        TotalCent <- Cent
-        Start <- 1
-      }
-    }
-  }
-}
-
-TotalCent <- TotalCent[TotalCent$Degree > 100, ]
-
+TotalCent <- filtered_df
 TotalCentMean <- aggregate(cbind(Degree, Closeness, Betweenness, QR, Queen) ~ ID, TotalCent, mean)
 
 TotalCentMean$Col <- sub("_[^_]+$", "", TotalCentMean$ID)
 
-TotalCent$alpha <- ifelse(TotalCent$Queen, .5, 0.005)
+TotalCent$Alpha <- ifelse(TotalCent$Queen, .5, 0.005)
 TotalCent <- TotalCent[sample(nrow(TotalCent)), ]
+TotalCent$PointSize <- ifelse(TotalCent$Queen, .003, .001)
+
+library(dplyr)
+
+TotalCent <- TotalCent %>%
+  mutate(QR_Queen_Condition = case_when(
+    !QR & !Queen ~ "Queenless",
+    QR & !Queen ~ "Queenright",
+    Queen ~ "Queen",
+    TRUE ~ NA_character_  # This handles any other case, which shouldn't exist in your scenario
+  )) %>%
+  mutate(QR_Queen_Condition = factor(QR_Queen_Condition, levels = c("Queenless", "Queenright", "Queen")))
+
 
 ggplot(TotalCent, aes(x = as.integer(Hour), y = Degree, group = ID)) +
-  geom_jitter(aes(color = interaction(QR, Queen), alpha = alpha), size = 0.001) +
-  geom_smooth(aes(group = interaction(QR, Queen), color = interaction(QR, Queen))) +
-  theme_classic() +
-  # Drop legend for alpha
-  # labs(title = "Degree in Queens, Queenless Workers, Queenright Workers") +
+  geom_jitter(aes(color = QR_Queen_Condition, alpha = Alpha, size = PointSize)) +
+  geom_smooth(aes(group = QR_Queen_Condition, color = QR_Queen_Condition)) +
+  scale_size(range = c(.001, .2)) +
   scale_color_manual(
-    name = "",
-    labels = c("Queenless Worker", "Queenright Worker", "Queen"),
-    values = c("#5785C1", "#CB7A5C", "#FBA72A"),
+    labels = c( "Queenright Worker","Queenless Worker", "Queen"),
+    values = c("#629CC0","#CEB175",  "#E54E21"),
     guide = guide_legend(direction = "horizontal")
   ) +
   scale_x_continuous(breaks = c(0, seq(24, 96, by = 24)), limits = c(0, NA), expand = c(0, 0)) + # Expand limits to include 0
-  labs(color = "Metric") +
+  labs(color = "") +
   xlab("Hour") +
-  ylab("Interaction Count") +
+  ylab("Mean Number of Interactions per Hour") +
   theme_minimal() +
   theme(
     plot.title = element_text(hjust = 0.5),
     legend.position = c(1, 1.02), # Move legend to top right
     legend.justification = c(1, 1), # Align legend to top right
-    legend.background = element_rect(fill = alpha("white", 0.8)),
+    legend.background = element_rect(fill = alpha("white", 1)),
     legend.title = element_text(size = 8, face = "bold"),
     legend.text = element_text(size = 7),
     panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
@@ -83,8 +60,8 @@ ggplot(TotalCent, aes(x = as.integer(Hour), y = Degree, group = ID)) +
     panel.grid = element_blank(),
     panel.border = element_blank()
   ) +
-  scale_y_log10() +
-  guides(alpha = "none")
+  # scale_y_log10() +
+  guides(alpha = "none", size = "none")
 
 ggsave("../figures/DegreeCent.png", width = 8.5, height = 3, dpi = 600, bg = "white")
 
@@ -166,24 +143,25 @@ anova(fm, fm.null)
 list_of_cols <- unique(TotalCentMeanRanked$Col)
 
 for (col in list_of_cols) {
-
   subset_data <- subset(TotalCentMeanRanked, Col == col)
-  
-  # Sum 'Degree' by 'ID'
-  sum_data <- subset_data %>%
-    group_by(ID) %>%
-    summarise(Degree = sum(Degree, na.rm = TRUE),
-              Queen = first(Queen))
-  
-  p <- ggplot(sum_data, aes(x = Degree, y = ID,color = as.factor(Queen))) +
+
+  # # Sum 'Degree' by 'ID'
+  # sum_data <- subset_data %>%
+  #   group_by(ID) %>%
+  #   summarize(Degree = sum(Degree, na.rm = TRUE),
+  #             Queen = first(Queen))
+
+  p <- ggplot(subset_data, aes(x = Degree, y = ID, color = as.factor(Queen))) +
     geom_point() +
-    labs(title = paste("Cleveland Dot Plot for", col),
-         x = "Degree",
-         y = "ID") +
+    labs(
+      title = paste("Cleveland Dot Plot for", col),
+      x = "Degree",
+      y = "ID"
+    ) +
     theme_minimal() +
-    xlim(0, max(sum_data$Degree))
+    xlim(0, max(subset_data$Degree))
 
   ggsave(paste0("../figures/cleveland_dot_plot_", col, ".jpg"), plot = p, width = 8.5, height = 5, dpi = 600)
-  
+
   print(p)
 }

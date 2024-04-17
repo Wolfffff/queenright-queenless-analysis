@@ -35,8 +35,6 @@ for (i in 1:length(prefixes)) {
     }
   }
 }
-TotalVel <- na.omit(TotalVel)
-TotalVel <- TotalVel[TotalVel$mean_vel < 15, ]
 
 Start=0
 for (i in 1:length(prefixes)) {
@@ -62,13 +60,22 @@ for (i in 1:length(prefixes)) {
     }
   }
 }
+TotalVel <- na.omit(TotalVel)
 
-DegVel <- TotalDeg %>% right_join(TotalVel, by=c("ID", "Hour","Day","QR","Queen"))
-DegVelMean <- aggregate(cbind(move_perc,mean_vel,Degree,QR,Queen) ~ ID, DegVel, mean)
+# get unique IDs by Col in TotalVel
+
+source("../scripts/utils/base_utils.R")
+deg_filtered <- filter_data("/Users/wolf/git/queenright-queenless-analysis/meta/experimental_tag_list.csv", TotalDeg)
+vel_filtered <- filter_data("/Users/wolf/git/queenright-queenless-analysis/meta/experimental_tag_list.csv", TotalVel)
+
+deg_vel <- merge(deg_filtered, vel_filtered, by=c("ID", "Hour","Day","QR","Queen"))
+
+
+DegVelMean <- aggregate(cbind(move_perc,mean_vel,Degree,QR,Queen) ~ ID, deg_vel, mean)
 DegVelMean$Col <- sub("_[^_]+$", "", DegVelMean$ID)
 
 
-DegVelMean <- DegVelMean[DegVelMean$move_perc > 0.25,]
+DegVelMean <- DegVelMean[DegVelMean$move_perc > 0.05,]
 DegVelMean$Alpha <- ifelse(DegVelMean$Queen, 0.5, 0.75)
 DegVelMean$PointSize <- ifelse(DegVelMean$Queen, 2, 1)
 
@@ -86,10 +93,11 @@ ggplot(DegVelMean, aes(x = move_perc, y = Degree, colour = interaction(QR, Queen
   scale_x_continuous() + # Use a continuous scale for x
   scale_y_continuous() + # Use a continuous scale for y
 #   labs(title="Total Interaction Count vs Movement Percentage", color = "Treatment") +  # Adjust title and legend title
-  xlab("Movement Percentage") +
-  ylab("Total Interaction Count") + # Adjust axis labels
+  xlab("Fraction of Time Spent Moving") +
+  ylab("Mean Number of Interactions per Hour") + # Adjust axis labels
   theme_minimal() +
   theme(
+    text = element_text(size = 16),
     plot.title = element_text(hjust = 0.5),
     legend.position = "none",
     panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
@@ -104,4 +112,48 @@ ggplot(DegVelMean, aes(x = move_perc, y = Degree, colour = interaction(QR, Queen
     aspect.ratio = 1
   )
 
-ggsave("../figures/fig5_deg_vel.jpg", width = 4.25, height = 4.25, dpi = 600)
+ggsave("../figures/interactions_by_frac_moving_qrql.jpg", width = 6.25, height = 6.25, dpi = 600)
+
+
+second_plot_df <- DegVelMean
+second_plot_df$source_colony <- sapply(strsplit(second_plot_df$Col, "_"), `[`, 1)
+second_plot_df$source_colony <- factor(second_plot_df$source_colony, levels = c("RooibosTea", "MexHotChoc", "20230213", "20221209", "20221123"))
+
+grouped_sum$Treatment <- ifelse(grouped_sum$Queen, "Queen", grouped_sum$Treatment)
+library(ggnewscale)
+ggplot(second_plot_df, aes(x = move_perc, y = Degree, group = interaction(QR, Queen))) +
+  geom_smooth(
+    data = subset(second_plot_df, Queen == FALSE), # Subset the data to exclude queens
+    method = lm, # Change method to lm for linear model
+    se = T, # Standard error
+    size = .75, # Adjust size to match first plot
+    linetype = 1, # Line type
+    aes(color = interaction(QR, Queen))
+  ) + # Color by treatment
+    scale_color_manual(values = c("#CEB175", "#629CC0", "#E54E21"), labels = c("Queenless Worker", "Queenright Worker", "Queen"), guide = guide_legend(direction = "vertical")) + # Adjust colors and labels
+  new_scale_color() +
+  geom_point(aes(color = source_colony,shape=as.factor(QR)), alpha = 1,size = second_plot_df$PointSize) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  scale_x_continuous() + # Use a continuous scale for x
+  scale_y_continuous() + # Use a continuous scale for y
+#   labs(title="Total Interaction Count vs Movement Percentage", color = "Treatment") +  # Adjust title and legend title
+  xlab("Fraction of Time Spent Moving") +
+  ylab("Mean Number of Interactions per Hour") + # Adjust axis labels
+  theme_minimal() +
+  theme(
+    text = element_text(size = 16),
+    plot.title = element_text(hjust = 0.5),
+    legend.position = "none",
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  )
+
+ggsave("../figures/interactions_by_frac_moving_by_col.jpg", width = 6.25, height = 6.25, dpi = 600)

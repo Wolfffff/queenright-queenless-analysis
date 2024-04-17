@@ -31,30 +31,35 @@ TotalCentSum <- TotalCent %>%
   group_by(ID) %>%
   summarise(Degree = mean(Degree), QR = first(QR),Col = first(Col), Queen = first(Queen))
 
-TotalCentSum <- merge(TotalCentSum, Ovaries, by = "ID", all.x = FALSE)
+TotalCentSum <- merge(TotalCentSum, Ovaries, by = "ID", all.x = TRUE)
 
 # Swap levels of QR to match the first plot
 TotalCentSum$Treatment <- ifelse(TotalCentSum$QR, "Queenright Worker", "Queenless Worker")
 
-grouped_sum <- TotalCentSum %>%
-  group_by(Treatment, Col, Queen) %>%
-  summarise(Degree = mean(Degree), AverageWidth = mean(AverageWidth))
+# Drop rows with NA in Degree or AverageWidth
+df <- TotalCentSum[complete.cases(TotalCentSum$Degree, TotalCentSum$AverageWidth), ]
+df$Alpha <- ifelse(df$Queen, 0.5, 0.75)
+df$PointSize <- ifelse(df$Queen, 2, 1)
 
-# get value before first _ in source_colony
-grouped_sum$source_colony <- sapply(strsplit(grouped_sum$Col, "_"), `[`, 1)
 
-# if is QR make treatment "Queen" otherwise don't change it. Keeping the current otherwise
-grouped_sum$Treatment <- ifelse(grouped_sum$Queen, "Queen", grouped_sum$Treatment)
-
-grouped_sum$source_colony <- factor(grouped_sum$source_colony, levels = c("RooibosTea", "MexHotChoc", "20230213", "20221209", "20221123"))
-
-ggplot(grouped_sum, aes(x = fct_rev(Treatment), y = AverageWidth)) +
-  geom_line(aes(group = source_colony), color = "darkgray") +
-  geom_point(aes(color = source_colony), size = 5) +
-  scale_color_manual(values = wes_palette("Cavalcanti1")) +
-  xlab("") +
-  labs(color = "Source Colony") +
-  ylab("Mean Width of Two Largest Oocytes (mm)") + # Adjust axis labels
+ggplot(df, aes(x = AverageWidth, y = Degree, colour = interaction(QR, Queen))) +
+  geom_xsidedensity(data = subset(df, Queen == FALSE),size=.5,aes(fill = factor(Treatment)),alpha=0.1) +
+  geom_ysidedensity(data = subset(df, Queen == FALSE),size=.5,aes(fill = factor(Treatment)),alpha=0.1) +
+ geom_smooth(
+    data = subset(df, Queen == FALSE), # Subset the data to exclude queens
+    method = lm, # Change method to lm for linear model
+    se = T, # Standard error
+    size = .75, # Adjust size to match first plot
+    linetype = 1, # Line type
+    aes(color = interaction(QR,Queen))
+  ) + # Color by treatment
+  geom_point(aes(color = interaction(QR, Queen)), alpha = 1,size= df$PointSize) +
+  scale_color_manual(values = c("#CEB175", "#629CC0", "#E54E21"), labels = c("Queenless Worker", "Queenright Worker", "Queen"), guide = guide_legend(direction = "vertical")) + # Adjust colors and labels
+  scale_x_continuous() + # Use a continuous scale for x
+  scale_y_continuous() + # Use a continuous scale for y
+  # labs(title="Total Interaction Count vs Max Oocyte Width", color = "Treatment") +  # Adjust title and legend title
+  xlab("Mean Width of Two Largest Oocytes (mm)") +
+  ylab("Mean Number of Interactions per Hour") + # Adjust axis labels
   theme_minimal() +
   theme(
     text = element_text(size = 16),
@@ -71,7 +76,6 @@ ggplot(grouped_sum, aes(x = fct_rev(Treatment), y = AverageWidth)) +
     axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
     aspect.ratio = 1
   ) +
-  guides(color = guide_legend(title.position = "top", title.hjust = 0.5))
+  theme_ggside_void()
 
-
-ggsave("../figures/ovary_difference.jpg", width = 6.25, height = 6.25, dpi = 600)
+ggsave("../figures/interactions_by_ovary.jpg", width = 6.25, height = 6.25, dpi = 600)
