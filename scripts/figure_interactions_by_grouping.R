@@ -50,7 +50,7 @@ ggplot(grouped_sum, aes(x = fct_rev(Treatment), y = Degree)) +
   scale_color_manual(values = wes_palette("Cavalcanti1")) +
   xlab("") +
   labs(color = "Source Colony") +
-  ylab("Mean Number of Interactions Per Hour") + # Adjust axis labels
+  ylab("Mean Number of Interactions per Hour") + # Adjust axis labels
   theme_minimal() +
   theme(
     plot.title = element_text(hjust = 0.5),

@@ -31,6 +31,18 @@ for (metric in unique_network_metrics) {
   single_param_df_agg$source_colony <- sapply(strsplit(single_param_df_agg$Col, "_"), `[`, 1)
   single_param_df_agg$source_colony <- factor(single_param_df_agg$source_colony, levels = c("RooibosTea", "MexHotChoc", "20230213", "20221209", "20221123"))
 
+  # map metric values to new names from named list
+# Assuming "metric" is a variable containing the name of the metric you want to map
+
+  # Define the mapping
+  metric_names <- list(
+    "Sum" = "Mean Number of Interactions per Hour"
+  )
+
+  # Check if metric is in the list and map to the corresponding value
+  if(metric %in% names(metric_names)) {
+    metric <- metric_names[[metric]]
+  }
 
   ggplot(single_param_df_agg, aes(x = fct_rev(Treatment), y = values)) + 
     geom_line(aes(group = source_colony),color="darkgray") +
@@ -42,7 +54,7 @@ for (metric in unique_network_metrics) {
     theme_minimal() +
     theme(
       plot.title = element_text(hjust = 0.5),
-      # legend.position = "none",
+      legend.position = "none",
       panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
       panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
       panel.grid.major.y = element_blank(), # Remove horizontal grid lines
@@ -56,11 +68,13 @@ for (metric in unique_network_metrics) {
     ) +
     guides(color = guide_legend(title.position = "top", title.hjust = 0.5)) 
 
-  ggsave(paste0("../figures/network_metric_",metric,"_contrast.jpg"), width = 8.5, height = 4, dpi = 600)
+  ggsave(paste0("../figures/network_metric_",metric,"_contrast.jpg"), width = 6.25, height = 6.25, dpi = 600)
 }
 
+
+focal_df <- agg_df
 # Group by QR, select the columns and pivot
-wide_df <- agg_df_qr %>% 
+wide_df <- focal_df %>% 
   select(params, values) %>% 
   pivot_wider(names_from = params, values_from = values)
 # Unlist each column and convert back to a dataframe
@@ -77,8 +91,6 @@ wide_df <- na.omit(wide_df)
 corr_df <- cor(wide_df)
 
 library(corrplot)
-jpeg("../figures/correlation_matrix.jpg", width = 8.5, height = 8.5, units = "in", res = 600)
-corrplot(corr_df, tl.cex = 0.5, tl.col = "black", tl.srt = 45, mar = c(5, 5, 5, 5))
+jpeg("../figures/correlation_matrix_network_all.jpg", width = 8.25, height = 8.25, units = "in", res = 300)
+corrplot(corr_df, type = "upper", tl.col = "black", tl.srt = 45,diag = FALSE,mar=c(0,0,0,0))
 dev.off()
-# save plot
-

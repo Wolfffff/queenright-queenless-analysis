@@ -40,8 +40,11 @@ TotalCentSum$Treatment <- ifelse(TotalCentSum$QR, "Queenright Worker", "Queenles
 # If Queen is TRUE, set Treatment to Queen
 TotalCentSum$Treatment <- ifelse(TotalCentSum$Queen, "Queen", TotalCentSum$Treatment)
 
-# Get only values with AverageWidth
-TotalCentSum <- TotalCentSum[!is.na(TotalCentSum$AverageWidth),]
+queen <- TotalCentSum[TotalCentSum$Queen,] 
+queen$Queen = TRUE
+
+# Drop queens 
+TotalCentSum <- TotalCentSum[!TotalCentSum$Queen,] 
 
 # Define a function to assign groups within each Colony
 assign_groups <- function(df) {
@@ -51,8 +54,15 @@ assign_groups <- function(df) {
   return(df)
 }
 
+queen$Group <- "Queen"
+
+# Drop queens 
+
+
 # Apply the function to each Colony
 TotalCentSum <- do.call(rbind, by(TotalCentSum, TotalCentSum$Col, assign_groups))
+
+TotalCentSum <- rbind(TotalCentSum, queen)
 dim(TotalCentSum[TotalCentSum$Col == "20221123_1543_AmericanoLatte_QR",])
 
 # group by combo of Treatment, Colony, and Queen
@@ -60,10 +70,13 @@ grouped_sum <- TotalCentSum %>%
   group_by(Treatment, Col, Queen, Group) %>%
   summarise(AverageWidth_var=var(AverageWidth,na.rm=TRUE),AverageLength_var=var(AverageLength,na.rm=TRUE), Degree_var=var(Degree), Degree = mean(Degree), AverageLength = mean(AverageLength,na.rm=TRUE), AverageWidth = mean(AverageWidth,na.rm=TRUE),Closeness=mean(Closeness), Betweenness = mean(Betweenness), .groups = 'drop')
 # Only workers for this plot
-grouped_sum <- grouped_sum[!grouped_sum$Queen, ]
+# grouped_sum <- grouped_sum[!grouped_sum$Queen, ]
 
 # get value before first _ in source_colony
 grouped_sum$source_colony <- sapply(strsplit(grouped_sum$Col, "_"), `[`, 1)                  
+
+
+
 
 library(wesanderson)
 library(forcats)
@@ -72,17 +85,19 @@ grouped_sum$source_colony <- factor(grouped_sum$source_colony, levels = c("Rooib
 # Drop middle group
 grouped_sum <- grouped_sum[grouped_sum$Group != "Middle",]
 
-ggplot(grouped_sum, aes(x = fct_rev(Treatment), y = Degree,Group)) + 
+ggplot(grouped_sum, aes(x = fct_rev(Treatment), y = AverageWidth)) + 
   geom_line(aes(group = source_colony),color="darkgray") +
   geom_point(aes(color = source_colony), size = 5) +
+  # geom_boxplot(aes(color = source_colony), alpha = 0.5) +
   scale_color_manual(values = wes_palette("Cavalcanti1")) +
   xlab("") +
   labs(color="Source Colony") +
-  ylab("Degree") + # Adjust axis labels
+  ylab("Mean Width of Two Largest Oocytes (mm)") + # Adjust axis labels
   theme_minimal() +
   theme(
+    # text = element_text(size = 16),
     plot.title = element_text(hjust = 0.5),
-    # legend.position = "none",
+    legend.position = "none",
     panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
     panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
     panel.grid.major.y = element_blank(), # Remove horizontal grid lines
@@ -97,8 +112,6 @@ ggplot(grouped_sum, aes(x = fct_rev(Treatment), y = Degree,Group)) +
   guides(color = guide_legend(title.position = "top", title.hjust = 0.5)) +
   facet_wrap(~Group)
 
-
-
 ggsave("../figures/top_bottom_ovary_deg.jpg", width = 8.5, height = 4, dpi = 600)
 
 
@@ -112,7 +125,7 @@ ggplot(grouped_sum, aes(x = Group, y = Degree)) +
   geom_point(aes(color = source_colony), size = 5) +
   scale_color_manual(values = wes_palette("Cavalcanti1")) +
   xlab("") +
-  labs(color="Source Colony") +
+  # labs(color="Source Colony") +
   ylab("Degree") + # Adjust axis labels
   theme_minimal() +
   theme(
