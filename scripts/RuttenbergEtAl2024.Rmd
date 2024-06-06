@@ -293,7 +293,7 @@ BDSMeans$Col = str_extract(BDSMeans$Bee, ".+?(?=#)")
 
 ```
 
-```{r Figure 2a}
+```{r Figure 2a (Ball and Stick Degree)}
 
 BDSMeansNoOv <- aggregate(cbind(Degree,Close,Eigen,Between,QR,Queen,boutDegree,boutBetween,boutClose,boutEigen,bodyDegree,bodyBetween,bodyClose,bodyEigen,AverageBoutLength,Presence,AntPresence,mean_vel,move_perc,N90.Day4,MRSD.Day4, Initiation.Freq) ~ Bee, BigDataSheet, mean)
 BDSMeansNoOv$Trial = str_extract(BDSMeansNoOv$Bee, ".+?(?=_)")
@@ -349,7 +349,7 @@ ggplot(BDSMeanOfMean, aes(x = fct_rev(as.factor(QR_Queen_Condition)), y = Degree
 
 ```
 
-```{r Figure 2b}
+```{r Figure 2b (Degree over Time)}
 
 ###MS:Figure 2b-----
 
@@ -405,7 +405,7 @@ ggplot(BigDataSheetF2, aes(x = as.integer(Hour), y = Degree/20, group = ID)) +
 
 ```
 
-```{r Figure 3}
+```{r Figure 3 (PCA)}
 
 ###MS:Figure 3------------
 numerical_data <- BigDataSheet[,c(4:7,16:42)]
@@ -456,7 +456,7 @@ cor.test(BDSMeansQL$Between, BDSMeansQL$boutBetween)
 
 ```
 
-```{r Figure 4}
+```{r Figure 4 (Velocity and Degree)}
 ###MS:Figure 4-------
 BDSMeans$Alpha <- ifelse(BDSMeans$Queen, 0.5, 0.75)
 BDSMeans$PointSize <- ifelse(BDSMeans$Queen, 2, 1)
@@ -499,7 +499,7 @@ ggplot(BDSMeans, aes(x = move_perc, y = Degree, group = interaction(QR, Queen)))
 
 ```
 
-```{r Figure 5}
+```{r Figure 5 (Ovaries and Degree)}
 
 BDSMeans$Alpha <- ifelse(BDSMeans$Queen, 0.5, 0.75)
 BDSMeans$PointSize <- ifelse(BDSMeans$Queen, 2, 1)
@@ -543,7 +543,7 @@ ggplot(BDSMeans, aes(x = OvaryIndex, y = Degree, group = interaction(QR, Queen))
 
 ```
 
-```{r Supp Figure 2b}
+```{r Supp Figure 2b (Presence-Standardized Degree Over Time)}
 
 BigDataSheetF2$StandardizedDegree = BigDataSheetF2$Degree * BigDataSheetF2$AntPresence
 
@@ -583,7 +583,7 @@ ggplot(BigDataSheetF2, aes(x = as.integer(Hour), y = StandardizedDegree/20, grou
 
 ```
 
-```{r Supp Figure 5}
+```{r Supp Figure 5 (Ball and Stick Dispersion)}
 ###MS:Supp Figure 5--------
 ggplot(BDSMeanOfMean, aes(x = fct_rev(as.factor(QR_Queen_Condition)), y = N90.Day4)) +
   geom_line(aes(group = Trial), color = "darkgray") +
@@ -609,5 +609,77 @@ ggplot(BDSMeanOfMean, aes(x = fct_rev(as.factor(QR_Queen_Condition)), y = N90.Da
     aspect.ratio = 1
   ) +
   guides(color = guide_legend(title.position = "top", title.hjust = 0.5))
+
+```
+
+```{r Presence Distribution}
+###Presence Distribution-----
+BDSRanked <- aggregate(cbind(Degree,Close,Eigen,Between,QR,Queen,boutDegree,boutBetween,boutClose,boutEigen,bodyDegree,bodyBetween,bodyClose,bodyEigen,AverageBoutLength,Presence,AntPresence,mean_vel,move_perc,N90.Day4,MRSD.Day4,Initiation.Freq) ~ Bee, BigDataSheet, mean)
+BDSRanked$Trial = str_extract(BDSRanked$Bee, ".+?(?=_)")
+BDSRanked$Col = str_extract(BDSRanked$Bee, ".+?(?=#)")
+BDSRanked = BDSRanked %>% arrange(Col, AntPresence) %>%
+  group_by(Col) %>%
+  mutate(Rank = rank(AntPresence))
+
+ggplot(BDSRanked, aes(x = Rank, y = AntPresence)) + 
+  geom_line(data = subset(BDSRanked, QR==1), aes(group = Col, color=Col)) +
+  geom_point(data = subset(BDSRanked, Queen==1),color="purple",size=3)
+
+```
+
+```{r Identifying Top 10}
+
+Top10 = BDSMeans %>%
+  group_by(Col) %>%
+  top_n(10, Degree)
+
+Bottom10 = BDSMeans %>%
+  group_by(Col) %>%
+  top_n(10, Degree)
+
+ggplot(BDSMeans, aes(x = QR, y = Degree)) + 
+  geom_line(aes(group = Trial),color="darkgray") +
+  geom_point(aes(color = Trial), size = 5) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  xlab("") +
+  labs(color="Source Colony") +
+  ylab("Degree") + # Adjust axis labels
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    # legend.position = "none",
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", linewidth =  0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", linewidth = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) +
+  guides(color = guide_legend(title.position = "top", title.hjust = 0.5)) 
+
+
+
+###AnalyzingTheSheet: OvaryIndex
+BDSMeans$OvaryIndex = BDSMeans$AverageOvaryWidth/BDSMeans$AverageWingLength
+ggplot(BDSMeans, aes(x=OvaryIndex, y=boutBetween)) + 
+  geom_point() + 
+  geom_smooth(method   = lm,
+              se       = T, 
+              linewidth = 1.5, 
+              linetype = 1, 
+              alpha    = .7,
+              aes(color    = factor(QR)))+
+  theme_classic() + 
+  labs(title="Avg Length vs Avg Width")+
+  scale_color_manual(name   ="Bee",
+                     labels = c("QL", "QR"),
+                     values = c("#161414", "#629CC0"))+
+  facet_wrap(~ QR, nrow = 2) #Made this before, but it's a good sanity check
+
+
 
 ```
