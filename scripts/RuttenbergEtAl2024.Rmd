@@ -1,6 +1,8 @@
 ---
 title: "DataForRuttenbergEtAl2024"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r load the big data sheet, aggregate}
@@ -45,6 +47,10 @@ for(i in 1:10){
     }
   }
 }
+TotalDeg <- TotalDeg %>%
+  mutate(degree = ifelse(Trial == "MexHotChoc", degree * 1.428, degree))
+TotalDeg <- TotalDeg %>%
+  mutate(close = ifelse(Trial == "MexHotChoc", close * 1.428, close))
 names(TotalDeg)[names(TotalDeg) == "degree"] <- "Degree"
 names(TotalDeg)[names(TotalDeg) == "between"] <- "Between"
 names(TotalDeg)[names(TotalDeg) == "close"] <- "Close"
@@ -78,6 +84,10 @@ for(i in 1:10){
   }
 }
 
+TotalBout <- TotalBout %>%
+  mutate(degree = ifelse(Trial == "MexHotChoc", degree * 1.428, degree))
+TotalBout <- TotalBout %>%
+  mutate(close = ifelse(Trial == "MexHotChoc", close * 1.428, close))
 TotalBoutSubset <- TotalBout[, c("ID", "degree", "between", "close", "eigen")]
 names(TotalBoutSubset)[names(TotalBoutSubset) == "degree"] <- "boutDegree"
 names(TotalBoutSubset)[names(TotalBoutSubset) == "between"] <- "boutBetween"
@@ -113,11 +123,16 @@ for(i in 1:10){
   }
 }
 
+TotalBody <- TotalBody %>%
+  mutate(degree = ifelse(Trial == "MexHotChoc", degree * 1.428, degree))
+TotalBody <- TotalBody %>%
+  mutate(close = ifelse(Trial == "MexHotChoc", close * 1.428, close))
 TotalBodySubset <- TotalBody[, c("ID", "degree", "between", "close", "eigen")]
 names(TotalBodySubset)[names(TotalBodySubset) == "degree"] <- "bodyDegree"
 names(TotalBodySubset)[names(TotalBodySubset) == "between"] <- "bodyBetween"
 names(TotalBodySubset)[names(TotalBodySubset) == "close"] <- "bodyClose"
 names(TotalBodySubset)[names(TotalBodySubset) == "eigen"] <- "bodyEigen"
+
 BigDataSheet <- merge(BigDataSheet, TotalBodySubset, by = "ID")
 
 #Bout Length
@@ -424,7 +439,7 @@ fviz_pca_ind(data.pca, label="none", habillage=numerical_data$Trial,
              addEllipses=TRUE, ellipse.level=0.95, palette = "Dark2")
 
 
-numerical_data <- BDSMeans[,c(2:5,8:25,28)]
+numerical_data <- BDSMeans[,c(2:5,8:25)]
 numerical_data = numerical_data[complete.cases(numerical_data), ]
 data_normalized <- scale(numerical_data)
 data.pca <- princomp(data_normalized)
@@ -433,7 +448,7 @@ fviz_pca_var(data.pca, col.var = "black")
 numerical_data$QR = BDSMeans[complete.cases(BDSMeans), ]$QR
 numerical_data$Trial = BDSMeans[complete.cases(BDSMeans), ]$Trial
 numerical_data$Queen = BDSMeans[complete.cases(BDSMeans), ]$Queen
-
+numerical_data$OvaryIndex = numerical_data$AverageOvaryWidth/numerical_data$AverageWingLength
 
 
 fviz_pca_ind(data.pca, label="none", habillage=numerical_data$QR,
@@ -444,7 +459,7 @@ fviz_pca_ind(data.pca, label="none", habillage=numerical_data$Queen,
              addEllipses=TRUE, ellipse.level=0.95, palette = "Dark2")
 fviz_pca_ind(data.pca, col.ind = numerical_data$OvaryIndex,geom="point",
              legend.title = "OvaryIndex", 
-             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"))
+             gradient.cols = c("#000000", "#006666", "#00FFBB"))
 
 
 BDSMeansQR = BDSMeans[BDSMeans$QR == TRUE,]
@@ -458,8 +473,8 @@ cor.test(BDSMeansQL$Between, BDSMeansQL$boutBetween)
 
 ```{r Figure 4 (Velocity and Degree)}
 ###MS:Figure 4-------
-BDSMeans$Alpha <- ifelse(BDSMeans$Queen, 0.5, 0.75)
-BDSMeans$PointSize <- ifelse(BDSMeans$Queen, 2, 1)
+BDSMeans$Alpha <- ifelse(BDSMeans$Queen, 1, 0.75)
+BDSMeans$PointSize <- ifelse(BDSMeans$Queen, 3, 1)
 
 ggplot(BDSMeans, aes(x = move_perc, y = Degree, group = interaction(QR, Queen))) +
   geom_smooth(
@@ -471,7 +486,7 @@ ggplot(BDSMeans, aes(x = move_perc, y = Degree, group = interaction(QR, Queen)))
     aes(color = interaction(QR, Queen))
   ) + # Color by treatment
   new_scale_color() +
-  geom_point(aes(color = Trial,shape=as.factor(QR)), alpha = 1,size = BDSMeans$PointSize) +
+  geom_point(aes(color = Trial,shape=as.factor(QR)), alpha = BDSMeans$Alpha,size = BDSMeans$PointSize) +
   scale_color_manual(values = wes_palette("Cavalcanti1")) +
   scale_x_continuous() + # Use a continuous scale for x
   scale_y_continuous() + # Use a continuous scale for y
@@ -482,7 +497,6 @@ ggplot(BDSMeans, aes(x = move_perc, y = Degree, group = interaction(QR, Queen)))
   theme(
     text = element_text(size = 16),
     plot.title = element_text(hjust = 0.5),
-    legend.position = "none",
     panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
     panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
     panel.grid.major.y = element_blank(), # Remove horizontal grid lines
@@ -493,16 +507,14 @@ ggplot(BDSMeans, aes(x = move_perc, y = Degree, group = interaction(QR, Queen)))
     axis.text.y.right = element_blank(), # Remove right y-axis text
     axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
     aspect.ratio = 1
-  ) +
-  xlim(0,1)
-
+  ) 
 
 ```
 
 ```{r Figure 5 (Ovaries and Degree)}
 
-BDSMeans$Alpha <- ifelse(BDSMeans$Queen, 0.5, 0.75)
-BDSMeans$PointSize <- ifelse(BDSMeans$Queen, 2, 1)
+BDSMeans$Alpha <- ifelse(BDSMeans$Queen, 1, 0.75)
+BDSMeans$PointSize <- ifelse(BDSMeans$Queen, 3, 1)
 
 BDSMeans$OvaryIndex = BDSMeans$AverageOvaryWidth/BDSMeans$AverageWingLength
 
@@ -527,7 +539,6 @@ ggplot(BDSMeans, aes(x = OvaryIndex, y = Degree, group = interaction(QR, Queen))
   theme(
     text = element_text(size = 16),
     plot.title = element_text(hjust = 0.5),
-    legend.position = "none",
     panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
     panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
     panel.grid.major.y = element_blank(), # Remove horizontal grid lines
@@ -538,9 +549,7 @@ ggplot(BDSMeans, aes(x = OvaryIndex, y = Degree, group = interaction(QR, Queen))
     axis.text.y.right = element_blank(), # Remove right y-axis text
     axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
     aspect.ratio = 1
-  ) +
-  xlim(0,1)
-
+  ) 
 ```
 
 ```{r Supp Figure 2b (Presence-Standardized Degree Over Time)}
