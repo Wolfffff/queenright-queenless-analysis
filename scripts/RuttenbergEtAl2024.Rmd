@@ -1748,4 +1748,213 @@ print(cutoff1)
 print(cutoff2)
 
 influencers = data_with_pca_ql[data_with_pca_ql$PC1 > cutoff1 & data_with_pca_ql$Rank >= 40,]
+
+BDSMeansNoOv$InflText = BDSMeansNoOv$Bee %in% influencers$Bee
+BDSMeans$InflText = BDSMeans$Bee %in% influencers$Bee
+BDSMeansNoOv$Infl <- ifelse(BDSMeansNoOv$InflText, 1, 0)
+BDSMeans$Infl <- ifelse(BDSMeans$InflText, 1, 0)
+
+BDSMeans <- BDSMeans %>%
+  mutate(QR_Queen_Inf = case_when(
+    QR==0 & Infl==0 ~ "Queenless Worker",
+    QR==1 & Queen==0 ~ "Queenright Worker",
+    Queen==1 ~ "Queen",
+    QR==0 & Infl==1 ~ "Influencer",
+    TRUE ~ NA_character_  # This handles any other case, which shouldn't exist in your scenario
+  )) %>%
+  mutate(QR_Queen_Inf = factor(QR_Queen_Inf, levels = c( "Queenless Worker","Queenright Worker", "Queen", "Influencer")))
+
+BDSMeansNoOv <- BDSMeansNoOv %>%
+  mutate(QR_Queen_Inf = case_when(
+    QR==0 & Infl==0 ~ "Queenless Worker",
+    QR==1 & Queen==0 ~ "Queenright Worker",
+    Queen==1 ~ "Queen",
+    QR==0 & Infl==1 ~ "Influencer",
+    TRUE ~ NA_character_  # This handles any other case, which shouldn't exist in your scenario
+  )) %>%
+  mutate(QR_Queen_Inf = factor(QR_Queen_Inf, levels = c( "Queenless Worker","Queenright Worker", "Queen", "Influencer")))
+BDSMeans$ID = paste(BDSMeans$Trial,BDSMeans$QR_Queen_Inf)
+BDSMeansNoOv$ID = paste(BDSMeansNoOv$Trial,BDSMeansNoOv$QR_Queen_Inf)
+BDSMeanOfMean <- aggregate(cbind(Degree,Close,Eigen,Between,QR,Queen,boutDegree,boutBetween,boutClose,boutEigen,bodyDegree,bodyBetween,bodyClose,bodyEigen,AverageBoutLength,Presence,AntPresence,mean_vel,move_perc,N90.Day4,MRSD.Day4, Initiation.Freq, clust, Infl) ~ ID, BDSMeansNoOv, mean)
+BDSMeanOfMean$Trial = str_extract(BDSMeanOfMean$ID, ".+?(?= )")
+
+BDSMeanOfMean <- BDSMeanOfMean %>%
+  mutate(QR_Queen_Inf = case_when(
+    QR==0 & Infl==0 ~ "Queenless Worker",
+    QR==1 & Queen==0 ~ "Queenright Worker",
+    Queen==1 ~ "Queen",
+    QR==0 & Infl==1 ~ "Influencer",
+    TRUE ~ NA_character_  # This handles any other case, which shouldn't exist in your scenario
+  )) %>%
+  mutate(QR_Queen_Inf = factor(QR_Queen_Inf, levels = c( "Queenless Worker","Queenright Worker", "Queen", "Influencer")))
+
+ggplot(BDSMeanOfMean, aes(x = factor(QR_Queen_Inf, levels = c("Queen", "Influencer", "Queenright Worker", "Queenless Worker")), y = Degree)) +
+  geom_line(aes(group = Trial), color = "darkgray") +
+  geom_point(aes(color = Trial), size = 5) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  xlab("") +
+  labs(color = "Source Colony") +
+  ylab("Mean Number of Interactions per Hour (Unstandardized)") + # Adjust axis labels
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    #legend.position = "none",
+    text = element_text(size = 16),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) +
+  guides(color = guide_legend(title.position = "top", title.hjust = 0.5))
+
+ggplot(BDSMeanOfMean, aes(x = factor(QR_Queen_Inf, levels = c("Queen", "Influencer", "Queenright Worker", "Queenless Worker")), y = move_perc)) +
+  geom_line(aes(group = Trial), color = "darkgray") +
+  geom_point(aes(color = Trial), size = 5) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  xlab("") +
+  labs(color = "Source Colony") +
+  ylab("Percentage of Time Moving") + # Adjust axis labels
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    #legend.position = "none",
+    text = element_text(size = 16),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) +
+  guides(color = guide_legend(title.position = "top", title.hjust = 0.5))
+
+ggplot(BDSMeanOfMean, aes(x = factor(QR_Queen_Inf, levels = c("Queen", "Influencer", "Queenright Worker", "Queenless Worker")), y = clust)) +
+  geom_line(aes(group = Trial), color = "darkgray") +
+  geom_point(aes(color = Trial), size = 5) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  xlab("") +
+  labs(color = "Source Colony") +
+  ylab("Clustering Coefficient") + # Adjust axis labels
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    #legend.position = "none",
+    text = element_text(size = 16),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) +
+  guides(color = guide_legend(title.position = "top", title.hjust = 0.5))
+
+ggplot(BDSMeanOfMean, aes(x = factor(QR_Queen_Inf, levels = c("Queen", "Influencer", "Queenright Worker", "Queenless Worker")), y = N90.Day4)) +
+  geom_line(aes(group = Trial), color = "darkgray") +
+  geom_point(aes(color = Trial), size = 5) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  xlab("") +
+  labs(color = "Source Colony") +
+  ylab("N90 Day 4") + # Adjust axis labels
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    #legend.position = "none",
+    text = element_text(size = 16),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) +
+  guides(color = guide_legend(title.position = "top", title.hjust = 0.5))
+
+ggplot(BDSMeanOfMean, aes(x = factor(QR_Queen_Inf, levels = c("Queen", "Influencer", "Queenright Worker", "Queenless Worker")), y = Initiation.Freq)) +
+  geom_line(aes(group = Trial), color = "darkgray") +
+  geom_point(aes(color = Trial), size = 5) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  xlab("") +
+  labs(color = "Source Colony") +
+  ylab("Initiation Prop") + # Adjust axis labels
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    #legend.position = "none",
+    text = element_text(size = 16),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) +
+  guides(color = guide_legend(title.position = "top", title.hjust = 0.5))
+
+BDSMeans$OvaryIndex = BDSMeans$AverageOvaryWidth / BDSMeans$AverageWingLength
+BDSMeanOfMean <- aggregate(cbind(Degree,Close,Eigen,Between,QR,Queen,boutDegree,boutBetween,boutClose,boutEigen,bodyDegree,bodyBetween,bodyClose,bodyEigen,AverageBoutLength,Presence,AntPresence,mean_vel,move_perc,N90.Day4,MRSD.Day4, Initiation.Freq, clust, Infl, OvaryIndex) ~ ID, BDSMeans, mean)
+BDSMeanOfMean$Trial = str_extract(BDSMeanOfMean$ID, ".+?(?= )")
+
+BDSMeanOfMean <- BDSMeanOfMean %>%
+  mutate(QR_Queen_Inf = case_when(
+    QR==0 & Infl==0 ~ "Queenless Worker",
+    QR==1 & Queen==0 ~ "Queenright Worker",
+    Queen==1 ~ "Queen",
+    QR==0 & Infl==1 ~ "Influencer",
+    TRUE ~ NA_character_  # This handles any other case, which shouldn't exist in your scenario
+  )) %>%
+  mutate(QR_Queen_Inf = factor(QR_Queen_Inf, levels = c( "Queenless Worker","Queenright Worker", "Queen", "Influencer")))
+
+
+ggplot(BDSMeanOfMean, aes(x = factor(QR_Queen_Inf, levels = c("Queen", "Influencer", "Queenright Worker", "Queenless Worker")), y = OvaryIndex)) +
+  geom_line(aes(group = Trial), color = "darkgray") +
+  geom_point(aes(color = Trial), size = 5) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  xlab("") +
+  labs(color = "Source Colony") +
+  ylab("Ovary Index") + # Adjust axis labels
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    #legend.position = "none",
+    text = element_text(size = 16),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) +
+  guides(color = guide_legend(title.position = "top", title.hjust = 0.5))
+
+
+
 ```
+
+
