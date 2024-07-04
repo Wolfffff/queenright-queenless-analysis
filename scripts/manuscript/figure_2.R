@@ -5,14 +5,7 @@ library(stringr)
 library(wesanderson)
 library(cowplot)
 
-Q_QRW_INT_QLW <- list(
-  Q = "#893F71",
-  QRW = "#AC6F82",
-  INF = "#CC5500",
-  QLW = "#FFAE00"
-)
-
-COLONY_COLORS <- wes_palette("Cavalcanti1")
+source("scripts/manuscript/constants.R")
 
 # Read the data
 bds <- read_csv("data/BigDataSheet.csv")
@@ -68,34 +61,13 @@ bds_mean_of_means <- bds_mean_of_means %>%
     mutate(QR_Queen_Condition = factor(QR_Queen_Condition, levels = c("Queenright", "Queenless", "Queen")))
 
 # Plot Degree
-
-consistent_theme <- theme_minimal() +
-    theme(
-        plot.title = element_text(hjust = 0.5),
-        legend.position = "None",
-        text = element_text(size = 9),
-        panel.grid.major.x = element_line(color = "grey", linetype = "dashed"),
-        panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"),
-        panel.grid.major.y = element_blank(),
-        panel.grid.minor.y = element_blank(),
-        axis.line.x = element_line(color = "black", size = 0.5),
-        axis.line.y = element_line(color = "black", size = 0.5),
-        strip.text = element_text(size = 9, face = "bold"),
-        axis.text.y.right = element_blank(),
-        axis.ticks.y.right = element_blank(),
-        aspect.ratio = 1,
-        axis.text.x = element_text(size = 8),
-        axis.text.y = element_text(size = 9),
-        plot.margin = unit(c(0.1, 0.1, 0.1, 0.1), "cm")
-    )
-# Plot Degree
 plot_degree <- ggplot(bds_mean_of_means, aes(x = QR_Queen_Condition, y = Degree)) +
     geom_line(aes(group = Trial), color = "darkgray", linewidth = 0.2) +
     geom_point(aes(color = Trial), size = 3) +
     scale_color_manual(values = COLONY_COLORS) +
     xlab("") +
     ylab("Std. Number of Int. per Hour") +
-    consistent_theme
+    CONSISTENT_THEME
 
 # Plot Initiation.Freq
 plot_init_freq <- ggplot(bds_mean_of_means, aes(x = QR_Queen_Condition, y = Initiation.Freq)) +
@@ -104,7 +76,7 @@ plot_init_freq <- ggplot(bds_mean_of_means, aes(x = QR_Queen_Condition, y = Init
     scale_color_manual(values = COLONY_COLORS) +
     xlab("") +
     ylab("Initiation Frequency") +
-    consistent_theme
+    CONSISTENT_THEME
 
 # Plot N90.Day4
 plot_n90_day4 <- ggplot(bds_mean_of_means, aes(x = QR_Queen_Condition, y = N90.Day4)) +
@@ -113,10 +85,10 @@ plot_n90_day4 <- ggplot(bds_mean_of_means, aes(x = QR_Queen_Condition, y = N90.D
     scale_color_manual(values = COLONY_COLORS) +
     xlab("") +
     ylab("N90 (Dispersion)") +
-    consistent_theme
+    CONSISTENT_THEME
 
 # Rug
-bds$Alpha <- ifelse(bds$Queen, .5, 0.005)
+bds$Alpha <- ifelse(bds$Queen, .5, 0.1)
 bds$PointSize <- ifelse(bds$Queen, .05, .005)
 
 degree_over_time <- ggplot(bds, aes(x = as.integer(Hour), y = Degree / 20, group = ID)) +
@@ -167,4 +139,4 @@ final_plot <- plot_grid(plots[[2]],top_row, ncol = 1, rel_heights = c(1, 1))
 
 # Save the combined plot
 # Adjust the plot saving command to include margins
-ggsave("figures/manuscript/figure_2_combined.jpeg", plot = final_plot + theme(plot.margin = margin(1, 1, 1, 1, "cm")), width = 8.5, height = 6)
+ggsave("figures/manuscript/figure_2_combined.jpeg", plot = final_plot + theme(plot.margin = margin(1, 1, 1, 1, "cm")), width = 8.5, height = 6,dpi =1200)
