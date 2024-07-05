@@ -65,11 +65,14 @@ bds_mean_of_means <- bds_mean_of_means %>%
     QR==0 & Infl==1 ~ "Influencer",
     TRUE ~ NA_character_  # This handles any other case, which shouldn't exist in your scenario
   )) %>%
-  mutate(QR_Queen_Inf = factor(QR_Queen_Inf, levels = c( "Queenless Worker","Queenright Worker", "Queen", "Influencer")))
+  mutate(QR_Queen_Inf = factor(QR_Queen_Inf, levels = c("Queenright Worker","Queenless Worker", "Queen", "Influencer")))
 
 # Sample data for beeswarm plot
 TotalCentSum <- bds_means %>%
     filter(QR_Queen_Inf %in% c("Queenless Worker", "Queenright Worker"))
+
+# Set order of levels
+TotalCentSum$QR_Queen_Inf <- factor(TotalCentSum$QR_Queen_Inf, levels = c("Queenright Worker","Queenless Worker"))
 
 grouped_sum <- TotalCentSum %>%
     group_by(Trial, QR_Queen_Inf) %>%
@@ -86,7 +89,7 @@ plot_swarm <- ggplot(TotalCentSum, aes(x = QR_Queen_Inf, y = Degree)) +
   ylab("Degree") +
   theme_minimal() +
   CONSISTENT_THEME +
-  scale_x_discrete(labels = c("Queenless\nWorker", "Queenright\nWorker")) +  # Update x-axis labels to be two lines
+  scale_x_discrete(labels = c("Queenright\nWorker","Queenless\nWorker")) +  # Update x-axis labels to be two lines
   guides(color = guide_legend(title.position = "top", title.hjust = 0.5))
 
 # Note: Adjust the labels in scale_x_discrete to match your actual QR_Queen_Inf values.
@@ -112,3 +115,4 @@ aligned_plots <- plot_grid(plot_swarm, plot_centrality, align = "hv", ncol = 2)
 
 # Save the combined plot using cowplot's save_plot function for better handling of cowplot objects
 save_plot("figures/manuscript/figure_5.jpeg", aligned_plots, base_width = 4.25, base_height = 2.833, dpi = 1200)
+
