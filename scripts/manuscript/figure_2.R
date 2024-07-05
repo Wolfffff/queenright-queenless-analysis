@@ -66,7 +66,7 @@ plot_degree <- ggplot(bds_mean_of_means, aes(x = QR_Queen_Condition, y = Degree)
     geom_point(aes(color = Trial), size = 3) +
     scale_color_manual(values = COLONY_COLORS) +
     xlab("") +
-    ylab("Std. Number of Int. per Hour") +
+    ylab("Std. Interactions per Hour") +
     CONSISTENT_THEME
 
 # Plot Initiation.Freq
@@ -103,7 +103,7 @@ degree_over_time <- ggplot(bds, aes(x = as.integer(Hour), y = Degree / 20, group
     scale_x_continuous(breaks = c(0, seq(24, 96, by = 24)), limits = c(0, NA), expand = c(0, 0)) + # Expand limits to include 0
     labs(color = "") +
     xlab("Hour") +
-    ylab("Time Spent Interacting per Hour (s)") +
+    ylab("Std. Time Interacting per Hour (s)") +
     theme_minimal() +
     theme(
         text = element_text(size = 9),

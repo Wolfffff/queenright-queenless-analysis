@@ -81,10 +81,10 @@ bds_mean_of_means <- bds_mean_of_means %>%
 ggplot(bds_mean_of_means, aes(x = factor(QR_Queen_Inf, levels = c("Queen", "Influencer", "Queenright Worker", "Queenless Worker")), y = Degree)) +
   geom_line(aes(group = Trial), color = "darkgray") +
   geom_point(aes(color = Trial), size = 5) +
-  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  scale_color_manual(values = COLONY_COLORS) +
   xlab("") +
   labs(color = "Source Colony") +
-  ylab("Mean Number of Interactions per Hour (Unstandardized)") + # Adjust axis labels
+  ylab("Std. Interactions per Hour") + # Adjust axis labels
   theme_minimal() +
   CONSISTENT_THEME +
   guides(color = guide_legend(title.position = "top", title.hjust = 0.5))
@@ -99,12 +99,12 @@ bds_mean_of_means$QR_Queen_Inf <- factor(bds_mean_of_means$QR_Queen_Inf, levels 
 
 # Step 3: Plot with a cut in the x-axis using facets
 plot_degree <- ggplot(bds_mean_of_means, aes(x = QR_Queen_Inf, y = Degree)) +
-  geom_line(aes(group = interaction(Trial, Group)), color = "darkgray") +
-  geom_point(aes(color = Trial), size = 2) +
-  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  geom_line(aes(group = interaction(Trial, Group)), color = "darkgray",size=0.2) +
+  geom_point(aes(color = Trial), size = 3) +
+  scale_color_manual(values = COLONY_COLORS) +
   xlab("") +
   labs(color = "Source Colony") +
-  ylab("Std. Number of Int. per Hour") +
+  ylab("Std. Interactions per Hour") +
   theme_minimal() +
   CONSISTENT_THEME_NO_ASPECT +
   guides(color = guide_legend(title.position = "top", title.hjust = 0.5)) +
@@ -113,9 +113,9 @@ plot_degree <- ggplot(bds_mean_of_means, aes(x = QR_Queen_Inf, y = Degree)) +
 
 # Step 3: Plot with a cut in the x-axis using facets
 plot_disp<- ggplot(bds_mean_of_means, aes(x = QR_Queen_Inf, y = N90.Day4)) +
-  geom_line(aes(group = interaction(Trial, Group)), color = "darkgray") +
-  geom_point(aes(color = Trial), size = 2) +
-  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  geom_line(aes(group = interaction(Trial, Group)), color = "darkgray",size=0.2) +
+  geom_point(aes(color = Trial), size = 3) +
+  scale_color_manual(values = COLONY_COLORS) +
   xlab("") +
   labs(color = "Source Colony") +
   ylab("N90 (Dispersion)") +
@@ -126,9 +126,9 @@ plot_disp<- ggplot(bds_mean_of_means, aes(x = QR_Queen_Inf, y = N90.Day4)) +
   SHARED_THEME
 
 plot_between <- ggplot(bds_mean_of_means, aes(x = QR_Queen_Inf, y = Between)) +
-  geom_line(aes(group = interaction(Trial, Group)), color = "darkgray") +
-  geom_point(aes(color = Trial), size = 2) +
-  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  geom_line(aes(group = interaction(Trial, Group)), color = "darkgray",size=0.2) +
+  geom_point(aes(color = Trial), size = 3) +
+  scale_color_manual(values = COLONY_COLORS) +
   xlab("") +
   labs(color = "Source Colony") +
   ylab("Betweenness") +

@@ -124,7 +124,7 @@ plot_degree <- ggplot(data_with_pca_workers, aes(x = Degree, fill = QR_Queen_Con
     geom_density(alpha = 0.5) +
     scale_fill_manual(values = c(Q_QRW_INT_QLW$QRW, Q_QRW_INT_QLW$QLW)) +
     theme_minimal() +
-    labs(x = "Std. Number of Int. per Hour", y = "Density") +
+    labs(x = "Std. Interactions per Hour", y = "Density") +
     CONSISTENT_THEME +
     theme(
         aspect.ratio = 1,
@@ -150,7 +150,7 @@ plot_move_perc <- ggplot(data_with_pca_workers, aes(x = move_perc, fill = QR_Que
     geom_density(alpha = 0.5) +
     scale_fill_manual(values = c(Q_QRW_INT_QLW$QRW, Q_QRW_INT_QLW$QLW)) +
     theme_minimal() +
-    labs(x = "Percent of Time Moving", y = "Density") +
+    labs(x = "Fraction of Time Moving", y = "Density") +
     CONSISTENT_THEME +
     theme(
         aspect.ratio = 1,

@@ -27,7 +27,7 @@ bds <- bds %>%
 # Calculate mean values of QR, Queen, and Degree for each Bee (QR and Queen are binary so mean is the value itself)
 bds_means <- bds %>%
   group_by(Bee) %>%
-  summarise(across(c(Degree, Close, Eigen, Between, QR, Queen, boutDegree, boutBetween, boutClose, boutEigen, bodyDegree, bodyBetween, bodyClose, bodyEigen, AverageBoutLength, Presence, AntPresence, mean_vel, move_perc, N90.Day4, MRSD.Day4, Initiation.Freq, clust, Infl), mean, na.rm = TRUE))
+  summarise(across(c(Infl, Degree, Close, Eigen, Between, QR, Queen, boutDegree, boutBetween, boutClose, boutEigen, bodyDegree, bodyBetween, bodyClose, bodyEigen, AverageBoutLength, Presence, AntPresence, mean_vel, move_perc, N90.Day4, MRSD.Day4, Initiation.Freq, clust, Infl), mean, na.rm = TRUE))
 
 # Extract Trial information from Bee column
 bds_means <- bds_means %>%
@@ -95,10 +95,10 @@ plot_swarm <- ggplot(TotalCentSum, aes(x = QR_Queen_Inf, y = Degree)) +
 
 # Note: Adjust the labels in scale_x_discrete to match your actual QR_Queen_Inf values.
 # Betweenness Centrality vs Degree Centrality
-bds_means$Point_Size <- ifelse(bds_means$QR_Queen_Inf == "Queen", 3.5, 2)
+bds_means$Point_Size <- ifelse(bds_means$QR_Queen_Inf %in% c("Queen","Influencer"), 3, 1)
 
 
-plot_centrality <- ggplot(bds_means, aes(x = Degree, y = Between, group = QR_Queen_Inf)) +
+plot_centrality <- ggplot(bds_means, aes(x = Between, y = Degree, group = QR_Queen_Inf)) +
   geom_point(aes(color = QR_Queen_Inf), alpha = .75, size = bds_means$Point_Size, stroke = 0) +
   scale_color_manual(
     labels = c("Queenright Worker", "Queenless Worker", "Queen", "Influencer"),
@@ -106,13 +106,35 @@ plot_centrality <- ggplot(bds_means, aes(x = Degree, y = Between, group = QR_Que
   ) +
   scale_x_continuous() + # Use a continuous scale for x
   scale_y_continuous() + # Use a continuous scale for y
-  xlab("Std. Number of Int. per Hour") +
-  ylab("Betweenness Centrality") + # Adjust axis labels
+  ylab("Std. Interactions per Hour") +
+  xlab("Betweenness Centrality") + # Adjust axis labels
   CONSISTENT_THEME
 
 
-# Combine the plots using cowplot's plot_grid
-aligned_plots <- plot_grid(plot_trans, plot_eff, plot_assort, plot_centrality, align = "hv", ncol = 4)
+# Degree by move_perc with linear models for
+plot_lm <- ggplot(bds_means, aes(x = move_perc, y = Degree, color = QR_Queen_Inf)) +
+  geom_point(aes(size = QR_Queen_Inf %in% c("Queen", "Influencer")),stroke=0,alpha = .75) +  # Conditional size for "Queen"
+  geom_smooth(data = subset(bds_means, QR_Queen_Inf %in% c("Queenright Worker", "Queen")), method = "lm", se = TRUE, color = "#642076") +  # Red line for Queen and Queenright Worker combined
+  geom_smooth(data = subset(bds_means, QR_Queen_Inf %in% c("Queenless Worker", "Influencer")), method = "lm", se = TRUE, color = "#E68200") +  # Green line for Queenless Worker and Influencer combined
+  scale_color_manual(
+    labels = c("Queenright Worker", "Queenless Worker", "Queen", "Influencer"),
+    values = c(Q_QRW_INT_QLW$QRW, Q_QRW_INT_QLW$QLW, Q_QRW_INT_QLW$Q, Q_QRW_INT_QLW$INF)
+  ) +
+  scale_size_manual(values = c(`TRUE` = 3, `FALSE` = 1)) +  # Adjust the size for "Queen"
+  guides(size = FALSE) +  # Optionally hide the size legend
+  xlab("Fraction of Time Moving") +
+  ylab("Std. Interactions per Hour") +
+  CONSISTENT_THEME
 
-# Save the combined plot using cowplot's save_plot function for better handling of cowplot objects
-save_plot("figures/manuscript/figure_5.jpeg", aligned_plots + theme(plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "cm")), base_width = 8.5, base_height = 2.125, dpi = 1200)
+# Create the top row with plot_centrality and plot_lm
+top_row <- plot_grid(plot_lm,plot_centrality, ncol = 2, align = 'h')
+
+# Create the bottom row with plot_trans, plot_eff, and plot_assort
+bottom_row <- plot_grid(plot_trans, plot_eff, plot_assort, ncol = 3, align = 'h')
+
+# Combine the top and bottom rows into the final layout
+final_layout <- plot_grid(top_row, bottom_row, ncol = 1, align = 'hv', rel_heights = c(1.5, 1))
+
+# Save the final layout with adjusted margins
+save_plot("figures/manuscript/figure_5.jpeg", final_layout + theme(plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "cm")), base_width = 8.5, base_height = 6, dpi = 600)
+
