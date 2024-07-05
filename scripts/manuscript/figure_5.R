@@ -86,7 +86,7 @@ plot_swarm <- ggplot(TotalCentSum, aes(x = QR_Queen_Inf, y = Degree)) +
   scale_color_manual(values = COLONY_COLORS) +
   xlab("") +
   labs(color = "Source Colony") +
-  ylab("Degree") +
+  ylab("Std. Number of Int. per Hour") +
   theme_minimal() +
   CONSISTENT_THEME +
   scale_x_discrete(labels = c("Queenright\nWorker","Queenless\nWorker")) +  # Update x-axis labels to be two lines
@@ -105,7 +105,7 @@ plot_centrality <- ggplot(bds_means, aes(x = Degree, y = Between, group = QR_Que
   ) +
   scale_x_continuous() + # Use a continuous scale for x
   scale_y_continuous() + # Use a continuous scale for y
-  xlab("Degree Centrality") +
+  xlab("Std. Number of Int. per Hour") +
   ylab("Betweenness Centrality") + # Adjust axis labels
   CONSISTENT_THEME
 
