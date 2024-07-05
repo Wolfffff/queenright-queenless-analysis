@@ -22,9 +22,9 @@ nwp_means <- nwp %>%
 nwp_means_transitivity <- nwp_means %>%
     filter(params == "Transitivity")
 
-plot_swarm <- ggplot(nwp_means_transitivity, aes(x = QR, y = mean_value)) +
-    geom_line(aes(group = Trial), color = "darkgray", linewidth = 1) +
-    geom_point(aes(color = Trial), size = 5) +
+plot_trans <- ggplot(nwp_means_transitivity, aes(x = QR, y = mean_value)) +
+    geom_line(aes(group = Trial), color = "darkgray", linewidth = 0.2) +
+    geom_point(aes(color = Trial), size = 3) +
     scale_color_manual(values = COLONY_COLORS) +
     xlab("") +
     labs(color = "Source Colony") +
@@ -41,9 +41,9 @@ ggsave("figures/manuscript/figure_5_supp_nwp_transitivity.png", plot_swarm, widt
 nwp_means_eff <- nwp_means %>%
     filter(params == "GlobalEfficiency")
 
-plot_swarm <- ggplot(nwp_means_eff, aes(x = QR, y = mean_value)) +
-    geom_line(aes(group = Trial), color = "darkgray", linewidth = 1) +
-    geom_point(aes(color = Trial), size = 5) +
+plot_eff <- ggplot(nwp_means_eff, aes(x = QR, y = mean_value)) +
+    geom_line(aes(group = Trial), color = "darkgray", linewidth = 0.2) +
+    geom_point(aes(color = Trial), size = 3) +
     scale_color_manual(values = COLONY_COLORS) +
     xlab("") +
     labs(color = "Source Colony") +
@@ -58,9 +58,9 @@ ggsave("figures/manuscript/figure_5_supp_nwp_eff.png", plot_swarm, width = 6, he
 nwp_means_assortativity <- nwp_means %>%
     filter(params == "Assortativity")
 
-plot_swarm <- ggplot(nwp_means_assortativity, aes(x = QR, y = mean_value)) +
-    geom_line(aes(group = Trial), color = "darkgray", linewidth = 1) +
-    geom_point(aes(color = Trial), size = 5) +
+plot_assort <- ggplot(nwp_means_assortativity, aes(x = QR, y = mean_value)) +
+    geom_line(aes(group = Trial), color = "darkgray", linewidth = 0.2) +
+    geom_point(aes(color = Trial), size = 3) +
     scale_color_manual(values = COLONY_COLORS) +
     xlab("") +
     labs(color = "Source Colony") +
