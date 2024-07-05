@@ -1,6 +1,6 @@
 Q_QRW_INT_QLW <- list(
-  Q = "#893F71",
-  QRW = "#3f007b",
+  Q = "#3f007b",
+  QRW = "#893F71",
   INF = "#CC5500",
   QLW = "#FFAE00"
 )
