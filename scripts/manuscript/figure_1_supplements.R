@@ -100,7 +100,7 @@ plot_int_type <- ggplot(d, aes(x = as.integer(Hour), y = value/20, group = varia
   scale_x_continuous(breaks = c(0, seq(24, 96, by = 24)), limits = c(0, NA), expand = c(0, 0)) + # Expand limits to include 0
   labs(color = "") +
   xlab("Hour") +
-  ylab("Standardized Time Spent Interacting per Hour (s)") +
+  ylab("Std. Time Interacting per Hour (s)") +
   theme_minimal() +
   theme(
     plot.title = element_text(hjust = 0.5),
