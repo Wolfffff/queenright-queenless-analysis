@@ -14,18 +14,10 @@ bds <- read_csv("data/BigDataSheet.csv")
 bds <- bds %>%
     mutate(Trial = str_extract(Bee, ".+?(?=_)"))
 
-bds <- bds %>%
-    mutate(QR_Queen_Condition = case_when(
-        QR == 0 & Queen == 0 ~ "Queenless",
-        QR == 1 & Queen == 0 ~ "Queenright",
-        Queen == 1 ~ "Queen"
-    )) %>%
-    mutate(QR_Queen_Condition = factor(QR_Queen_Condition, levels = c("Queenright", "Queenless", "Queen")))
-
 # Calculate mean values of QR, Queen, and Degree for each Bee (QR and Queen are binary so mean is the value itself)
 bds_means <- bds %>%
     group_by(Bee) %>%
-    summarise(across(c(Degree, Close, Eigen, Between, QR, Queen, boutDegree, boutBetween, boutClose, boutEigen, bodyDegree, bodyBetween, bodyClose, bodyEigen, AverageBoutLength, Presence, AntPresence, mean_vel, move_perc, N90.Day4, MRSD.Day4, Initiation.Freq, clust), mean, na.rm = TRUE))
+    summarise(across(c(Infl, Degree, Close, Eigen, Between, QR, Queen, boutDegree, boutBetween, boutClose, boutEigen, bodyDegree, bodyBetween, bodyClose, bodyEigen, AverageBoutLength, Presence, AntPresence, mean_vel, move_perc, N90.Day4, MRSD.Day4, Initiation.Freq, clust), mean, na.rm = TRUE))
 
 # Extract Trial information from Bee column
 bds_means <- bds_means %>%
@@ -146,11 +138,11 @@ plot_dispersion <- ggplot(data_with_pca_workers, aes(x = N90.Day4, fill = QR_Que
     scale_alpha_continuous() # Explicit control over alpha scale
 
 # Density plot for move_perc (Percent of Time Moving)
-plot_move_perc <- ggplot(data_with_pca_workers, aes(x = move_perc, fill = QR_Queen_Condition)) +
+plot_move_perc <- ggplot(data_with_pca_workers, aes(x = move_perc*100, fill = QR_Queen_Condition)) +
     geom_density(alpha = 0.5) +
     scale_fill_manual(values = c(Q_QRW_INT_QLW$QRW, Q_QRW_INT_QLW$QLW)) +
     theme_minimal() +
-    labs(x = "Fraction of Time Moving", y = "Density") +
+    labs(x = "Percent of Time Moving", y = "Density") +
     CONSISTENT_THEME +
     theme(
         aspect.ratio = 1,
@@ -170,6 +162,8 @@ plot_clustering <- ggplot(data_with_pca_workers, aes(x = clust, fill = QR_Queen_
         plot.margin = unit(c(0, 0, 0, 0), "cm")
     ) +
     scale_alpha_continuous() # Explicit control over alpha scale
+
+# Ov
 
 # Create the top row with two plots side by side
 grid <- plot_grid(plot_degree, plot_move_perc, plot_dispersion, plot_clustering, ncol = 2, nrow = 2, align = 'hv', axis = 'tblr')

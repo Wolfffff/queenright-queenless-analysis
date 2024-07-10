@@ -98,7 +98,7 @@ plot_swarm <- ggplot(TotalCentSum, aes(x = QR_Queen_Inf, y = Degree)) +
 bds_means$Point_Size <- ifelse(bds_means$QR_Queen_Inf %in% c("Queen","Influencer"), 3, 1)
 
 
-plot_centrality <- ggplot(bds_means, aes(x = Between, y = Degree, group = QR_Queen_Inf)) +
+plot_centrality <- ggplot(bds_means, aes(y = Between, x = Degree, group = QR_Queen_Inf)) +
   geom_point(aes(color = QR_Queen_Inf), alpha = .75, size = bds_means$Point_Size, stroke = 0) +
   scale_color_manual(
     labels = c("Queenright Worker", "Queenless Worker", "Queen", "Influencer"),
@@ -106,13 +106,13 @@ plot_centrality <- ggplot(bds_means, aes(x = Between, y = Degree, group = QR_Que
   ) +
   scale_x_continuous() + # Use a continuous scale for x
   scale_y_continuous() + # Use a continuous scale for y
-  ylab("Std. Interactions per Hour") +
-  xlab("Betweenness Centrality") + # Adjust axis labels
+  xlab("Std. Interactions per Hour") +
+  ylab("Betweenness Centrality") + # Adjust axis labels
   CONSISTENT_THEME
 
 
 # Degree by move_perc with linear models for
-plot_lm <- ggplot(bds_means, aes(x = move_perc, y = Degree, color = QR_Queen_Inf)) +
+plot_lm <- ggplot(bds_means, aes(y = move_perc*100, x = Degree, color = QR_Queen_Inf)) +
   geom_point(aes(size = QR_Queen_Inf %in% c("Queen", "Influencer")),stroke=0,alpha = .75) +  # Conditional size for "Queen"
   geom_smooth(data = subset(bds_means, QR_Queen_Inf %in% c("Queenright Worker", "Queen")), method = "lm", se = TRUE, color = "#642076") +  # Red line for Queen and Queenright Worker combined
   geom_smooth(data = subset(bds_means, QR_Queen_Inf %in% c("Queenless Worker", "Influencer")), method = "lm", se = TRUE, color = "#E68200") +  # Green line for Queenless Worker and Influencer combined
@@ -122,8 +122,8 @@ plot_lm <- ggplot(bds_means, aes(x = move_perc, y = Degree, color = QR_Queen_Inf
   ) +
   scale_size_manual(values = c(`TRUE` = 3, `FALSE` = 1)) +  # Adjust the size for "Queen"
   guides(size = FALSE) +  # Optionally hide the size legend
-  xlab("Fraction of Time Moving") +
-  ylab("Std. Interactions per Hour") +
+  ylab("Percent of Time Moving") +
+  xlab("Std. Interactions per Hour") +
   CONSISTENT_THEME
 
 # Create the top row with plot_centrality and plot_lm

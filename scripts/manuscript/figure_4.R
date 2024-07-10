@@ -6,6 +6,7 @@ library(wesanderson)
 library(patchwork)
 library(factoextra)
 library(ggplot2)
+library(cowplot)
 
 source("scripts/manuscript/constants.R")
 
@@ -23,14 +24,6 @@ bds <- read_csv("data/BigDataSheet.csv")
 bds <- bds %>%
     mutate(Trial = str_extract(Bee, ".+?(?=_)"))
 
-bds <- bds %>%
-    mutate(QR_Queen_Condition = case_when(
-        QR == 0 & Queen == 0 ~ "Queenless",
-        QR == 1 & Queen == 0 ~ "Queenright",
-        Queen == 1 ~ "Queen"
-    )) %>%
-    mutate(QR_Queen_Condition = factor(QR_Queen_Condition, levels = c("Queenright", "Queenless", "Queen")))
-
 # Calculate mean values of QR, Queen, and Degree for each Bee (QR and Queen are binary so mean is the value itself)
 bds_means <- bds %>%
     group_by(Bee) %>%
@@ -47,7 +40,6 @@ bds_means <- bds_means %>%
     QR==1 & Queen==0 ~ "Queenright Worker",
     Queen==1 ~ "Queen",
     QR==0 & Infl==1 ~ "Influencer",
-    TRUE ~ NA_character_  # This handles any other case, which shouldn't exist in your scenario
   )) %>%
   mutate(QR_Queen_Inf = factor(QR_Queen_Inf, levels = c( "Queenless Worker","Queenright Worker", "Queen", "Influencer")))
 
@@ -139,5 +131,43 @@ plot_between <- ggplot(bds_mean_of_means, aes(x = QR_Queen_Inf, y = Between)) +
   SHARED_THEME
 
 
-plot_grid(plot_degree, plot_disp, plot_between, ncol = 3)
+bds_oi <- bds %>% mutate(QR_Queen_Inf = case_when(
+    QR==0 & Infl==0 ~ "Queenless Worker",
+    QR==1 & Queen==0 ~ "Queenright Worker",
+    Queen==1 ~ "Queen",
+    QR==0 & Infl==1 ~ "Influencer",
+    TRUE ~ NA_character_  # This handles any other case, which shouldn't exist in your scenario
+  )) %>%
+  mutate(QR_Queen_Inf = factor(QR_Queen_Inf, levels = c( "Queenless Worker","Queenright Worker", "Queen", "Influencer")))
+
+bds_oi$OvaryIndex <- bds$AverageOvaryWidth / bds$AverageWingLength
+# Get OI per bee
+bds_oi <- bds_oi %>%
+  group_by(Bee) %>%
+  summarise(Trial = first(Trial),QR_Queen_Inf = first(QR_Queen_Inf), OvaryIndex = mean(OvaryIndex, na.rm = TRUE))
+
+# Filter NAs
+bds_oi$Group <- with(bds_oi, ifelse(QR_Queen_Inf %in% c("Queen", "Queenright Worker"), "Q + QRw", "Inf + QLw"))
+bds_oi$Group <- factor(bds_oi$Group, levels = c("Q + QRw", "Inf + QLw"))
+
+# Mean by group
+bds_oi <- bds_oi %>%
+  group_by(QR_Queen_Inf, Trial) %>%
+  summarise(Group = first(Group), Trial = first(Trial), OvaryIndex = mean(OvaryIndex, na.rm = TRUE))
+
+# Plot the same but OvaryIndex
+plot_oi <- ggplot(bds_oi, aes(x = QR_Queen_Inf, y = OvaryIndex)) +
+  geom_line(aes(group = interaction(Trial, Group)), color = "darkgray",size=0.2) +
+  geom_point(aes(color = Trial), size = 3) +
+  scale_color_manual(values = COLONY_COLORS) +
+  xlab("") +
+  labs(color = "Source Colony") +
+  ylab("Ovary Index") +
+  theme_minimal() +
+  CONSISTENT_THEME_NO_ASPECT +
+  guides(color = guide_legend(title.position = "top", title.hjust = 0.5)) +
+  facet_grid(~Group, scales = "free_x", space = "free_x", switch = "x", labeller = labeller(.rows = label_both, .cols = label_both)) +
+  SHARED_THEME
+plot_oi
+plot_grid(plot_degree, plot_disp, plot_between,plot_oi, ncol = 4)
 ggsave("figures/manuscript/figure_4.jpeg", width = 8.5, height = 3, dpi = 1200)
