@@ -10,7 +10,11 @@ bds <- read_csv("data/BigDataSheet.csv")
 bds <- bds %>%
   mutate(Trial = str_extract(Bee, ".+?(?=_)"))
 
-bds <- bds %>%
+# Remove queens
+bds_no_queens <- bds %>%
+  filter(Queen == FALSE)
+
+bds_no_queens <- bds_no_queens %>%
   mutate(QR_Queen_Inf = case_when(
     QR == 0 & Infl == 0 ~ "Queenless Worker",
     QR == 1 & Queen == 0 ~ "Queenright Worker",
@@ -21,25 +25,17 @@ bds <- bds %>%
   mutate(QR_Queen_Inf = factor(QR_Queen_Inf, levels = c("Queenless Worker", "Queenright Worker", "Queen", "Influencer")))
 
 
-# Get average by individual, trial, time of day
 
-# Pool time by Day and DayNight pair and get mean per
-bds_pooled <- bds %>%
-  mutate(Day_DayNight = paste(Day, TimeOfDay, sep = "_")) %>%
-  group_by(Bee, Trial, QR, Day_DayNight) %>%
-  summarise(across(c(Infl, Degree, Close, Eigen, Between, Queen, boutDegree, boutBetween, boutClose, boutEigen, bodyDegree, bodyBetween, bodyClose, bodyEigen, AverageBoutLength, Presence, AntPresence, mean_vel, move_perc, N90.Day4, MRSD.Day4, Initiation.Freq, clust), mean, na.rm = TRUE))
-
-
-bds_pooled %>%
-  select(Bee, Trial, QR, Day_DayNight, Degree) %>%
-  head(10)
+bds_pooled <- bds_no_queens %>%
+  filter(TimeOfDay == "Day") %>%
+  mutate(Day_Zeit = paste(Day, Zeit, sep = "_"))
 
 # List of features to test
-features <- c("Degree", "move_perc", "mean_vel", "N90.Day4", "Initiation.Freq", "Close", "Between")
+features <- c("Degree", "move_perc", "mean_vel", "N90.Day4", "Initiation.Freq", "Close", "Between","clust")
 
 # Function to fit and summarize the model for each feature
 fit_and_summarize <- function(feature) {
-  formula <- as.formula(paste(feature, "~ 1 + QR + (1 | Trial) + (1 | QR:Trial) + (1 | Day_DayNight) + (1 | Day_DayNight:Trial)"))
+  formula <- as.formula(paste(feature, "~ 1 + QR + (1 | Trial) + (1 | QR:Trial) + (1 | Day_Zeit) + (1 | Day_Zeit:Trial)"))
   model <- lmer(formula, data = bds_pooled)
   tidy_model <- tidy(model, effects = "fixed", conf.int = TRUE) %>%
     mutate(feature = feature, model_spec = paste(deparse(formula), collapse = " "))
@@ -73,4 +69,4 @@ significant_features <- comprehensive_summary_table %>%
 
 write_csv(comprehensive_summary_table, "data/comprehensive_summary_table.csv")
 
-significant_features
+print(significant_features)
