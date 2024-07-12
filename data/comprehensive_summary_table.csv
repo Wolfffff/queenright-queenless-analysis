@@ -1,0 +1,15 @@
+feature,model_spec,term,estimate,std.error,statistic,p.value
+Between,Between ~ 1 + QR + (1 | Trial) + (1 | QR:Trial) + (1 | Day_DayNight) +      (1 | Day_DayNight:Trial),(Intercept),0.02674369125509471,6.876472848269449e-4,38.891582712822164,5.072751735810029e-10
+Between,Between ~ 1 + QR + (1 | Trial) + (1 | QR:Trial) + (1 | Day_DayNight) +      (1 | Day_DayNight:Trial),QRTRUE,0.001164400529281596,8.804517157047296e-4,1.3225035609699376,0.2560474181904544
+Close,Close ~ 1 + QR + (1 | Trial) + (1 | QR:Trial) + (1 | Day_DayNight) +      (1 | Day_DayNight:Trial),(Intercept),80.20099554874399,8.024617802063858,9.994369517276827,1.8135614416929947e-5
+Close,Close ~ 1 + QR + (1 | Trial) + (1 | QR:Trial) + (1 | Day_DayNight) +      (1 | Day_DayNight:Trial),QRTRUE,-16.450219714723165,7.489942723130838,-2.196307812063866,0.09303813100980235
+Degree,Degree ~ 1 + QR + (1 | Trial) + (1 | QR:Trial) + (1 | Day_DayNight) +      (1 | Day_DayNight:Trial),(Intercept),3853.824586696376,368.7392239617256,10.451355148201959,3.299063728882275e-5
+Degree,Degree ~ 1 + QR + (1 | Trial) + (1 | QR:Trial) + (1 | Day_DayNight) +      (1 | Day_DayNight:Trial),QRTRUE,-1003.5073186227594,360.90499218195987,-2.7805304453001702,0.04979020316843001
+Initiation.Freq,Initiation.Freq ~ 1 + QR + (1 | Trial) + (1 | QR:Trial) + (1 |      Day_DayNight) + (1 | Day_DayNight:Trial),(Intercept),0.49452365640529417,0.0022197682894199143,222.7816564288909,2.1504431064156615e-50
+Initiation.Freq,Initiation.Freq ~ 1 + QR + (1 | Trial) + (1 | QR:Trial) + (1 |      Day_DayNight) + (1 | Day_DayNight:Trial),QRTRUE,-0.002573299764292444,0.003009793958054018,-0.8549753903939028,0.39260550873822275
+N90.Day4,N90.Day4 ~ 1 + QR + (1 | Trial) + (1 | QR:Trial) + (1 | Day_DayNight) +      (1 | Day_DayNight:Trial),(Intercept),60.63714874011708,5.602034692567608,10.82412945792111,7.665882002458682e-6
+N90.Day4,N90.Day4 ~ 1 + QR + (1 | Trial) + (1 | QR:Trial) + (1 | Day_DayNight) +      (1 | Day_DayNight:Trial),QRTRUE,-1.5412156253022817,6.8086530645533445,-0.2263613097465684,0.832021222768938
+mean_vel,mean_vel ~ 1 + QR + (1 | Trial) + (1 | QR:Trial) + (1 | Day_DayNight) +      (1 | Day_DayNight:Trial),(Intercept),5.828985731281063,0.5182436694756614,11.247577297333128,6.837005475355702e-6
+mean_vel,mean_vel ~ 1 + QR + (1 | Trial) + (1 | QR:Trial) + (1 | Day_DayNight) +      (1 | Day_DayNight:Trial),QRTRUE,-0.8310737792158889,0.3006628457290753,-2.764138605821493,0.05064856506949378
+move_perc,move_perc ~ 1 + QR + (1 | Trial) + (1 | QR:Trial) + (1 | Day_DayNight) +      (1 | Day_DayNight:Trial),(Intercept),0.5876684644048322,0.01600755130084163,36.71195258789733,8.638198758646052e-15
+move_perc,move_perc ~ 1 + QR + (1 | Trial) + (1 | QR:Trial) + (1 | Day_DayNight) +      (1 | Day_DayNight:Trial),QRTRUE,-0.036572005161779955,0.01792549456018872,-2.040222937168152,0.1107394098357941
