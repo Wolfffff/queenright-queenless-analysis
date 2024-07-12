@@ -4,6 +4,7 @@ library(tidyverse)
 library(stringr)
 library(ggplot2)
 library(broom.mixed)
+library(lmerTest)
 
 # Read the data
 bds <- read_csv("data/BigDataSheet.csv")
@@ -23,7 +24,6 @@ bds_no_queens <- bds_no_queens %>%
     TRUE ~ NA_character_ # This handles any other case, which shouldn't exist in your scenario
   )) %>%
   mutate(QR_Queen_Inf = factor(QR_Queen_Inf, levels = c("Queenless Worker", "Queenright Worker", "Queen", "Influencer")))
-
 
 
 bds_pooled <- bds_no_queens %>%
