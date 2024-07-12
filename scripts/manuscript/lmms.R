@@ -2,14 +2,8 @@
 library(lme4)
 library(tidyverse)
 library(stringr)
-library(wesanderson)
-library(patchwork)
-library(factoextra)
 library(ggplot2)
-library(ggbeeswarm)
-library(cowplot)
-
-source("scripts/manuscript/constants.R")
+library(broom.mixed)
 
 # Read the data
 bds <- read_csv("data/BigDataSheet.csv")
@@ -36,8 +30,47 @@ bds_pooled <- bds %>%
   summarise(across(c(Infl, Degree, Close, Eigen, Between, Queen, boutDegree, boutBetween, boutClose, boutEigen, bodyDegree, bodyBetween, bodyClose, bodyEigen, AverageBoutLength, Presence, AntPresence, mean_vel, move_perc, N90.Day4, MRSD.Day4, Initiation.Freq, clust), mean, na.rm = TRUE))
 
 
-# Dont truncate
-bds_pooled %>% select(Bee, Trial, QR, Day_DayNight, Degree) %>% head(10)
+bds_pooled %>%
+  select(Bee, Trial, QR, Day_DayNight, Degree) %>%
+  head(10)
 
+# List of features to test
+features <- c("Degree", "move_perc", "mean_vel", "N90.Day4", "Initiation.Freq", "Close", "Between")
 
-lmer(data=bds_pooled,Degree ~ 1 + QR +  (1|Trial) + (1|QR:Trial) + (1|Day_DayNight)  + (1|Day_DayNight:Trial))
+# Function to fit and summarize the model for each feature
+fit_and_summarize <- function(feature) {
+  formula <- as.formula(paste(feature, "~ 1 + QR + (1 | Trial) + (1 | QR:Trial) + (1 | Day_DayNight) + (1 | Day_DayNight:Trial)"))
+  model <- lmer(formula, data = bds_pooled)
+  tidy_model <- tidy(model, effects = "fixed", conf.int = TRUE) %>%
+    mutate(feature = feature, model_spec = paste(deparse(formula), collapse = " "))
+  return(tidy_model)
+}
+
+# Fit and summarize models for each feature
+tidy_results_list <- lapply(features, fit_and_summarize)
+
+# Combine tidy results into a single data frame
+tidy_results <- bind_rows(tidy_results_list)
+
+# Ensure no truncation in the output display
+options(width = 200)
+
+# Display tidy results
+print(tidy_results)
+
+# Create a comprehensive summary table
+comprehensive_summary_table <- tidy_results %>%
+  select(feature, model_spec, term, estimate, std.error, statistic, p.value) %>%
+  arrange(feature, term)
+
+# Display comprehensive summary table
+print(comprehensive_summary_table)
+
+# Get significant features
+significant_features <- comprehensive_summary_table %>%
+  filter(p.value < 0.05) %>%
+  select(feature,term, p.value)
+
+write_csv(comprehensive_summary_table, "data/comprehensive_summary_table.csv")
+
+significant_features
