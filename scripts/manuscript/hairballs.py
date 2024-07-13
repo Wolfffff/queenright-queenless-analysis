@@ -5,8 +5,8 @@ import numpy as np
 
 # Hardcoded values
 FILENAMES = [
-    "data/RooibosTea_QR_1216_1646_Time_Day4.gml",
-    "data/RooibosTea_QL_1216_1646_Time_Day4.gml",
+    "data/RooibosTea_QR_1216_1646_Time_AllDays.gml",
+    "data/RooibosTea_QL_1216_1646_Time_AllDays.gml",
 ]
 FOCAL_NODES = [
     ["ArUcoTag#52"],  # Replace with actual focal nodes for the first file
@@ -32,10 +32,10 @@ COLORS = {
     "QLW": "#FFAE00",
 }
 EDGE_WEIGHT = "count"
-SEED_COUNT = 5  # Number of times to replot with different seeds
-THRESHOLD = 20  # Edge weight threshold for pruning
-EDGE_WIDTH_SCALE = 5  # Scaling factor for edge widths
-NODE_SIZE_SCALE = 50  # Scaling factor for node sizes
+SEED_COUNT = 3  # Number of times to replot with different seeds
+THRESHOLD = 600  # Edge weight threshold for pruning
+EDGE_WIDTH_SCALE = 3  # Scaling factor for edge widths
+NODE_SIZE_SCALE = 100  # Scaling factor for node sizes
 
 
 def load_graph(filename):
