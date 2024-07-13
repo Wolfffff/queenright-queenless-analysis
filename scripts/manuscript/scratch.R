@@ -32,8 +32,5 @@ bds <- bds %>%
 
 # get unique influencer bees
 influencers <- bds %>%
-  filter(QR_Queen_Inf == "Queen") %>%
+  filter(QR_Queen_Inf == "Influencer") %>%
   distinct(Bee)
-
-
-
