@@ -186,7 +186,7 @@ def plot_hairball(
 
 def save_plot(fig, set_name):
     """Save the plot with a specific filename format."""
-    filename = f"plots/{set_name}_spring_count.png"
+    filename = f"figures/hairballs/{set_name}_spring_count.png"
     os.makedirs(os.path.dirname(filename), exist_ok=True)
     fig.savefig(filename, dpi=600)
     plt.close(fig)
