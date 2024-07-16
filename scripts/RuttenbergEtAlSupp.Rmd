@@ -1,0 +1,2582 @@
+---
+title: "RuttenbergEtAlJustSupps"
+output: html_document
+---
+
+```{r load the big data sheet, aggregate}
+library(lme4)
+library(tidyverse)
+library(dplyr)
+library(stringr)
+library("wesanderson")
+library(ggnewscale)
+library('corrr')
+library('ggcorrplot')
+library("FactoMineR")
+library("factoextra")
+
+setwd("~/Downloads/QueenModelComplete_062424/")
+prefixes = c("RooibosTea_QR_1216_1646", "RooibosTea_QL_1216_1646", "MexHotChoc_QR_1216_1646", "MexHotChoc_QL_1216_1646", "20230213_1745_AlmdudlerGspritzt_C1", "20230213_1745_AlmdudlerGspritzt_C0", "20221209_1613_QR", "20221209_1613_QL", "20221123_1543_AmericanoLatte_QR", "20221123_1543_AmericanoLatte_QL")
+Day = 1
+Days <- list()
+Start = 0
+#Total Degree
+for(i in 1:10){
+  for(j in 0:95){
+    if(file.exists(paste(prefixes[i],sprintf("%03d", j),"Head_to_Head_False_Centralities.csv",sep = "_"))) {
+      Deg = read.csv(paste(prefixes[i],sprintf("%03d", j),"Head_to_Head_False_Centralities.csv",sep = "_"))
+      Deg$Node = sub('\\.0','',Deg$X)
+      Deg$ExpDay = as.factor(floor((j/24)+1))
+      Deg$Day = as.factor(floor(((j+17)/24)+1))
+      Deg$Zeit = as.numeric((j+17)%%24)
+      Deg$Hour = j
+      Deg$Col = prefixes[i]
+      Deg$QR = i %% 2 == 1
+      Deg$ID = paste(Deg$Col, Deg$Node, Deg$Hour, sep='_')
+      Deg$Bee = paste(Deg$Col, Deg$Node, sep='_')
+      Deg$Mod = "Head_Head"
+      Deg$Trial = str_extract(Deg$Col, ".+?(?=_)")
+      Deg$Queen = Deg$Bee %in% c("RooibosTea_QR_1216_1646_ArUcoTag#52", "MexHotChoc_QR_1216_1646_ArUcoTag#13", "20230213_1745_AlmdudlerGspritzt_C1_ArUcoTag#24", "20221209_1613_QR_ArUcoTag#47", "20221123_1543_AmericanoLatte_QR_ArUcoTag#43")
+      if(Start == 1){
+        TotalDeg = rbind(TotalDeg, Deg)
+      }
+      if(Start == 0){
+        TotalDeg = Deg
+        Start = 1
+      }
+    }
+  }
+}
+TotalDeg <- TotalDeg %>%
+  mutate(degree = ifelse(Trial == "MexHotChoc", degree * 1.428, degree))
+TotalDeg <- TotalDeg %>%
+  mutate(close = ifelse(Trial == "MexHotChoc", close * 1.428, close))
+names(TotalDeg)[names(TotalDeg) == "degree"] <- "Degree"
+names(TotalDeg)[names(TotalDeg) == "between"] <- "Between"
+names(TotalDeg)[names(TotalDeg) == "close"] <- "Close"
+names(TotalDeg)[names(TotalDeg) == "eigen"] <- "Eigen"
+
+#Bout Degree
+
+Start = 0
+for(i in 1:10){
+  for(j in 0:95){
+    if(file.exists(paste(prefixes[i],sprintf("%03d", j),"Head_to_Head_True_Centralities.csv",sep = "_"))) {
+      Deg = read.csv(paste(prefixes[i],sprintf("%03d", j),"Head_to_Head_True_Centralities.csv",sep = "_"))
+      Deg$Node = sub('\\.0','',Deg$X)
+      Deg$ExpDay = as.factor(floor((j/24)+1))
+      Deg$Day = as.factor(floor(((j+17)/24)+1))
+      Deg$Zeit = as.numeric((j+17)%%24)
+      Deg$Hour = j
+      Deg$Col = prefixes[i]
+      Deg$QR = i %% 2 == 1
+      Deg$ID = paste(Deg$Col, Deg$Node, Deg$Hour, sep='_')
+      Deg$Bee = paste(Deg$Col, Deg$Node, sep='_')
+      Deg$Mod = "Head_Head"
+      Deg$Trial = str_extract(Deg$Col, ".+?(?=_)")
+      Deg$Queen = Deg$Bee %in% c("RooibosTea_QR_1216_1646_ArUcoTag#52", "MexHotChoc_QR_1216_1646_ArUcoTag#13", "20230213_1745_AlmdudlerGspritzt_C1_ArUcoTag#24", "20221209_1613_QR_ArUcoTag#47", "20221123_1543_AmericanoLatte_QR_ArUcoTag#43")
+      if(Start == 1){
+        TotalBout = rbind(TotalBout, Deg)
+      }
+      if(Start == 0){
+        TotalBout = Deg
+        Start = 1
+      }
+    }
+  }
+}
+
+TotalBout <- TotalBout %>%
+  mutate(degree = ifelse(Trial == "MexHotChoc", degree * 1.428, degree))
+TotalBout <- TotalBout %>%
+  mutate(close = ifelse(Trial == "MexHotChoc", close * 1.428, close))
+TotalBoutSubset <- TotalBout[, c("ID", "degree", "between", "close", "eigen")]
+names(TotalBoutSubset)[names(TotalBoutSubset) == "degree"] <- "boutDegree"
+names(TotalBoutSubset)[names(TotalBoutSubset) == "between"] <- "boutBetween"
+names(TotalBoutSubset)[names(TotalBoutSubset) == "close"] <- "boutClose"
+names(TotalBoutSubset)[names(TotalBoutSubset) == "eigen"] <- "boutEigen"
+BigDataSheet <- merge(TotalDeg, TotalBoutSubset, by = "ID")
+
+#Body Degree
+
+Start = 0
+for(i in 1:10){
+  for(j in 0:95){
+    if(file.exists(paste(prefixes[i],sprintf("%03d", j),"Head_to_Body_False_Centralities.csv",sep = "_"))) {
+      Deg = read.csv(paste(prefixes[i],sprintf("%03d", j),"Head_to_Body_False_Centralities.csv",sep = "_"))
+      Deg$Node = sub('\\.0','',Deg$X)
+      Deg$ExpDay = as.factor(floor((j/24)+1))
+      Deg$Day = as.factor(floor(((j+17)/24)+1))
+      Deg$Zeit = as.numeric((j+17)%%24)
+      Deg$Hour = j
+      Deg$Col = prefixes[i]
+      Deg$QR = i %% 2 == 1
+      Deg$ID = paste(Deg$Col, Deg$Node, Deg$Hour, sep='_')
+      Deg$Bee = paste(Deg$Col, Deg$Node, sep='_')
+      Deg$Mod = "Head_Head"
+      Deg$Trial = str_extract(Deg$Col, ".+?(?=_)")
+      Deg$Queen = Deg$Bee %in% c("RooibosTea_QR_1216_1646_ArUcoTag#52", "MexHotChoc_QR_1216_1646_ArUcoTag#13", "20230213_1745_AlmdudlerGspritzt_C1_ArUcoTag#24", "20221209_1613_QR_ArUcoTag#47", "20221123_1543_AmericanoLatte_QR_ArUcoTag#43")
+      if(Start == 1){
+        TotalBody = rbind(TotalBody, Deg)
+      }
+      if(Start == 0){
+        TotalBody = Deg
+        Start = 1
+      }
+    }
+  }
+}
+
+TotalBody <- TotalBody %>%
+  mutate(degree = ifelse(Trial == "MexHotChoc", degree * 1.428, degree))
+TotalBody <- TotalBody %>%
+  mutate(close = ifelse(Trial == "MexHotChoc", close * 1.428, close))
+TotalBodySubset <- TotalBody[, c("ID", "degree", "between", "close", "eigen")]
+names(TotalBodySubset)[names(TotalBodySubset) == "degree"] <- "bodyDegree"
+names(TotalBodySubset)[names(TotalBodySubset) == "between"] <- "bodyBetween"
+names(TotalBodySubset)[names(TotalBodySubset) == "close"] <- "bodyClose"
+names(TotalBodySubset)[names(TotalBodySubset) == "eigen"] <- "bodyEigen"
+
+BigDataSheet <- merge(BigDataSheet, TotalBodySubset, by = "ID")
+
+#Bout Length
+BigDataSheet$AverageBoutLength = BigDataSheet$Degree / BigDataSheet$boutDegree
+
+
+#Ovary Measurements
+Ovaries = read.csv('OvaryMeasurements.csv')
+Ovaries$AverageOvaryLength = (Ovaries$LongestOocyteLength1..mm. + Ovaries$LongestOocyteLength2..mm.) / 2
+Ovaries$AverageOvaryWidth = (Ovaries$LongestOocyteWidth1..mm. + Ovaries$LongestOocyteWidth2..mm.) / 2
+Ovaries$Bee = paste(Ovaries$ColonyID, '_ArUcoTag#', Ovaries$Tag, sep='')
+BigDataSheet <- merge(BigDataSheet, Ovaries[, c("Bee", "AverageOvaryLength", "AverageOvaryWidth")], by = "Bee", all.x = TRUE)
+
+#Wing Measurements
+Wings = read.csv('WingMeasurements.csv')
+Wings$AverageWingLength = (Wings$wing_1_mm + Wings$wing_2_mm) / 2
+Wings$TagNumber = str_extract(Wings$ID, "(?<=Tag)\\d+")
+Wings$Bee = paste(Wings$ColonyID, '_ArUcoTag#', Wings$TagNumber, sep='')
+BigDataSheet <- merge(BigDataSheet, Wings[, c("Bee", "AverageWingLength")], by = "Bee", all.x = TRUE)
+
+#Track Presence
+Start=0
+for(i in 1:10){
+  for(j in 0:95){
+    if(file.exists(paste(prefixes[i],sprintf("%03d", j),"8_8_3_1_10_interp_filtered.h5_TrackPresence.csv",sep = "_"))) {
+      Deg = read.csv(paste(prefixes[i],sprintf("%03d", j),"8_8_3_1_10_interp_filtered.h5_TrackPresence.csv",sep = "_"))
+      Deg$track = sub('\\.0','',Deg$track)
+      Deg$ExpDay = as.factor(floor((j/24)+1))
+      Deg$Day = as.factor(floor(((j+17)/24)+1))
+      Deg$Zeit = as.numeric((j+17)%%24)
+      Deg$Hour = j
+      Deg$Col = prefixes[i]
+      Deg$QR = i %% 2 == 1
+      Deg$ID = paste(Deg$Col, Deg$track, Deg$Hour, sep='_')
+      Deg$Bee = paste(Deg$Col, Deg$track, sep='_')
+      Deg$Mod = "Head_Head"
+      Deg$Trial = str_extract(Deg$Col, ".+?(?=_)")
+      Deg$Queen = Deg$Bee %in% c("RooibosTea_QR_1216_1646_ArUcoTag#52", "MexHotChoc_QR_1216_1646_ArUcoTag#13", "20230213_1745_AlmdudlerGspritzt_C1_ArUcoTag#24", "20221209_1613_QR_ArUcoTag#47", "20221123_1543_AmericanoLatte_QR_ArUcoTag#43")
+      if(Start == 1){
+        TotalPresence = rbind(TotalPresence, Deg)
+      }
+      if(Start == 0){
+        TotalPresence = Deg
+        Start = 1
+      }
+    }
+  }
+}
+
+TotalPresenceSubset <- TotalPresence[, c("ID", "Presence")]
+BigDataSheet <- merge(BigDataSheet, TotalPresenceSubset, by = "ID")
+
+#Antennna Presence
+Start=0
+for(i in 1:10){
+  for(j in 0:95){
+    if(file.exists(paste(prefixes[i],sprintf("%03d", j),"8_8_3_1_10_interp_filtered.h5_TrackPresenceAnt.csv",sep = "_"))) {
+      Deg = read.csv(paste(prefixes[i],sprintf("%03d", j),"8_8_3_1_10_interp_filtered.h5_TrackPresenceAnt.csv",sep = "_"))
+      Deg$track = sub('\\.0','',Deg$track)
+      Deg$ExpDay = as.factor(floor((j/24)+1))
+      Deg$Day = as.factor(floor(((j+17)/24)+1))
+      Deg$Zeit = as.numeric((j+17)%%24)
+      Deg$Hour = j
+      Deg$Col = prefixes[i]
+      Deg$QR = i %% 2 == 1
+      Deg$ID = paste(Deg$Col, Deg$track, Deg$Hour, sep='_')
+      Deg$Bee = paste(Deg$Col, Deg$track, sep='_')
+      Deg$Mod = "Head_Head"
+      Deg$Trial = str_extract(Deg$Col, ".+?(?=_)")
+      Deg$Queen = Deg$Bee %in% c("RooibosTea_QR_1216_1646_ArUcoTag#52", "MexHotChoc_QR_1216_1646_ArUcoTag#13", "20230213_1745_AlmdudlerGspritzt_C1_ArUcoTag#24", "20221209_1613_QR_ArUcoTag#47", "20221123_1543_AmericanoLatte_QR_ArUcoTag#43")
+      if(Start == 1){
+        TotalPresence = rbind(TotalPresence, Deg)
+      }
+      if(Start == 0){
+        TotalPresence = Deg
+        Start = 1
+      }
+    }
+  }
+}
+
+TotalPresenceSubset <- TotalPresence[, c("ID", "Presence")]
+names(TotalPresenceSubset)[names(TotalPresenceSubset) == "Presence"] <- "AntPresence"
+BigDataSheet <- merge(BigDataSheet, TotalPresenceSubset, by = "ID")
+
+#Vels Data
+Start=0
+for(i in 1:10){
+  for(j in 0:95){
+    if(file.exists(paste(prefixes[i],sprintf("%03d", j),"velstrackqueenstandard.csv",sep = "_")) | file.exists(paste(prefixes[i],sprintf("%03d", j),"velstrackqueen.csv",sep = "_"))){
+      if(file.exists(paste(prefixes[i],sprintf("%03d", j),"velstrackqueenstandard.csv",sep = "_"))){
+        Deg = read.csv(paste(prefixes[i],sprintf("%03d", j),"velstrackqueenstandard.csv",sep = "_"))
+      }
+      if(file.exists(paste(prefixes[i],sprintf("%03d", j),"velstrackqueen.csv",sep = "_"))){
+        Deg = read.csv(paste(prefixes[i],sprintf("%03d", j),"velstrackqueen.csv",sep = "_"))
+      }
+      Deg$X = sub('\\.0','',Deg$X)
+      Deg$ExpDay = as.factor(floor((j/24)+1))
+      Deg$Day = as.factor(floor(((j+17)/24)+1))
+      Deg$Zeit = as.numeric((j+17)%%24)
+      Deg$Hour = j
+      Deg$Col = prefixes[i]
+      Deg$QR = i %% 2 == 1
+      Deg$ID = paste(Deg$Col, Deg$X, Deg$Hour, sep='_')
+      Deg$Bee = paste(Deg$Col, Deg$X, sep='_')
+      Deg$Mod = "Head_Head"
+      Deg$Trial = str_extract(Deg$Col, ".+?(?=_)")
+      Deg$Queen = Deg$Bee %in% c("RooibosTea_QR_1216_1646_ArUcoTag#52", "MexHotChoc_QR_1216_1646_ArUcoTag#13", "20230213_1745_AlmdudlerGspritzt_C1_ArUcoTag#24", "20221209_1613_QR_ArUcoTag#47", "20221123_1543_AmericanoLatte_QR_ArUcoTag#43")
+      if(Start == 1){
+        TotalVels = rbind(TotalVels, Deg)
+      }
+      if(Start == 0){
+        TotalVels = Deg
+        Start = 1
+      }
+    }
+  }
+}
+TotalVels <- TotalVels %>%
+  mutate(mean_vel = ifelse(Trial == "MexHotChoc", mean_vel / 1.428, mean_vel))
+
+TotalVelsSubset <- TotalVels[, c("ID", "mean_vel", "move_perc")]
+BigDataSheet <- merge(BigDataSheet, TotalVelsSubset, by = "ID")
+
+Start=0
+for(i in 1:10){
+  if(file.exists(paste(prefixes[i],"096_DispersionMetrics.csv",sep = "_"))) {
+    Deg = read.csv(paste(prefixes[i],"096_DispersionMetrics.csv",sep = "_"))
+    Deg$Tag = sub('\\.0','',Deg$Tag)
+    Deg$Col = prefixes[i]
+    Deg$QR = i %% 2 == 1
+    Deg$Bee = paste(Deg$Col, Deg$Tag, sep='_')
+    Deg$Queen = Deg$Bee %in% c("RooibosTea_QR_1216_1646_ArUcoTag#52", "MexHotChoc_QR_1216_1646_ArUcoTag#13", "20230213_1745_AlmdudlerGspritzt_C1_ArUcoTag#24", "20221209_1613_QR_ArUcoTag#47", "20221123_1543_AmericanoLatte_QR_ArUcoTag#43")
+    if(Start == 1){
+      TotalDisp = rbind(TotalDisp, Deg)
+    }
+    if(Start == 0){
+      TotalDisp = Deg
+      Start = 1
+    }
+  }
+}
+
+DispNew <- reshape(TotalDisp, idvar=c("Tag", "Col", "QR", "Bee", "Queen"), timevar = "Day", direction="wide")
+
+DispSubset <- DispNew[, c("Bee", "N90.Day1", "N90.Day2", "N90.Day3", "N90.Day4", "MRSD.Day1", "MRSD.Day2", "MRSD.Day3", "MRSD.Day4")]
+BigDataSheet <- merge(BigDataSheet, DispSubset, by = "Bee", all.x = TRUE)
+
+
+#Diectional Degree
+
+Start = 0
+for(i in 1:10){
+  for(j in 0:95){
+    if(file.exists(paste(prefixes[i],sprintf("%03d", j),"DegDir.csv",sep = "_"))) {
+      Deg = read.csv(paste(prefixes[i],sprintf("%03d", j),"DegDir.csv",sep = "_"))
+      Deg$Node = sub('\\.0','',Deg$Origin.interactor)
+      Deg$ExpDay = as.factor(floor((j/24)+1))
+      Deg$Day = as.factor(floor(((j+17)/24)+1))
+      Deg$Zeit = as.numeric((j+17)%%24)
+      Deg$Hour = j
+      Deg$Col = prefixes[i]
+      Deg$QR = i %% 2 == 1
+      Deg$ID = paste(Deg$Col, Deg$Node, Deg$Hour, sep='_')
+      Deg$Bee = paste(Deg$Col, Deg$Node, sep='_')
+      Deg$Mod = "Head_Head"
+      Deg$Trial = str_extract(Deg$Col, ".+?(?=_)")
+      Deg$Queen = Deg$Bee %in% c("RooibosTea_QR_1216_1646_ArUcoTag#52", "MexHotChoc_QR_1216_1646_ArUcoTag#13", "20230213_1745_AlmdudlerGspritzt_C1_ArUcoTag#24", "20221209_1613_QR_ArUcoTag#47", "20221123_1543_AmericanoLatte_QR_ArUcoTag#43")
+      if(Start == 1){
+        TotalDir = rbind(TotalDir, Deg)
+      }
+      if(Start == 0){
+        TotalDir = Deg
+        Start = 1
+      }
+    }
+  }
+}
+
+DirSubset <- TotalDir[, c("ID", "count_ori", "count_des", "Initiation.Freq")]
+BigDataSheet <- merge(BigDataSheet, DirSubset, by = "ID")
+
+Start = 0
+for(i in 1:10){
+  for(j in 0:95){
+    if(file.exists(paste(prefixes[i],sprintf("%03d", j),"Head_to_Head_False_Clustering.csv",sep = "_"))){
+      Deg = read.csv(paste(prefixes[i],sprintf("%03d", j),"Head_to_Head_False_Clustering.csv",sep = "_"))
+      Deg$Node = sub('\\.0','',Deg$X)
+      Deg$ExpDay = as.factor(floor((j/24)+1))
+      Deg$Day = as.factor(floor(((j+17)/24)+1))
+      Deg$Zeit = as.numeric((j+17)%%24)
+      Deg$Hour = j
+      Deg$Col = prefixes[i]
+      Deg$QR = i %% 2 == 1
+      Deg$ID = paste(Deg$Col, Deg$Node, Deg$Hour, sep='_')
+      Deg$Bee = paste(Deg$Col, Deg$Node, sep='_')
+      Deg$Mod = "Head_Head"
+      Deg$Trial = str_extract(Deg$Col, ".+?(?=_)")
+      Deg$Queen = Deg$Bee %in% c("RooibosTea_QR_1216_1646_ArUcoTag#52", "MexHotChoc_QR_1216_1646_ArUcoTag#13", "20230213_1745_AlmdudlerGspritzt_C1_ArUcoTag#24", "20221209_1613_QR_ArUcoTag#47", "20221123_1543_AmericanoLatte_QR_ArUcoTag#43")
+      if(Start == 1){
+        TotalClu = rbind(TotalClu, Deg)
+      }
+      if(Start == 0){
+        TotalClu = Deg
+        Start = 1
+      }
+    }
+  }
+}
+
+TotalCluSubset <- TotalClu[, c("ID", "clust")]
+BigDataSheet <- merge(BigDataSheet, TotalCluSubset, by = "ID")
+
+Start = 0
+for(i in 1:10){
+  for(j in 0:95){
+    if(file.exists(paste(prefixes[i],sprintf("%03d", j),"DisparitiesStandardized.csv",sep = "_"))){
+      Deg = read.csv(paste(prefixes[i],sprintf("%03d", j),"DisparitiesStandardized.csv",sep = "_"))
+      Deg$Node = sub('\\.0','',Deg$Tag)
+      Deg$Hour = j
+      Deg$Col = prefixes[i]
+      Deg$ID = paste(Deg$Col, Deg$Node, Deg$Hour, sep='_')
+      if(Start == 1){
+        TotalDisp = rbind(TotalDisp, Deg)
+      }
+      if(Start == 0){
+        TotalDisp = Deg
+        Start = 1
+      }
+    }
+  }
+}
+
+TotalDispSubset <- TotalDisp[, c("ID", "Disparity")]
+BigDataSheet <- merge(BigDataSheet, TotalDispSubset, by = "ID")
+
+
+BigDataSheet$Degree = BigDataSheet$Degree / BigDataSheet$AntPresence
+BigDataSheet$boutDegree = BigDataSheet$boutDegree / BigDataSheet$AntPresence
+BigDataSheet$bodyDegree = BigDataSheet$bodyDegree / BigDataSheet$AntPresence
+
+BigDataSheet <- BigDataSheet %>%
+  mutate(TimeOfDay = case_when(
+    Zeit<=17 & Zeit>=8 ~ "Day",
+    Zeit>17 | Zeit<8 ~ "Night",
+    TRUE ~ NA_character_  # This handles any other case, which shouldn't exist in your scenario
+  )) %>%
+  mutate(TimeOfDay = factor(TimeOfDay, levels = c( "Day","Night")))
+
+BigDataSheet$DayTime = paste(BigDataSheet$ExpDay, BigDataSheet$TimeOfDay, sep='_')
+
+```
+
+```{r pre-figure analysis}
+BDSMeans <- aggregate(cbind(Degree,Close,Eigen,Between,QR,Queen,boutDegree,boutBetween,boutClose,boutEigen,bodyDegree,bodyBetween,bodyClose,bodyEigen,AverageBoutLength,AverageOvaryWidth,AverageWingLength,Presence,AntPresence,mean_vel,move_perc,N90.Day4,MRSD.Day4, Initiation.Freq,clust,Disparity) ~ Bee, BigDataSheet, mean)
+BDSMeans$Trial = str_extract(BDSMeans$Bee, ".+?(?=_)")
+BDSMeans$Col = str_extract(BDSMeans$Bee, ".+?(?=#)")
+
+
+
+BigDataSheet$HourID = paste(BigDataSheet$Col, BigDataSheet$Hour,sep = "#")
+
+BigDataSheetQueen = BigDataSheet[BigDataSheet$Queen==TRUE,]
+BigDataSheetQR = BigDataSheet[BigDataSheet$Queen==FALSE & BigDataSheet$QR==TRUE,]
+BigDataSheetQL = BigDataSheet[BigDataSheet$QR==FALSE,]
+
+  
+BDSHourMeans <- aggregate(cbind(Hour,Degree,Close,Eigen,Between,boutDegree,boutBetween,boutClose,boutEigen,bodyDegree,bodyBetween,bodyClose,bodyEigen,AverageBoutLength,AverageOvaryWidth,AverageWingLength,Presence,AntPresence,mean_vel,move_perc,N90.Day4,MRSD.Day4, Initiation.Freq,clust,Disparity) ~ HourID, BigDataSheet, mean)
+BDSHourMeans$Trial = str_extract(BDSHourMeans$HourID, ".+?(?=_)")
+BDSHourMeans$Col = str_extract(BDSHourMeans$HourID, ".+?(?=#)")
+
+BDSHourMeansQueen <- aggregate(cbind(Hour,Degree,Close,Eigen,Between,boutDegree,boutBetween,boutClose,boutEigen,bodyDegree,bodyBetween,bodyClose,bodyEigen,AverageBoutLength,Presence,AntPresence,mean_vel,move_perc,N90.Day4,MRSD.Day4, Initiation.Freq,clust,Disparity) ~ HourID, BigDataSheetQueen, mean)
+BDSHourMeansQueen$Trial = str_extract(BDSHourMeansQueen$HourID, ".+?(?=_)")
+BDSHourMeansQueen$Col = str_extract(BDSHourMeansQueen$HourID, ".+?(?=#)")
+
+BDSHourMeansQR <- aggregate(cbind(Hour,Degree,Close,Eigen,Between,boutDegree,boutBetween,boutClose,boutEigen,bodyDegree,bodyBetween,bodyClose,bodyEigen,AverageBoutLength,Presence,AntPresence,mean_vel,move_perc,N90.Day4,MRSD.Day4, Initiation.Freq,clust,Disparity) ~ HourID, BigDataSheetQR, mean)
+BDSHourMeansQR$Trial = str_extract(BDSHourMeansQR$HourID, ".+?(?=_)")
+BDSHourMeansQR$Col = str_extract(BDSHourMeansQR$HourID, ".+?(?=#)")
+
+BDSHourMeansQL <- aggregate(cbind(Hour,Degree,Close,Eigen,Between,boutDegree,boutBetween,boutClose,boutEigen,bodyDegree,bodyBetween,bodyClose,bodyEigen,AverageBoutLength,Presence,AntPresence,mean_vel,move_perc,N90.Day4,MRSD.Day4, Initiation.Freq,clust,Disparity) ~ HourID, BigDataSheetQL, mean)
+BDSHourMeansQL$Trial = str_extract(BDSHourMeansQL$HourID, ".+?(?=_)")
+BDSHourMeansQL$Col = str_extract(BDSHourMeansQL$HourID, ".+?(?=#)")
+
+
+```
+
+```{r Supp Figure 1 (SLEAP Statistics)}
+#Made in SLEAP
+```
+
+```{r Supp Figure 2 (Filtered Pipeline Statistics)}
+treatment <-  c('QL', 'QR')
+preinterp <- c(2.4638e7, 2.427e7)
+deadbeefilter <- c(2.4635e7,2.422e7)
+speedfilter <- c(2.09e7,2.09e7)
+sizefilter <- c(2.063e7,2.064e7)
+spacefilter <- c(2.061e7,2.062e7)
+interp <- c(2.54e7,2.48e7)
+data <- data.frame(treatment, preinterp, deadbeefilter, speedfilter, sizefilter,spacefilter,interp)
+df <- melt(data ,  id.vars = 'treatment', variable.name = 'filter')
+ggplot(data=df, aes(x=filter, y=value)) +
+  geom_bar(stat="identity", aes(fill=treatment))+
+  scale_fill_manual(
+    labels = c( "Queenless Worker","Queenright Worker"),
+    values = c( "#161414","#429CF0"))+
+  theme_minimal()+
+  facet_wrap(~treatment,scales = "free_x")
+
+```
+
+```{r Supp Figure 3 (Presence Metrics)}
+ggplot(BDSMeansNoOv, aes(AntPresence, group = as.factor(QR))) + 
+  geom_density(alpha = 0.2, aes(color=as.factor(QR))) + 
+  scale_color_manual(labels = c("Queenless Worker","Queenright Worker"), values = c("#161414","#429CF0"))+
+  theme_minimal() +
+  theme(
+    text = element_text(size = 16),
+    plot.title = element_text(hjust = 0.5),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) +
+  facet_wrap(~Trial, scales="free_y")
+  
+```
+
+```{r Supp Figure 4 (Head to Head vs Head to Body)}
+
+library(reshape2)
+
+BigDataSheetQRFilt = data.frame(BigDataSheetQR$Hour,BigDataSheetQR$Degree,BigDataSheetQR$bodyDegree, BigDataSheetQR$ID,BigDataSheetQR$Trial)
+colnames(BigDataSheetQRFilt)<- c("Hour","Degree","bodyDegree","ID","Trial") 
+
+d <- melt(BigDataSheetQRFilt, id=c("Hour","ID","Trial"))
+
+BigDataSheetF2$Alpha <- ifelse(BigDataSheetF2$Queen, .5, 0.005)
+BigDataSheetF2 <- BigDataSheetF2[sample(nrow(BigDataSheetF2)), ]
+BigDataSheetF2$PointSize <- ifelse(BigDataSheetF2$Queen, .003, .001)
+
+ggplot(d, aes(x = as.integer(Hour), y = value/20, group = variable)) +
+  geom_jitter(aes(color = variable, alpha = 0.005, size = 0.001)) +
+  geom_smooth(aes(group = variable, color = variable)) +
+  scale_size(range = c(.001, .2)) +
+  scale_color_manual(
+    labels = c( "Head-to-Head", "Head-to-Body"),
+    values = c( "#DDBC58", "#023020"),
+    guide = guide_legend(direction = "horizontal")
+  ) +
+  scale_x_continuous(breaks = c(0, seq(24, 96, by = 24)), limits = c(0, NA), expand = c(0, 0)) + # Expand limits to include 0
+  labs(color = "") +
+  xlab("Hour") +
+  ylab("Time Spent Interacting per Hour (s)") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    legend.position = c(1, 1.02), # Move legend to top right
+    legend.justification = c(1, 1), # Align legend to top right
+    legend.background = element_rect(fill = alpha("white", 1)),
+    legend.title = element_text(size = 8, face = "bold"),
+    legend.text = element_text(size = 7),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 10, face = "bold"), # Make facet plot titles larger and bold
+    panel.grid = element_blank(),
+    panel.border = element_blank()
+  ) +
+  # scale_y_log10() +
+  guides(alpha = "none", size = "none")
+
+fm <- lmer(formula = bodyDegree ~ 1 + QR +  (1|Trial) + (1|QR:Trial) + (1|DayTime)  + (1|DayTime:Trial), data = BigDataSheetF2) #to run the model
+fm.null <- lmer(formula = bodyDegree ~ 1 +  (1|Trial) + (1|QR:Trial) + (1|DayTime)  + (1|DayTime:Trial), data = BigDataSheetF2)
+anova(fm, fm.null)
+print(fm)
+
+fm <- lmer(formula = Degree ~ 1 + QR + bodyDegree + (1|Trial) + (1|QR:Trial) + (1|DayTime)  + (1|DayTime:Trial), data = BigDataSheetF2) #to run the model
+fm.null <- lmer(formula = Degree ~ 1 + bodyDegree + (1|Trial) + (1|QR:Trial) + (1|DayTime)  + (1|DayTime:Trial), data = BigDataSheetF2)
+anova(fm, fm.null)
+print(fm)
+
+fm <- lmer(formula = Degree ~ 1 + QR + bodyDegree + QR:bodyDegree + (1|Trial) + (1|QR:Trial) + (1|DayTime)  + (1|DayTime:Trial), data = BigDataSheetF2) #to run the model
+fm.null <- lmer(formula = Degree ~ 1 + QR + bodyDegree + (1|Trial) + (1|QR:Trial) + (1|DayTime)  + (1|DayTime:Trial), data = BigDataSheetF2) #to run the model
+anova(fm, fm.null)
+print(fm)
+```
+
+```{r Supp Figure 5a (BoutDegree Over Time)}
+BDSMeansNoOv <- aggregate(cbind(Degree,Close,Eigen,Between,QR,Queen,boutDegree,boutBetween,boutClose,boutEigen,bodyDegree,bodyBetween,bodyClose,bodyEigen,AverageBoutLength,Presence,AntPresence,mean_vel,move_perc,N90.Day4,MRSD.Day4, Initiation.Freq, clust,Disparity) ~ Bee, BigDataSheet, mean)
+BDSMeansNoOv$Trial = str_extract(BDSMeansNoOv$Bee, ".+?(?=_)")
+
+BDSMeansNoOv <- BDSMeansNoOv %>%
+  mutate(QR_Queen_Condition = case_when(
+    QR==0 & Queen==0 ~ "Queenless",
+    QR==1 & Queen==0 ~ "Queenright",
+    Queen==1 ~ "Queen",
+    TRUE ~ NA_character_  # This handles any other case, which shouldn't exist in your scenario
+  )) %>%
+  mutate(QR_Queen_Condition = factor(QR_Queen_Condition, levels = c( "Queenright","Queenless", "Queen")))
+
+BDSMeansNoOv$ID = paste(BDSMeansNoOv$Trial,BDSMeansNoOv$QR_Queen_Condition)
+BDSMeanOfMean <- aggregate(cbind(Degree,Close,Eigen,Between,QR,Queen,boutDegree,boutBetween,boutClose,boutEigen,bodyDegree,bodyBetween,bodyClose,bodyEigen,AverageBoutLength,Presence,AntPresence,mean_vel,move_perc,N90.Day4,MRSD.Day4, Initiation.Freq, clust,Disparity) ~ ID, BDSMeansNoOv, mean)
+BDSMeanOfMean$Trial = str_extract(BDSMeanOfMean$ID, ".+?(?= )")
+
+BDSMeanOfMean <- BDSMeanOfMean %>%
+  mutate(QR_Queen_Condition = case_when(
+    QR==0 & Queen==0 ~ "Queenless",
+    QR==1 & Queen==0 ~ "Queenright",
+    Queen==1 ~ "Queen",
+    TRUE ~ NA_character_  # This handles any other case, which shouldn't exist in your scenario
+  )) %>%
+  mutate(QR_Queen_Condition = factor(QR_Queen_Condition, levels = c( "Queenright","Queenless", "Queen")))
+
+ggplot(BDSMeanOfMean, aes(x = fct_rev(as.factor(QR_Queen_Condition)), y = boutDegree)) +
+  geom_line(aes(group = Trial), color = "darkgray") +
+  geom_point(aes(color = Trial), size = 5) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  xlab("") +
+  labs(color = "Source Colony") +
+  ylab("Mean Number of Interactions per Hour (Unstandardized)") + # Adjust axis labels
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    #legend.position = "none",
+    text = element_text(size = 16),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) +
+  guides(color = guide_legend(title.position = "top", title.hjust = 0.5))
+
+```
+
+```{r Supp Figure 5b (Presence-Non-standardized Degree Over Time)}
+
+BigDataSheetF2$UnStandardizedDegree = BigDataSheetF2$Degree * BigDataSheetF2$AntPresence
+
+BDSMeansUnStandardized <- aggregate(cbind(UnStandardizedDegree,Close,Eigen,Between,QR,Queen,boutDegree,boutBetween,boutClose,boutEigen,bodyDegree,bodyBetween,bodyClose,bodyEigen,AverageBoutLength,Presence,AntPresence,mean_vel,move_perc,N90.Day4,MRSD.Day4, Initiation.Freq, clust,Disparity) ~ Bee, BigDataSheetF2, mean)
+BDSMeansUnStandardized$Trial = str_extract(BDSMeansUnStandardized$Bee, ".+?(?=_)")
+
+BDSMeansUnStandardized <- BDSMeansUnStandardized %>%
+  mutate(QR_Queen_Condition = case_when(
+    QR==0 & Queen==0 ~ "Queenless",
+    QR==1 & Queen==0 ~ "Queenright",
+    Queen==1 ~ "Queen",
+    TRUE ~ NA_character_  # This handles any other case, which shouldn't exist in your scenario
+  )) %>%
+  mutate(QR_Queen_Condition = factor(QR_Queen_Condition, levels = c( "Queenright","Queenless", "Queen")))
+
+BDSMeansUnStandardized$ID = paste(BDSMeansUnStandardized$Trial,BDSMeansUnStandardized$QR_Queen_Condition)
+BDSMeanOfMeanUnstandardized <- aggregate(cbind(UnStandardizedDegree,Close,Eigen,Between,QR,Queen,boutDegree,boutBetween,boutClose,boutEigen,bodyDegree,bodyBetween,bodyClose,bodyEigen,AverageBoutLength,Presence,AntPresence,mean_vel,move_perc,N90.Day4,MRSD.Day4, Initiation.Freq, clust,Disparity) ~ ID, BDSMeansUnStandardized, mean)
+BDSMeanOfMeanUnstandardized$Trial = str_extract(BDSMeanOfMeanUnstandardized$ID, ".+?(?= )")
+
+BDSMeanOfMeanUnstandardized <- BDSMeanOfMeanUnstandardized %>%
+  mutate(QR_Queen_Condition = case_when(
+    QR==0 & Queen==0 ~ "Queenless",
+    QR==1 & Queen==0 ~ "Queenright",
+    Queen==1 ~ "Queen",
+    TRUE ~ NA_character_  # This handles any other case, which shouldn't exist in your scenario
+  )) %>%
+  mutate(QR_Queen_Condition = factor(QR_Queen_Condition, levels = c( "Queenright","Queenless", "Queen")))
+
+ggplot(BDSMeanOfMeanUnstandardized, aes(x = fct_rev(as.factor(QR_Queen_Condition)), y = UnStandardizedDegree)) +
+  geom_line(aes(group = Trial), color = "darkgray") +
+  geom_point(aes(color = Trial), size = 5) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  xlab("") +
+  labs(color = "Source Colony") +
+  ylab("Mean Number of Interactions per Hour (Unstandardized)") + # Adjust axis labels
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    #legend.position = "none",
+    text = element_text(size = 16),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) +
+  guides(color = guide_legend(title.position = "top", title.hjust = 0.5))
+
+fm <- lmer(formula = UnStandardizedDegree ~ 1 + TimeOfDay + QR_Queen_Condition + (1|Trial/Day), data = BigDataSheetF2) #to run the model
+fm.null <- lmer(formula = UnStandardizedDegree ~ 1 + TimeOfDay + (1|Trial/Day), data = BigDataSheetF2) #to run the model
+anova(fm, fm.null)
+print(fm)
+
+```
+
+```{r Supp Figure 6 (Movement Perc)}
+ggplot(BDSMeanOfMean, aes(x = fct_rev(as.factor(QR_Queen_Condition)), y = move_perc)) +
+  geom_line(aes(group = Trial), color = "darkgray") +
+  geom_point(aes(color = Trial), size = 5) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  xlab("") +
+  labs(color = "Source Colony") +
+  ylab("Movement Percentage") + # Adjust axis labels
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    #legend.position = "none",
+    text = element_text(size = 16),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) +
+  guides(color = guide_legend(title.position = "top", title.hjust = 0.5))
+
+```
+
+```{r Supp Figure 7 (PCA Biplot)}
+
+numerical_data <- BDSMeansNoOv[,c(2:5,8:15,19:21,23:25)]
+numerical_data = numerical_data[complete.cases(numerical_data), ]
+data_normalized <- scale(numerical_data)
+data.pca <- princomp(data_normalized)
+fviz_pca_var(data.pca, col.var = "black")
+```
+
+```{r Supp Figure 8 (PCA With Trials)}
+numerical_data$QR = BDSMeansNoOv[complete.cases(BDSMeans), ]$QR
+numerical_data$Trial = BDSMeansNoOv[complete.cases(BDSMeans), ]$Trial
+numerical_data$Queen = BDSMeansNoOv[complete.cases(BDSMeans), ]$Queen
+
+numerical_data <- numerical_data %>%
+  mutate(QR_Queen_Condition = case_when(
+    QR!=1 & Queen!=1 ~ "Queenless",
+    QR==1 & Queen!=1 ~ "Queenright",
+    Queen==1 ~ "Queen",
+    TRUE ~ NA_character_  # This handles any other case, which shouldn't exist in your scenario
+  )) %>%
+  mutate(QR_Queen_Condition = factor(QR_Queen_Condition, levels = c( "Queenright","Queenless", "Queen")))
+
+fviz_pca_ind(data.pca, label="none", habillage=numerical_data$Trial,
+             addEllipses=TRUE, ellipse.level=0.95, palette = "Dark2") + theme_minimal() + labs(title ="Standardized PCA")
+
+pca_scores <- data.pca$scores
+data_with_pca <- data.frame(BDSMeansNoOv, PC1 = pca_scores[, 1], PC2 = pca_scores[, 2])
+```
+
+```{r Supp Figure 9 Wing Morphology}
+#Made With a different data set
+```
+
+```{r Supp Figure 10 (OvIdx For Queen vs. Worker in General)}
+BDSMeans$Alpha <- ifelse(BDSMeans$Queen, 1, 0.75)
+BDSMeans$PointSize <- ifelse(BDSMeans$Queen, 3, 1)
+BDSMeans$OvaryIndex = BDSMeans$AverageOvaryWidth/BDSMeans$AverageWingLength
+BDSMeans$ID = paste(BDSMeans$Trial,BDSMeans$QR_Queen_Condition)
+BDSMeanOfMean <- aggregate(cbind(Degree,Close,Eigen,Between,QR,Queen,boutDegree,boutBetween,boutClose,boutEigen,bodyDegree,bodyBetween,bodyClose,bodyEigen,AverageBoutLength,Presence,AntPresence,mean_vel,move_perc,N90.Day4,MRSD.Day4, Initiation.Freq, clust, OvaryIndex,AverageWingLength,AverageOvaryWidth) ~ ID, BDSMeans, mean)
+BDSMeanOfMean$Trial = str_extract(BDSMeanOfMean$ID, ".+?(?= )")
+
+BDSMeanOfMean <- BDSMeanOfMean %>%
+  mutate(QR_Queen_Condition = case_when(
+    QR==0 & Queen==0 ~ "Queenless",
+    QR==1 & Queen==0 ~ "Queenright",
+    Queen==1 ~ "Queen",
+    TRUE ~ NA_character_  # This handles any other case, which shouldn't exist in your scenario
+  )) %>%
+  mutate(QR_Queen_Condition = factor(QR_Queen_Condition, levels = c( "Queenright","Queenless", "Queen")))
+
+ggplot(BDSMeanOfMean, aes(x = fct_rev(as.factor(QR_Queen_Condition)), y = OvaryIndex)) +
+  geom_line(aes(group = Trial), color = "darkgray") +
+  geom_point(aes(color = Trial), size = 5) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  xlab("") +
+  labs(color = "Source Colony") +
+  ylab("Ovary Index") + # Adjust axis labels
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    #legend.position = "none",
+    text = element_text(size = 16),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) +
+  guides(color = guide_legend(title.position = "top", title.hjust = 0.5))
+
+```
+
+```{r Supp Figure 11 OvIdx for Queen vs. Worker in RooTea}
+
+BDSMeansRoo = BDSMeans[BDSMeans$Trial=='RooibosTea',]
+
+
+ggplot(BDSMeansRoo, aes(OvaryIndex, fill = QR_Queen_Condition)) + 
+  geom_density(alpha = 0.2) + 
+  scale_fill_manual(labels = c("Queenless Worker","Queenright Worker"), values = c("#161414","#429CF0"))+
+  theme_minimal() +
+  theme(
+    text = element_text(size = 16),
+    plot.title = element_text(hjust = 0.5),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) +
+  facet_wrap(~Trial, scales="free_y")
+```
+
+```{r Supp Figure 12 (Influencers are not Assortative)}
+
+setwd("~/Downloads/QueenModelComplete_062424/")
+Start=0
+for(i in 1:10){
+  for(j in 0:95){
+    if(file.exists(paste(prefixes[i],sprintf("%03d", j),"Head_to_Head_False_NWP.csv",sep = "_"))) {
+      Deg = read.csv(paste(prefixes[i],sprintf("%03d", j),"Head_to_Head_False_NWP.csv",sep = "_"))
+    }
+    Deg$ExpDay = as.factor(floor((j/24)+1))
+    Deg$Day = as.factor(floor(((j+17)/24)+1))
+    Deg$Zeit = as.numeric((j+7)%%24)
+    Deg$Hour = j
+    Deg$Col = prefixes[i]
+    Deg$QR = i %% 2 == 1
+    Deg$ID = paste(Deg$Col, Deg$Hour)
+    Deg$Mod = "Head_Head"
+    Deg$Trial = str_extract(Deg$Col, ".+?(?=_)")
+    if(Start == 1){
+      TotalNWP = rbind(TotalNWP, Deg)
+    }
+    if(Start == 0){
+      TotalNWP = Deg
+      Start = 1
+    }
+  }
+}
+
+TotalNWP <- TotalNWP %>%
+  mutate(TimeOfDay = case_when(
+    Zeit<=17 & Zeit>=8 ~ "Day",
+    Zeit>17 | Zeit<8 ~ "Night",
+    TRUE ~ NA_character_  # This handles any other case, which shouldn't exist in your scenario
+  )) %>%
+  mutate(TimeOfDay = factor(TimeOfDay, levels = c( "Day","Night")))
+TotalNWP$ID = paste(TotalNWP$Trial,TotalNWP$QR)
+
+TotalNWPKeyAssortPer = TotalNWP[TotalNWP$params == 'KeystoneAssPercentile',]
+
+ggplot(TotalNWPKeyAssortPer, aes(x = as.integer(Hour), y = values, group = ID)) +
+  geom_jitter(aes(color = QR, alpha = 0.005, size=0.01)) +
+  geom_smooth(aes(group = QR, color = QR)) +
+  scale_size(range = c(.001, .2)) +
+  scale_color_manual(
+    labels = c( "Queenless Worker"),
+    values = c("#161414"))+
+  scale_x_continuous(breaks = c(0, seq(24, 96, by = 24)), limits = c(0, NA), expand = c(0, 0)) + # Expand limits to include 0
+  labs(color = "") +
+  xlab("Hour") +
+  ylab("Assortativity Percentile") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    legend.position = c(1, 1.02), # Move legend to top right
+    legend.justification = c(1, 1), # Align legend to top right
+    legend.background = element_rect(fill = alpha("white", 1)),
+    legend.title = element_text(size = 8, face = "bold"),
+    legend.text = element_text(size = 7),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 10, face = "bold"), # Make facet plot titles larger and bold
+    panel.grid = element_blank(),
+    panel.border = element_blank()
+  ) +
+  # scale_y_log10() +
+  guides(alpha = "none", size = "none")
+
+```
+
+```{r Supp Figure 13 (Influencers are Less Specialized re: directionality)}
+
+ggplot(BDSMeansNoOv, aes(x = Degree, y = bodyDegree, group = QR_Queen_Inf)) +
+  new_scale_color() +
+  geom_point(aes(color = QR_Queen_Inf,shape=as.factor(QR)), alpha = 1, size = BDSMeansNoOv$PointSize) +
+  scale_color_manual(
+    labels = c( "Queenright Worker","Queenless Worker","Queen","Influencer"),
+    values = c( "#429CF0","#161414","#7851A9","#AA1233"))+
+  scale_x_continuous() + # Use a continuous scale for x
+  scale_y_continuous() + # Use a continuous scale for y
+  xlab("Head Degree Centrality") +
+  ylab("Body Degree Centrality") + # Adjust axis labels
+  theme(
+    text = element_text(size = 16),
+    plot.title = element_text(hjust = 0.5),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) 
+```
+
+
+```{r Supp Figure 3 (Modularity and other NWP)}
+
+setwd("~/Downloads/QueenModelComplete_062424/")
+Start=0
+for(i in 1:10){
+  for(j in 0:95){
+    if(file.exists(paste(prefixes[i],sprintf("%03d", j),"Head_to_Head_False_NWP.csv",sep = "_"))) {
+      Deg = read.csv(paste(prefixes[i],sprintf("%03d", j),"Head_to_Head_False_NWP.csv",sep = "_"))
+    }
+    Deg$ExpDay = as.factor(floor((j/24)+1))
+    Deg$Day = as.factor(floor(((j+17)/24)+1))
+    Deg$Zeit = as.numeric((j+7)%%24)
+    Deg$Hour = j
+    Deg$Col = prefixes[i]
+    Deg$QR = i %% 2 == 1
+    Deg$ID = paste(Deg$Col, Deg$Hour)
+    Deg$Mod = "Head_Head"
+    Deg$Trial = str_extract(Deg$Col, ".+?(?=_)")
+    if(Start == 1){
+      TotalNWP = rbind(TotalNWP, Deg)
+    }
+    if(Start == 0){
+      TotalNWP = Deg
+      Start = 1
+    }
+  }
+}
+
+TotalNWP <- TotalNWP %>%
+  mutate(TimeOfDay = case_when(
+    Zeit<=17 & Zeit>=8 ~ "Day",
+    Zeit>17 | Zeit<8 ~ "Night",
+    TRUE ~ NA_character_  # This handles any other case, which shouldn't exist in your scenario
+  )) %>%
+  mutate(TimeOfDay = factor(TimeOfDay, levels = c( "Day","Night")))
+TotalNWP$ID = paste(TotalNWP$Trial,TotalNWP$QR)
+
+
+TotalNWPModularity = TotalNWP[TotalNWP$params == 'Modularity',]
+TotalNWPEfficiency = TotalNWP[TotalNWP$params == 'GlobalEfficiency',]
+TotalNWPTransitivity = TotalNWP[TotalNWP$params == 'Transitivity',]
+TotalNWPClustering = TotalNWP[TotalNWP$params == 'Average Clustering',]
+TotalNWPAssortativity = TotalNWP[TotalNWP$params == 'Assortativity',]
+TotalNWPDC = TotalNWP[TotalNWP$params == 'DegreeCentralization',]
+TotalNWPKeyAssort = TotalNWP[TotalNWP$params == 'KeystoneAssortativity',]
+TotalNWPKeyAssortPer = TotalNWP[TotalNWP$params == 'KeystoneAssPercentile',]
+
+
+NWPMeanOfMean <- aggregate(cbind(values,QR) ~ ID, TotalNWPModularity, mean)
+NWPMeanOfMean$Trial = str_extract(NWPMeanOfMean$ID, ".+?(?= )")
+
+ggplot(NWPMeanOfMean, aes(x = fct_rev(as.factor(QR)), y = values)) +
+  geom_line(aes(group = Trial), color = "darkgray") +
+  geom_point(aes(color = Trial), size = 5) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  xlab("Queen Presence") +
+  labs(color = "Source Colony") +
+  ylab("Modularity") + # Adjust axis labels
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    legend.position = "none",
+    text = element_text(size = 16),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) +
+  guides(color = guide_legend(title.position = "top", title.hjust = 0.5))
+
+
+fm <- lmer(formula = values ~ 1 + TimeOfDay + QR + (1|Trial/Day), data = TotalNWPModularity) #to run the model
+fm.null <- lmer(formula = values ~ 1 + TimeOfDay + (1|Trial/Day), data = TotalNWPModularity) #to run the model
+anova(fm, fm.null)
+print(fm)
+
+NWPMeanOfMean <- aggregate(cbind(values,QR) ~ ID, TotalNWPTransitivity, mean)
+NWPMeanOfMean$Trial = str_extract(NWPMeanOfMean$ID, ".+?(?= )")
+
+ggplot(NWPMeanOfMean, aes(x = fct_rev(as.factor(QR)), y = values)) +
+  geom_line(aes(group = Trial), color = "darkgray") +
+  geom_point(aes(color = Trial), size = 5) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  xlab("Queen Presence") +
+  labs(color = "Source Colony") +
+  ylab("Transitivity") + # Adjust axis labels
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    legend.position = "none",
+    text = element_text(size = 16),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) +
+  guides(color = guide_legend(title.position = "top", title.hjust = 0.5))
+
+
+fm <- lmer(formula = values ~ 1 + TimeOfDay + QR + (1|Trial/Day), data = TotalNWPTransitivity) #to run the model
+fm.null <- lmer(formula = values ~ 1 + TimeOfDay + (1|Trial/Day), data = TotalNWPTransitivity) #to run the model
+anova(fm, fm.null)
+print(fm)
+
+NWPMeanOfMean <- aggregate(cbind(values,QR) ~ ID, TotalNWPEfficiency, mean)
+NWPMeanOfMean$Trial = str_extract(NWPMeanOfMean$ID, ".+?(?= )")
+
+ggplot(NWPMeanOfMean, aes(x = fct_rev(as.factor(QR)), y = values)) +
+  geom_line(aes(group = Trial), color = "darkgray") +
+  geom_point(aes(color = Trial), size = 5) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  xlab("Queen Presence") +
+  labs(color = "Source Colony") +
+  ylab("Efficiency") + # Adjust axis labels
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    legend.position = "none",
+    text = element_text(size = 16),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) +
+  guides(color = guide_legend(title.position = "top", title.hjust = 0.5))
+
+
+fm <- lmer(formula = values ~ 1 + TimeOfDay + QR + (1|Trial/Day), data = TotalNWPEfficiency) #to run the model
+fm.null <- lmer(formula = values ~ 1 + TimeOfDay + (1|Trial/Day), data = TotalNWPEfficiency) #to run the model
+anova(fm, fm.null)
+print(fm)
+
+NWPMeanOfMean <- aggregate(cbind(values,QR) ~ ID, TotalNWPClustering, mean)
+NWPMeanOfMean$Trial = str_extract(NWPMeanOfMean$ID, ".+?(?= )")
+
+ggplot(NWPMeanOfMean, aes(x = fct_rev(as.factor(QR)), y = values)) +
+  geom_line(aes(group = Trial), color = "darkgray") +
+  geom_point(aes(color = Trial), size = 5) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  xlab("Queen Presence") +
+  labs(color = "Source Colony") +
+  ylab("Clustering") + # Adjust axis labels
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    legend.position = "none",
+    text = element_text(size = 16),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) +
+  guides(color = guide_legend(title.position = "top", title.hjust = 0.5))
+
+
+fm <- lmer(formula = values ~ 1 + TimeOfDay + QR + (1|Trial/Day), data = TotalNWPClustering) #to run the model
+fm.null <- lmer(formula = values ~ 1 + TimeOfDay + (1|Trial/Day), data = TotalNWPClustering) #to run the model
+anova(fm, fm.null)
+print(fm)
+
+NWPMeanOfMean <- aggregate(cbind(values,QR) ~ ID, TotalNWPAssortativity, mean)
+NWPMeanOfMean$Trial = str_extract(NWPMeanOfMean$ID, ".+?(?= )")
+
+ggplot(NWPMeanOfMean, aes(x = fct_rev(as.factor(QR)), y = values)) +
+  geom_line(aes(group = Trial), color = "darkgray") +
+  geom_point(aes(color = Trial), size = 5) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  xlab("Queen Presence") +
+  labs(color = "Source Colony") +
+  ylab("Assortativity") + # Adjust axis labels
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    legend.position = "none",
+    text = element_text(size = 16),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) +
+  guides(color = guide_legend(title.position = "top", title.hjust = 0.5))
+
+
+fm <- lmer(formula = values ~ 1 + TimeOfDay + QR + (1|Trial/Day), data = TotalNWPAssortativity) #to run the model
+fm.null <- lmer(formula = values ~ 1 + TimeOfDay + (1|Trial/Day), data = TotalNWPAssortativity) #to run the model
+anova(fm, fm.null)
+print(fm)
+
+ggplot(TotalNWPAssortativity, aes(x = as.integer(Hour), y = values, group = ID)) +
+  geom_jitter(aes(color = QR, alpha = 0.005, size=0.01)) +
+  geom_smooth(aes(group = QR, color = QR)) +
+  scale_size(range = c(.001, .2)) +
+  scale_color_manual(
+    labels = c( "Queenless Worker","Queenright Worker"),
+    values = c("#161414", "#429CF0"))+
+  scale_x_continuous(breaks = c(0, seq(24, 96, by = 24)), limits = c(0, NA), expand = c(0, 0)) + # Expand limits to include 0
+  labs(color = "") +
+  xlab("Hour") +
+  ylab("Assortativity") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    legend.position = c(1, 1.02), # Move legend to top right
+    legend.justification = c(1, 1), # Align legend to top right
+    legend.background = element_rect(fill = alpha("white", 1)),
+    legend.title = element_text(size = 8, face = "bold"),
+    legend.text = element_text(size = 7),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 10, face = "bold"), # Make facet plot titles larger and bold
+    panel.grid = element_blank(),
+    panel.border = element_blank()
+  ) +
+  # scale_y_log10() +
+  guides(alpha = "none", size = "none")
+
+NWPMeanOfMean <- aggregate(cbind(values,QR) ~ ID, TotalNWPDC, mean)
+NWPMeanOfMean$Trial = str_extract(NWPMeanOfMean$ID, ".+?(?= )")
+
+ggplot(NWPMeanOfMean, aes(x = fct_rev(as.factor(QR)), y = values)) +
+  geom_line(aes(group = Trial), color = "darkgray") +
+  geom_point(aes(color = Trial), size = 5) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  xlab("Queen Presence") +
+  labs(color = "Source Colony") +
+  ylab("Degree Centralizationn") + # Adjust axis labels
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    legend.position = "none",
+    text = element_text(size = 16),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) +
+  guides(color = guide_legend(title.position = "top", title.hjust = 0.5))
+
+
+fm <- lmer(formula = values ~ 1 + TimeOfDay + QR + (1|Trial/Day), data = TotalNWPDC) #to run the model
+fm.null <- lmer(formula = values ~ 1 + TimeOfDay + (1|Trial/Day), data = TotalNWPDC) #to run the model
+anova(fm, fm.null)
+print(fm)
+
+ggplot(TotalNWPDC, aes(x = as.integer(Hour), y = values, group = ID)) +
+  geom_jitter(aes(color = QR, alpha = 0.005, size=0.01)) +
+  geom_smooth(aes(group = QR, color = QR)) +
+  scale_size(range = c(.001, .2)) +
+  scale_color_manual(
+    labels = c( "Queenless Worker","Queenright Worker"),
+    values = c("#161414", "#429CF0"))+
+  scale_x_continuous(breaks = c(0, seq(24, 96, by = 24)), limits = c(0, NA), expand = c(0, 0)) + # Expand limits to include 0
+  labs(color = "") +
+  xlab("Hour") +
+  ylab("Degree Centralization") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    legend.position = c(1, 1.02), # Move legend to top right
+    legend.justification = c(1, 1), # Align legend to top right
+    legend.background = element_rect(fill = alpha("white", 1)),
+    legend.title = element_text(size = 8, face = "bold"),
+    legend.text = element_text(size = 7),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 10, face = "bold"), # Make facet plot titles larger and bold
+    panel.grid = element_blank(),
+    panel.border = element_blank()
+  ) +
+  # scale_y_log10() +
+  guides(alpha = "none", size = "none")
+
+ggplot(TotalNWPDC, aes(x = as.integer(Hour), y = values, group = ID)) +
+  geom_jitter(aes(color = QR, alpha = 0.005, size=0.01)) +
+  geom_smooth(aes(group = QR, color = QR)) +
+  scale_size(range = c(.001, .2)) +
+  scale_color_manual(
+    labels = c( "Queenless Worker","Queenright Worker"),
+    values = c("#161414", "#429CF0"))+
+  scale_x_continuous(breaks = c(0, seq(24, 96, by = 24)), limits = c(0, NA), expand = c(0, 0)) + # Expand limits to include 0
+  labs(color = "") +
+  xlab("Hour") +
+  ylab("Degree Centralization") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    legend.position = c(1, 1.02), # Move legend to top right
+    legend.justification = c(1, 1), # Align legend to top right
+    legend.background = element_rect(fill = alpha("white", 1)),
+    legend.title = element_text(size = 8, face = "bold"),
+    legend.text = element_text(size = 7),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 10, face = "bold"), # Make facet plot titles larger and bold
+    panel.grid = element_blank(),
+    panel.border = element_blank()
+  ) +
+  # scale_y_log10() +
+  guides(alpha = "none", size = "none")
+
+ggplot(TotalNWPKeyAssortPer, aes(x = as.integer(Hour), y = values, group = ID)) +
+  geom_jitter(aes(color = QR, alpha = 0.005, size=0.01)) +
+  geom_smooth(aes(group = QR, color = QR)) +
+  scale_size(range = c(.001, .2)) +
+  scale_color_manual(
+    labels = c( "Queenless Worker"),
+    values = c("#161414"))+
+  scale_x_continuous(breaks = c(0, seq(24, 96, by = 24)), limits = c(0, NA), expand = c(0, 0)) + # Expand limits to include 0
+  labs(color = "") +
+  xlab("Hour") +
+  ylab("Assortativity Percentile") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    legend.position = c(1, 1.02), # Move legend to top right
+    legend.justification = c(1, 1), # Align legend to top right
+    legend.background = element_rect(fill = alpha("white", 1)),
+    legend.title = element_text(size = 8, face = "bold"),
+    legend.text = element_text(size = 7),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 10, face = "bold"), # Make facet plot titles larger and bold
+    panel.grid = element_blank(),
+    panel.border = element_blank()
+  ) +
+  # scale_y_log10() +
+  guides(alpha = "none", size = "none")
+
+```
+
+```{r Supp Figure 4 (Degree vs. Betweenness)}
+BDSMeans$Alpha <- ifelse(BDSMeans$Queen, 1, 0.75)
+BDSMeans$PointSize <- ifelse(BDSMeans$Queen, 3, 1)
+BDSMeans$OvaryIndex = BDSMeans$AverageOvaryWidth/BDSMeans$AverageWingLength
+BDSMeans <- BDSMeans %>%
+  mutate(QR_Queen_Condition = case_when(
+    QR==0 & Queen==0 ~ "Queenless",
+    QR==1 & Queen==0 ~ "Queenright",
+    Queen==1 ~ "Queen",
+    TRUE ~ NA_character_  # This handles any other case, which shouldn't exist in your scenario
+  )) 
+
+ggplot(BDSMeansNoOv, aes(x = Degree, y = Between, group = QR_Queen_Condition)) +
+  new_scale_color() +
+  geom_point(aes(color = QR_Queen_Condition,shape=as.factor(QR)), alpha = 1, size = BDSMeansNoOv$PointSize) +
+  scale_color_manual(
+    labels = c( "Queenright Worker","Queenless Worker","Queen"),
+    values = c( "#429CF0","#161414","#7851A9"))+
+  scale_x_continuous() + # Use a continuous scale for x
+  scale_y_continuous() + # Use a continuous scale for y
+  xlab("Degree Centrality") +
+  ylab("Betweenness Centrality") + # Adjust axis labels
+  theme(
+    text = element_text(size = 16),
+    plot.title = element_text(hjust = 0.5),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) 
+
+fm <- lmer(formula = Between ~ 1 + OvaryIndex + QR_Queen_Condition + (1|Trial), data = BDSMeansOvNoQueen) #to run the model
+fm.null <- lmer(formula = Between ~ 1 + OvaryIndex + (1|Trial), data = BDSMeansOvNoQueen) #to run the model
+anova(fm, fm.null)
+print(fm)
+
+fm <- lmer(formula = Between ~ 1 + OvaryIndex + QR_Queen_Condition  + OvaryIndex:QR_Queen_Condition + (1|Trial), data = BDSMeansOvNoQueen) #to run the model
+fm.null <- lmer(formula = Between ~ 1 + OvaryIndex + QR_Queen_Condition + (1|Trial), data = BDSMeansOvNoQueen) #to run the model
+anova(fm, fm.null)
+print(fm)
+
+
+ggplot(BDSMeansNoOv, aes(x = Degree, y = Close, group = QR_Queen_Condition)) +
+  new_scale_color() +
+  geom_point(aes(color = QR_Queen_Condition,shape=as.factor(QR)), alpha = 1, size = BDSMeansNoOv$PointSize) +
+  scale_color_manual(
+    labels = c( "Queenright Worker","Queenless Worker","Queen"),
+    values = c( "#429CF0","#161414","#7851A9"))+
+  scale_x_continuous() + # Use a continuous scale for x
+  scale_y_continuous() + # Use a continuous scale for y
+  xlab("Degree Centrality") +
+  ylab("Closeness Centrality") + # Adjust axis labels
+  theme(
+    text = element_text(size = 16),
+    plot.title = element_text(hjust = 0.5),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) 
+
+fm <- lmer(formula = Close ~ 1 + OvaryIndex + QR_Queen_Condition + (1|Trial), data = BDSMeansOvNoQueen) #to run the model
+fm.null <- lmer(formula = Close ~ 1 + OvaryIndex + (1|Trial), data = BDSMeansOvNoQueen) #to run the model
+anova(fm, fm.null)
+print(fm)
+
+fm <- lmer(formula = Close ~ 1 + OvaryIndex + QR_Queen_Condition  + OvaryIndex:QR_Queen_Condition + (1|Trial), data = BDSMeansOvNoQueen) #to run the model
+fm.null <- lmer(formula = Close ~ 1 + OvaryIndex + QR_Queen_Condition + (1|Trial), data = BDSMeansOvNoQueen) #to run the model
+anova(fm, fm.null)
+print(fm)
+
+
+ggplot(BDSMeansNoOv, aes(x = Degree, y = Eigen, group = QR_Queen_Condition)) +
+  new_scale_color() +
+  geom_point(aes(color = QR_Queen_Condition,shape=as.factor(QR)), alpha = 1, size = BDSMeansNoOv$PointSize) +
+  scale_color_manual(
+    labels = c( "Queenright Worker","Queenless Worker","Queen"),
+    values = c( "#429CF0","#161414","#7851A9"))+
+  scale_x_continuous() + # Use a continuous scale for x
+  scale_y_continuous() + # Use a continuous scale for y
+  xlab("Degree Centrality") +
+  ylab("Eigenvector Centrality") + # Adjust axis labels
+  theme(
+    text = element_text(size = 16),
+    plot.title = element_text(hjust = 0.5),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) 
+
+fm <- lmer(formula = Eigen ~ 1 + OvaryIndex + QR_Queen_Condition + (1|Trial), data = BDSMeansOvNoQueen) #to run the model
+fm.null <- lmer(formula = Eigen ~ 1 + OvaryIndex + (1|Trial), data = BDSMeansOvNoQueen) #to run the model
+anova(fm, fm.null)
+print(fm)
+
+fm <- lmer(formula = Eigen ~ 1 + OvaryIndex + QR_Queen_Condition  + OvaryIndex:QR_Queen_Condition + (1|Trial), data = BDSMeansOvNoQueen) #to run the model
+fm.null <- lmer(formula = Eigen ~ 1 + OvaryIndex + QR_Queen_Condition + (1|Trial), data = BDSMeansOvNoQueen) #to run the model
+anova(fm, fm.null)
+print(fm)
+
+
+
+```
+
+```{r Supp Figure 5 (Ball and Stick Dispersion)}
+###MS:Supp Figure 5--------
+ggplot(BDSMeanOfMean, aes(x = fct_rev(as.factor(QR_Queen_Condition)), y = N90.Day4)) +
+  geom_line(aes(group = Trial), color = "darkgray") +
+  geom_point(aes(color = Trial), size = 5) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  xlab("") +
+  labs(color = "Source Colony") +
+  ylab("N90 (Dispersion Measure)") + # Adjust axis labels
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    legend.position = "none",
+    text = element_text(size = 16),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) +
+  guides(color = guide_legend(title.position = "top", title.hjust = 0.5))
+
+fm <- lmer(formula = N90.Day4 ~ 1 + QR_Queen_Condition + (1|Trial), data = BDSMeansNoOv) #to run the model
+fm.null <- lmer(formula = N90.Day4 ~ 1 + (1|Trial), data = BDSMeansNoOv) #to run the model
+anova(fm, fm.null)
+print(fm)
+
+fm <- lmer(formula = N90.Day4 ~ 1 + Queen + (1|Trial), data = BDSMeansNoOv) #to run the model
+fm.null <- lmer(formula = N90.Day4 ~ 1 + (1|Trial), data = BDSMeansNoOv) #to run the model
+anova(fm, fm.null)
+print(fm)
+```
+
+```{r Supp Figure 6 (Wingsize and Body Size)}
+#Ian's Figure!  Will take directly
+```
+
+```{r Supp Figure 7 Ovaries in Rooibos}
+BDSMeans$Alpha <- ifelse(BDSMeans$Queen, 1, 0.75)
+BDSMeans$PointSize <- ifelse(BDSMeans$Queen, 3, 1)
+BDSMeans$OvaryIndex = BDSMeans$AverageOvaryWidth/BDSMeans$AverageWingLength
+
+BDSMeansRoo = BDSMeans[BDSMeans$Trial=='RooibosTea',]
+
+ggplot(BDSMeansRoo, aes(x = OvaryIndex, y = Degree, group = interaction(QR, Queen))) +
+  geom_smooth(
+        color = "#161414",
+        method = "lm",
+        data = subset(BDSMeansRoo, QR_Queen_Condition == 'Queenless'),
+        se = T
+    )  + 
+    geom_smooth(
+        color = "#429CF0",
+        method = "lm",
+        data = subset(BDSMeansRoo, QR_Queen_Condition == 'Queenright'),
+        se = T
+    ) +
+  new_scale_color() +
+  geom_point(aes(shape=as.factor(QR)), alpha = 1,size = BDSMeansRoo$PointSize,color='black') +
+  scale_x_continuous() + # Use a continuous scale for x
+  scale_y_continuous() + # Use a continuous scale for y
+  #   labs(title="Total Interaction Count vs Movement Percentage", color = "Treatment") +  # Adjust title and legend title
+  xlab("Ovary Index") +
+  ylab("Mean Number of Interactions per Hour") + # Adjust axis labels
+  theme_minimal() +
+  theme(
+    text = element_text(size = 16),
+    plot.title = element_text(hjust = 0.5),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) 
+
+fm <- lmer(formula = Degree ~ 1  + OvaryIndex + QR_Queen_Condition + (1|Col), data = BDSMeansRoo) #to run the model
+fm.null <- lmer(formula = Degree ~ 1 + OvaryIndex + (1|Col), data = BDSMeansRoo) #to run the model
+anova(fm, fm.null)
+print(fm)
+
+fm <- lmer(formula = Degree ~ 1 + OvaryIndex + QR_Queen_Condition  + OvaryIndex:QR_Queen_Condition + (1|Col), data = BDSMeansRoo) #to run the model
+fm.null <- lmer(formula = Degree ~ 1 + OvaryIndex + QR_Queen_Condition + (1|Col), data = BDSMeansRoo) #to run the model
+anova(fm, fm.null)
+print(fm)
+
+ggplot(BDSMeansRoo, aes(OvaryIndex, fill = QR_Queen_Condition)) + 
+  geom_density(alpha = 0.2) + 
+  scale_fill_manual(labels = c("Queenless Worker","Queenright Worker"), values = c("#161414","#429CF0"))+
+  theme_minimal() +
+  theme(
+    text = element_text(size = 16),
+    plot.title = element_text(hjust = 0.5),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) +
+  facet_wrap(~Trial, scales="free_y")
+```
+
+```{r Figure 9}
+ggplot(BDSMeanOfMean, aes(x = fct_rev(as.factor(QR_Queen_Condition)), y = Initiation.Freq)) +
+  geom_line(aes(group = Trial), color = "darkgray") +
+  geom_point(aes(color = Trial), size = 5) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  xlab("") +
+  labs(color = "Source Colony") +
+  ylab("Initiation Frequency") + # Adjust axis labels
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    legend.position = "none",
+    text = element_text(size = 16),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) +
+  guides(color = guide_legend(title.position = "top", title.hjust = 0.5))
+
+fm <- lmer(formula = Initiation.Freq ~ 1 + QR_Queen_Condition + (1|Trial), data = BDSMeansNoOv) #to run the model
+fm.null <- lmer(formula = Initiation.Freq ~ 1 + (1|Trial), data = BDSMeansNoOv) #to run the model
+anova(fm, fm.null)
+print(fm)
+
+fm <- lmer(formula = Initiation.Freq ~ 1 + Queen + (1|Trial), data = BDSMeansNoOv) #to run the model
+fm.null <- lmer(formula = Initiation.Freq ~ 1 + (1|Trial), data = BDSMeansNoOv) #to run the model
+anova(fm, fm.null)
+print(fm)
+
+ggplot(BDSMeansNoOv, aes(x = Degree, y = Initiation.Freq, group = interaction(QR, Queen))) +
+  geom_smooth(
+    data = subset(BDSMeansNoOv, Queen == FALSE), # Subset the data to exclude queens
+    method = lm, # Change method to lm for linear model
+    se = T, # Standard error
+    size = .75, # Adjust size to match first plot
+    linetype = 1, # Line type
+    aes(color = interaction(QR, Queen))
+  ) + # Color by treatment
+  new_scale_color() +
+  geom_point(aes(color = Trial,shape=as.factor(QR)), alpha = 0.5,size = 1) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  scale_x_continuous() + # Use a continuous scale for x
+  scale_y_continuous() + # Use a continuous scale for y
+  #   labs(title="Total Interaction Count vs Movement Percentage", color = "Treatment") +  # Adjust title and legend title
+  xlab("Degree") +
+  ylab("Initiations/(Initiations + Receptions)") + # Adjust axis labels
+  theme_minimal() +
+  theme(
+    text = element_text(size = 16),
+    plot.title = element_text(hjust = 0.5),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) 
+
+
+```
+
+```{r Presence Distribution}
+###Presence Distribution-----
+BDSRanked <- aggregate(cbind(Degree,Close,Eigen,Between,QR,Queen,boutDegree,boutBetween,boutClose,boutEigen,bodyDegree,bodyBetween,bodyClose,bodyEigen,AverageBoutLength,Presence,AntPresence,mean_vel,move_perc,N90.Day4,MRSD.Day4,Initiation.Freq) ~ Bee, BigDataSheet, mean)
+BDSRanked$Trial = str_extract(BDSRanked$Bee, ".+?(?=_)")
+BDSRanked$Col = str_extract(BDSRanked$Bee, ".+?(?=#)")
+BDSRanked = BDSRanked %>% arrange(Col, AntPresence) %>%
+  group_by(Col) %>%
+  mutate(Rank = rank(AntPresence))
+
+ggplot(BDSRanked, aes(x = Rank, y = AntPresence)) + 
+  geom_line(data = subset(BDSRanked, QR==1), aes(group = Col, color=Col)) +
+  geom_point(data = subset(BDSRanked, Queen==1),color="purple",size=3)
+
+BDSRankedTotal = BDSRanked %>% arrange(Col, Presence) %>%
+  group_by(Col) %>%
+  mutate(Rank = rank(Presence))
+
+ggplot(BDSRankedTotal, aes(x = Rank, y = Presence)) + 
+  geom_line(data = subset(BDSRankedTotal, QR==1), aes(group = Col, color=Col)) +
+  geom_point(data = subset(BDSRankedTotal, Queen==1),color="purple",size=3)
+
+
+```
+
+```{r Identifying Top 10}
+
+Top10 = BDSMeans %>%
+  group_by(Col) %>%
+  top_n(10, Degree)
+
+Bottom10 = BDSMeans %>%
+  group_by(Col) %>%
+  slice_min(Degree, n = 10)
+
+BigDataSheet$Top10 = 'None'
+BigDataSheet$Top10[BigDataSheet$Bee %in% Top10$Bee] = 'Top10'
+BigDataSheet$Top10[BigDataSheet$Bee %in% Bottom10$Bee] = 'Bottom10'
+
+  
+ggplot(BDSMeans, aes(x = QR, y = Degree)) + 
+  geom_line(aes(group = Trial),color="darkgray") +
+  geom_point(aes(color = Trial), size = 5) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  xlab("") +
+  labs(color="Source Colony") +
+  ylab("Degree") + # Adjust axis labels
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    # legend.position = "none",
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", linewidth =  0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", linewidth = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) +
+  guides(color = guide_legend(title.position = "top", title.hjust = 0.5)) 
+
+
+
+###AnalyzingTheSheet: OvaryIndex
+BDSMeans$OvaryIndex = BDSMeans$AverageOvaryWidth/BDSMeans$AverageWingLength
+ggplot(BDSMeans, aes(x=OvaryIndex, y=boutBetween)) + 
+  geom_point() + 
+  geom_smooth(method   = lm,
+              se       = T, 
+              linewidth = 1.5, 
+              linetype = 1, 
+              alpha    = .7,
+              aes(color    = factor(QR)))+
+  theme_classic() + 
+  labs(title="Avg Length vs Avg Width")+
+  scale_color_manual(name   ="Bee",
+                     labels = c("QL", "QR"),
+                     values = c("#161414", "#629CC0"))+
+  facet_wrap(~ QR, nrow = 2) #Made this before, but it's a good sanity check
+
+
+
+```
+
+```{r Permutation Test}
+BDSMeans$OvaryIndex = BDSMeans$AverageOvaryWidth/BDSMeans$AverageWingLength
+
+BDSMeans$Alpha <- ifelse(BDSMeans$Queen, 1, 0.75)
+BDSMeans$PointSize <- ifelse(BDSMeans$Queen, 3, 1)
+
+BDSMeans_Perm <- BDSMeans %>%
+  group_by(Col) %>%
+  mutate(OvaryIndex = sample(OvaryIndex)) %>%
+  ungroup()
+
+ggplot(BDSMeans_Perm, aes(x = OvaryIndex, y = Degree, group = interaction(QR, Queen))) +
+  geom_smooth(
+    data = subset(BDSMeans_Perm, Queen == FALSE), # Subset the data to exclude queens
+    method = lm, # Change method to lm for linear model
+    se = T, # Standard error
+    size = .75, # Adjust size to match first plot
+    linetype = 1, # Line type
+    aes(color = interaction(QR, Queen))
+  ) + # Color by treatment
+  new_scale_color() +
+  geom_point(aes(color = Trial,shape=as.factor(QR)), alpha = 1,size = BDSMeans_Perm$PointSize) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  scale_x_continuous() + # Use a continuous scale for x
+  scale_y_continuous() + # Use a continuous scale for y
+  #   labs(title="Total Interaction Count vs Movement Percentage", color = "Treatment") +  # Adjust title and legend title
+  xlab("Ovary Index") +
+  ylab("Mean Number of Interactions per Hour") + # Adjust axis labels
+  theme_minimal() +
+  theme(
+    text = element_text(size = 16),
+    plot.title = element_text(hjust = 0.5),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) 
+
+
+fm <- lmer(formula = Degree ~ 1 + QR + OvaryIndex + QR:OvaryIndex + (1|Col), data = BDSMeans) #to run the model
+fm.null <- lmer(formula = Degree ~ 1 + QR + OvaryIndex + (1|Col), data = BDSMeans) #to run the model
+anova(fm, fm.null)
+
+fm <- lmer(formula = Degree ~ 1 + QR + QR:OvaryIndex + (1|Col), data = BDSMeans_Perm) #to run the model
+fm.null <- lmer(formula = Degree ~ 1 + QR + OvaryIndex + (1|Col), data = BDSMeans_Perm) #to run the model
+anova(fm, fm.null)
+```
+
+```{r Ball and Stick Antennal}
+ggplot(BDSMeanOfMean, aes(x = fct_rev(as.factor(QR_Queen_Condition)), y = AntPresence)) +
+  geom_line(aes(group = Trial), color = "darkgray") +
+  geom_point(aes(color = Trial), size = 5) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  xlab("") +
+  labs(color = "Source Colony") +
+  ylab("Antennal Presence") + # Adjust axis labels
+  theme_minimal() +
+  ylim(0.4,1) +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    text = element_text(size = 16),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) +
+  guides(color = guide_legend(title.position = "top", title.hjust = 0.5))
+```
+
+```{r correlations}
+BDSMeansQR = BDSMeans[BDSMeans$QR == TRUE,]
+BDSMeansQL = BDSMeans[BDSMeans$QR == FALSE,]
+
+cor.test(BDSMeansQR$Between, BDSMeansQR$boutBetween)
+cor.test(BDSMeansQL$Between, BDSMeansQL$boutBetween)
+```
+
+```{r heatmap}
+
+library(hrbrthemes)
+
+ggplot(BDSHourMeansQL, aes(Trial, Hour, fill= AntPresence)) + 
+  geom_tile()+
+  scale_fill_gradient(low="white", high="blue") +
+  theme_minimal()+
+  labs(title="Antennal Presence in QL Workers")
+
+ggplot(BDSHourMeansQR, aes(Trial, Hour, fill= AntPresence)) + 
+  geom_tile()+
+  scale_fill_gradient(low="white", high="blue") +
+  theme_minimal()+
+  labs(title="Antennal Presence in QR Workers")
+
+
+ggplot(BDSHourMeansQueen, aes(Trial, Hour, fill= AntPresence)) + 
+  geom_tile()+
+  scale_fill_gradient(low="white", high="blue") +
+  theme_minimal() +
+  labs(title="Antennal Presence in Queens")
+
+ggplot(BDSMeansNoOv, aes(AntPresence, group = as.factor(QR))) + 
+  geom_density(alpha = 0.2, aes(color=as.factor(QR))) + 
+  scale_color_manual(labels = c("Queenless Worker","Queenright Worker"), values = c("#161414","#429CF0"))+
+  theme_minimal() +
+  theme(
+    text = element_text(size = 16),
+    plot.title = element_text(hjust = 0.5),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) +
+  facet_wrap(~Trial, scales="free_y")
+  
+```
+
+```{r day and night}
+
+
+fm <- lmer(formula = Degree ~ 1 + TimeOfDay + QR_Queen_Condition + (1|Trial/Day), data = BigDataSheetF2) #to run the model
+fm.null <- lmer(formula = Degree ~ 1 + QR_Queen_Condition + (1|Trial/Day), data = BigDataSheetF2) #to run the model
+anova(fm, fm.null)
+print(fm)
+
+fm <- lmer(formula = Degree ~ 1 + TimeOfDay + QR_Queen_Condition + TimeOfDay:QR_Queen_Condition + (1|Trial/Day), data = BigDataSheetF2) #to run the model
+fm.null <- lmer(formula = Degree ~ 1  + TimeOfDay+ QR_Queen_Condition + (1|Trial/Day), data = BigDataSheetF2) #to run the model
+anova(fm, fm.null)
+print(fm)
+```
+
+```{r clust coeff}
+
+ggplot(BigDataSheetF2, aes(x = as.integer(Hour), y = clust, group = ID)) +
+  geom_jitter(aes(color = QR_Queen_Condition, alpha = Alpha, size = PointSize)) +
+  geom_smooth(aes(group = QR_Queen_Condition, color = QR_Queen_Condition)) +
+  scale_size(range = c(.001, .2)) +
+  scale_color_manual(
+    labels = c( "Queenright Worker","Queenless Worker","Queen"),
+    values = c( "#429CF0","#161414","#7851A9"))+
+  scale_x_continuous(breaks = c(0, seq(24, 96, by = 24)), limits = c(0, NA), expand = c(0, 0)) + # Expand limits to include 0
+  labs(color = "") +
+  xlab("Hour") +
+  ylab("Standardized Time Spent Interacting per Hour (s)") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    legend.position = c(1, 1.02), # Move legend to top right
+    legend.justification = c(1, 1), # Align legend to top right
+    legend.background = element_rect(fill = alpha("white", 1)),
+    legend.title = element_text(size = 8, face = "bold"),
+    legend.text = element_text(size = 7),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 10, face = "bold"), # Make facet plot titles larger and bold
+    panel.grid = element_blank(),
+    panel.border = element_blank()
+  ) +
+  # scale_y_log10() +
+  guides(alpha = "none", size = "none")
+
+ggplot(BDSMeansNoOv, aes(x = Degree, y = clust, group = interaction(QR, Queen))) +
+  geom_smooth(
+    data = subset(BDSMeansNoOv, Queen == FALSE), # Subset the data to exclude queens
+    method = lm, # Change method to lm for linear model
+    se = T, # Standard error
+    size = .75, # Adjust size to match first plot
+    linetype = 1, # Line type
+    aes(color = interaction(QR, Queen))
+  ) + # Color by treatment
+  new_scale_color() +
+  geom_point(aes(color = Trial,shape=as.factor(QR)), alpha = 1,size = 0.5) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  scale_x_continuous() + # Use a continuous scale for x
+  scale_y_continuous() + # Use a continuous scale for y
+  #   labs(title="Total Interaction Count vs Movement Percentage", color = "Treatment") +  # Adjust title and legend title
+  xlab("Mean Number of Interactions per Hour") +
+  ylab("Clustering Coefficient") + # Adjust axis labels
+  theme_minimal() +
+  theme(
+    text = element_text(size = 16),
+    plot.title = element_text(hjust = 0.5),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) 
+
+ggplot(BDSMeanOfMean, aes(x = fct_rev(as.factor(QR_Queen_Condition)), y = clust)) +
+  geom_line(aes(group = Trial), color = "darkgray") +
+  geom_point(aes(color = Trial), size = 5) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  xlab("") +
+  labs(color = "Source Colony") +
+  ylab("Clustering Coefficient") + # Adjust axis labels
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    text = element_text(size = 16),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) +
+  guides(color = guide_legend(title.position = "top", title.hjust = 0.5))
+```
+
+```{r density plot}
+ggplot(BDSMeansNoQueen, aes(clust, fill = QR_Queen_Condition)) + 
+  geom_density(alpha = 0.2) + 
+  scale_fill_manual(labels = c("Queenless Worker","Queenright Worker"), values = c("#161414","#429CF0"))+
+  theme_minimal() +
+  theme(
+    text = element_text(size = 16),
+    plot.title = element_text(hjust = 0.5),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) +
+  facet_wrap(~Trial, scales="free_y")
+
+
+ggplot(BDSMeansNoQueen, aes(AverageBoutLength, fill = QR_Queen_Condition)) + 
+  geom_density(alpha = 0.2) + 
+  scale_fill_manual(labels = c("Queenless Worker","Queenright Worker"), values = c("#161414","#429CF0"))+
+  theme_minimal() +
+  theme(
+    text = element_text(size = 16),
+    plot.title = element_text(hjust = 0.5),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) +
+  facet_wrap(~Trial, scales="free_y")
+```
+
+```{r Disparity Measures}
+ggplot(BDSMeansNoOv, aes(x = boutDegree, y = Disparity, group = interaction(QR, Queen))) +
+  geom_smooth(
+        color = "#161414",
+        method = "lm",
+        data = subset(BDSMeansNoOv, QR_Queen_Condition == 'Queenless'),
+        se = T
+    )  + 
+    geom_smooth(
+        color = "#429CF0",
+        method = "lm",
+        data = subset(BDSMeansNoOv, QR_Queen_Condition == 'Queenright'),
+        se = T
+    ) +
+  new_scale_color() +
+  geom_point(aes(color = Trial,shape=as.factor(QR)), alpha = BDSMeansNoOv$Alpha,size = BDSMeansNoOv$PointSize) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  scale_x_continuous() + # Use a continuous scale for x
+  scale_y_continuous() + # Use a continuous scale for y
+  xlab("Unique Bouts of Interaction per Hour") +
+  ylab("Disparity") + # Adjust axis labels
+  theme_minimal() +
+  theme(
+    text = element_text(size = 16),
+    plot.title = element_text(hjust = 0.5),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) 
+
+fm <- lmer(formula = Disparity ~ 1 + QR + boutDegree + QR:boutDegree + (1|Trial), data = BDSMeansNoOv) #to run the model
+fm.null <- lmer(formula = Disparity ~ 1 + QR + boutDegree + (1|Trial), data = BDSMeansNoOv) #to run the model
+anova(fm, fm.null)
+
+ggplot(BDSMeansNoOv, aes(x = AntPresence, y = Disparity, group = interaction(QR, Queen))) +
+  geom_smooth(
+        color = "#161414",
+        method = "lm",
+        data = subset(BDSMeansNoOv, QR_Queen_Condition == 'Queenless'),
+        se = T
+    )  + 
+    geom_smooth(
+        color = "#429CF0",
+        method = "lm",
+        data = subset(BDSMeansNoOv, QR_Queen_Condition == 'Queenright'),
+        se = T
+    ) +
+  new_scale_color() +
+  geom_point(aes(color = Trial,shape=as.factor(QR)), alpha = BDSMeansNoOv$Alpha,size = BDSMeansNoOv$PointSize) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  scale_x_continuous() + # Use a continuous scale for x
+  scale_y_continuous() + # Use a continuous scale for y
+  xlab("Antennal Presence") +
+  ylab("Disparity") + # Adjust axis labels
+  theme_minimal() +
+  theme(
+    text = element_text(size = 16),
+    plot.title = element_text(hjust = 0.5),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) 
+
+fm <- lmer(formula = Disparity ~ 1 + QR_Queen_Condition + Degree + AntPresence + (1|Trial), data = BDSMeansNoOv) #to run the model
+fm.null <- lmer(formula = Disparity ~ 1 + QR_Queen_Condition + Degree + (1|Trial), data = BDSMeansNoOv) #to run the model
+anova(fm, fm.null)
+```
+
+```{r Rank Measures}
+
+BDSRanked <- aggregate(cbind(Degree,Close,Eigen,Between,QR,Queen,boutDegree,boutBetween,boutClose,boutEigen,bodyDegree,bodyBetween,bodyClose,bodyEigen,AverageBoutLength,Presence,AntPresence,mean_vel,move_perc,N90.Day4,MRSD.Day4,Initiation.Freq) ~ Bee, BigDataSheet, mean)
+BDSRanked$Trial = str_extract(BDSRanked$Bee, ".+?(?=_)")
+BDSRanked$Col = str_extract(BDSRanked$Bee, ".+?(?=#)")
+BDSRanked = BDSRanked %>% arrange(Col, Degree) %>%
+  group_by(Col) %>%
+  mutate(Rank = rank(Degree))
+
+
+ggplot(BDSRanked, aes(x = Rank, y = Degree)) + 
+  geom_line(data = subset(BDSRanked[BDSRanked$Queen==0,]), aes(group = Col, color=QR)) +
+  geom_point(data = subset(BDSRanked, Queen==1),color="purple",size=3)+
+  facet_wrap(~Trial, scales="free_y")
+
+
+
+```
+
+```{r influencer identification}
+
+data_with_pca = data_with_pca %>% arrange(ID, Degree) %>%
+  group_by(ID) %>%
+  mutate(Rank = rank(Degree))
+
+data_with_pca_qr = data_with_pca[data_with_pca$QR_Queen_Condition == "Queenright",]
+data_with_pca_ql = data_with_pca[data_with_pca$QR_Queen_Condition == "Queenless",]
+cutoff1 = quantile(data_with_pca_qr$PC1, 1) 
+cutoff2 = quantile(data_with_pca_qr$PC2, 0.9) 
+print(cutoff1)
+print(cutoff2)
+
+fm <- lmer(formula = PC1 ~ 1 + Degree + Between + QR + (1|QR:Trial) + (1|Trial), data = data_with_pca) #to run the model
+fm.null <- lmer(formula = PC1 ~ 1 + Between + QR + (1|QR:Trial) + (1|Trial), data = data_with_pca) #to run the model
+anova(fm, fm.null)
+print(fm)
+
+fm <- lmer(formula = PC1 ~ 1 + Degree + Between + QR + (1|QR:Trial) + (1|Trial), data = data_with_pca) #to run the model
+fm.null <- lmer(formula = PC1 ~ 1 + Degree + QR + (1|QR:Trial) + (1|Trial), data = data_with_pca) #to run the model
+anova(fm, fm.null)
+print(fm)
+
+fm <- lmer(formula = PC2 ~ 1 + Degree + Between + QR + (1|QR:Trial) + (1|Trial), data = data_with_pca) #to run the model
+fm.null <- lmer(formula = PC2 ~ 1 + Between + QR + (1|QR:Trial) + (1|Trial), data = data_with_pca) #to run the model
+anova(fm, fm.null)
+print(fm)
+
+
+fm <- lmer(formula = PC2 ~ 1 + Degree + Between + QR + (1|QR:Trial) + (1|Trial), data = data_with_pca) #to run the model
+fm.null <- lmer(formula = PC2 ~ 1 + Degree + QR + (1|QR:Trial) + (1|Trial), data = data_with_pca) #to run the model
+anova(fm, fm.null)
+print(fm)
+
+
+influencers = data_with_pca_ql[data_with_pca_ql$PC1 > cutoff1,]
+
+BigDataSheet$Infl = BigDataSheet$Bee %in% influencers$Bee
+BDSMeansNoOv$InflText = BDSMeansNoOv$Bee %in% influencers$Bee
+BDSMeans$InflText = BDSMeans$Bee %in% influencers$Bee
+BDSMeansNoOv$Infl <- ifelse(BDSMeansNoOv$InflText, 1, 0)
+BDSMeans$Infl <- ifelse(BDSMeans$InflText, 1, 0)
+
+BDSMeans <- BDSMeans %>%
+  mutate(QR_Queen_Inf = case_when(
+    QR==0 & Infl==0 ~ "Queenless Worker",
+    QR==1 & Queen==0 ~ "Queenright Worker",
+    Queen==1 ~ "Queen",
+    QR==0 & Infl==1 ~ "Influencer",
+    TRUE ~ NA_character_  # This handles any other case, which shouldn't exist in your scenario
+  )) %>%
+  mutate(QR_Queen_Inf = factor(QR_Queen_Inf, levels = c( "Queenless Worker","Queenright Worker", "Queen", "Influencer")))
+
+BDSMeansNoOv <- BDSMeansNoOv %>%
+  mutate(QR_Queen_Inf = case_when(
+    QR==0 & Infl==0 ~ "Queenless Worker",
+    QR==1 & Queen==0 ~ "Queenright Worker",
+    Queen==1 ~ "Queen",
+    QR==0 & Infl==1 ~ "Influencer",
+    TRUE ~ NA_character_  # This handles any other case, which shouldn't exist in your scenario
+  )) %>%
+  mutate(QR_Queen_Inf = factor(QR_Queen_Inf, levels = c( "Queenless Worker","Queenright Worker", "Queen", "Influencer")))
+BDSMeans$ID = paste(BDSMeans$Trial,BDSMeans$QR_Queen_Inf)
+BDSMeansNoOv$ID = paste(BDSMeansNoOv$Trial,BDSMeansNoOv$QR_Queen_Inf)
+BDSMeanOfMean <- aggregate(cbind(Degree,Close,Eigen,Between,QR,Queen,boutDegree,boutBetween,boutClose,boutEigen,bodyDegree,bodyBetween,bodyClose,bodyEigen,AverageBoutLength,Presence,AntPresence,mean_vel,move_perc,N90.Day4,MRSD.Day4, Initiation.Freq, clust, Disparity, Infl) ~ ID, BDSMeansNoOv, mean)
+BDSMeanOfMean$Trial = str_extract(BDSMeanOfMean$ID, ".+?(?= )")
+
+BDSMeanOfMean <- BDSMeanOfMean %>%
+  mutate(QR_Queen_Inf = case_when(
+    QR==0 & Infl==0 ~ "Queenless Worker",
+    QR==1 & Queen==0 ~ "Queenright Worker",
+    Queen==1 ~ "Queen",
+    QR==0 & Infl==1 ~ "Influencer",
+    TRUE ~ NA_character_  # This handles any other case, which shouldn't exist in your scenario
+  )) %>%
+  mutate(QR_Queen_Inf = factor(QR_Queen_Inf, levels = c( "Queenless Worker","Queenright Worker", "Queen", "Influencer")))
+
+ggplot(BDSMeanOfMean, aes(x = factor(QR_Queen_Inf, levels = c("Queen","Queenright Worker", "Influencer", "Queenless Worker")), y = Degree)) +
+  geom_line(aes(group = Trial), color = "darkgray") +
+  geom_point(aes(color = Trial), size = 5) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  xlab("") +
+  labs(color = "Source Colony") +
+  ylab("Mean Number of Interactions per Hour (Unstandardized)") + # Adjust axis labels
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    #legend.position = "none",
+    text = element_text(size = 16),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) +
+  guides(color = guide_legend(title.position = "top", title.hjust = 0.5))
+
+ggplot(BDSMeanOfMean, aes(x = factor(QR_Queen_Inf, levels = c("Queen","Queenright Worker", "Influencer","Queenless Worker")), y = move_perc)) +
+  geom_line(aes(group = Trial), color = "darkgray") +
+  geom_point(aes(color = Trial), size = 5) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  xlab("") +
+  labs(color = "Source Colony") +
+  ylab("Percentage of Time Moving") + # Adjust axis labels
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    #legend.position = "none",
+    text = element_text(size = 16),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) +
+  guides(color = guide_legend(title.position = "top", title.hjust = 0.5))
+
+ggplot(BDSMeanOfMean, aes(x = factor(QR_Queen_Inf, levels = c("Queen", "Queenright Worker", "Influencer", "Queenless Worker")), y = clust)) +
+  geom_line(aes(group = Trial), color = "darkgray") +
+  geom_point(aes(color = Trial), size = 5) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  xlab("") +
+  labs(color = "Source Colony") +
+  ylab("Clustering Coefficient") + # Adjust axis labels
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    #legend.position = "none",
+    text = element_text(size = 16),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) +
+  guides(color = guide_legend(title.position = "top", title.hjust = 0.5))
+
+ggplot(BDSMeanOfMean, aes(x = factor(QR_Queen_Inf, levels = c("Queen", "Queenright Worker", "Influencer", "Queenless Worker")), y = N90.Day4)) +
+  geom_line(aes(group = Trial), color = "darkgray") +
+  geom_point(aes(color = Trial), size = 5) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  xlab("") +
+  labs(color = "Source Colony") +
+  ylab("N90 Day 4") + # Adjust axis labels
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    #legend.position = "none",
+    text = element_text(size = 16),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) +
+  guides(color = guide_legend(title.position = "top", title.hjust = 0.5))
+
+ggplot(BDSMeanOfMean, aes(x = factor(QR_Queen_Inf, levels = c("Queen", "Queenright Worker", "Influencer", "Queenless Worker")), y = Initiation.Freq)) +
+  geom_line(aes(group = Trial), color = "darkgray") +
+  geom_point(aes(color = Trial), size = 5) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  xlab("") +
+  labs(color = "Source Colony") +
+  ylab("Initiation Prop") + # Adjust axis labels
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    #legend.position = "none",
+    text = element_text(size = 16),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) +
+  guides(color = guide_legend(title.position = "top", title.hjust = 0.5))
+
+ggplot(BDSMeanOfMean, aes(x = factor(QR_Queen_Inf, levels = c("Queen", "Queenright Worker", "Influencer", "Queenless Worker")), y = Disparity)) +
+  geom_line(aes(group = Trial), color = "darkgray") +
+  geom_point(aes(color = Trial), size = 5) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  xlab("") +
+  labs(color = "Source Colony") +
+  ylab("Disparity") + # Adjust axis labels
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    #legend.position = "none",
+    text = element_text(size = 16),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) +
+  guides(color = guide_legend(title.position = "top", title.hjust = 0.5))
+
+fm <- lmer(formula = Disparity ~ 1 + QR_Queen_Inf + (1|Trial), data = BDSMeansNoOv) #to run the model
+fm.null <- lmer(formula = Disparity ~ 1 + (1|Trial), data = BDSMeansNoOv) #to run the model
+anova(fm, fm.null)
+print(fm)
+
+fm <- lmer(formula = Disparity ~ 1 + QR_Queen_Inf + AntPresence + (1|Trial), data = BDSMeansNoOv) #to run the model
+fm.null <- lmer(formula = Disparity ~ 1 + AntPresence + (1|Trial), data = BDSMeansNoOv) #to run the model
+anova(fm, fm.null)
+print(fm)
+
+
+
+BDSMeans$OvaryIndex = BDSMeans$AverageOvaryWidth / BDSMeans$AverageWingLength
+BDSMeanOfMean <- aggregate(cbind(Degree,Close,Eigen,Between,QR,Queen,boutDegree,boutBetween,boutClose,boutEigen,bodyDegree,bodyBetween,bodyClose,bodyEigen,AverageBoutLength,Presence,AntPresence,mean_vel,move_perc,N90.Day4,MRSD.Day4, Initiation.Freq, clust, Disparity, Infl, OvaryIndex,AverageWingLength,AverageOvaryWidth) ~ ID, BDSMeans, mean)
+BDSMeanOfMean$Trial = str_extract(BDSMeanOfMean$ID, ".+?(?= )")
+
+BDSMeanOfMean <- BDSMeanOfMean %>%
+  mutate(QR_Queen_Inf = case_when(
+    QR==0 & Infl==0 ~ "Queenless Worker",
+    QR==1 & Queen==0 ~ "Queenright Worker",
+    Queen==1 ~ "Queen",
+    QR==0 & Infl==1 ~ "Influencer",
+    TRUE ~ NA_character_  # This handles any other case, which shouldn't exist in your scenario
+  )) %>%
+  mutate(QR_Queen_Inf = factor(QR_Queen_Inf, levels = c( "Queenless Worker","Queenright Worker", "Queen", "Influencer")))
+
+
+ggplot(BDSMeanOfMean, aes(x = factor(QR_Queen_Inf, levels = c("Queen", "Queenright Worker", "Influencer", "Queenless Worker")), y = AverageOvaryWidth)) +
+  geom_line(aes(group = Trial), color = "darkgray") +
+  geom_point(aes(color = Trial), size = 5) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  xlab("") +
+  labs(color = "Source Colony") +
+  ylab("Average Ovary Width") + # Adjust axis labels
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    #legend.position = "none",
+    text = element_text(size = 16),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) +
+  guides(color = guide_legend(title.position = "top", title.hjust = 0.5))
+
+
+ggplot(BDSMeanOfMean, aes(x = factor(QR_Queen_Inf, levels = c("Queen", "Queenright Worker", "Influencer", "Queenless Worker")), y = AverageWingLength)) +
+  geom_line(aes(group = Trial), color = "darkgray") +
+  geom_point(aes(color = Trial), size = 5) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  xlab("") +
+  labs(color = "Source Colony") +
+  ylab("Wing Length") + # Adjust axis labels
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    #legend.position = "none",
+    text = element_text(size = 16),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) +
+  guides(color = guide_legend(title.position = "top", title.hjust = 0.5))
+
+fm <- lmer(formula = Disparity ~ 1 + QR_Queen_Inf + AntPresence + (1|Trial), data = BDSMeansNoOv) #to run the model
+fm.null <- lmer(formula = Disparity ~ 1 + AntPresence + (1|Trial), data = BDSMeansNoOv) #to run the model
+anova(fm, fm.null)
+print(fm)
+
+
+ggplot(BDSMeansNoOv, aes(x = Degree, y = clust, group = QR_Queen_Inf)) +
+  new_scale_color() +
+  geom_point(aes(color = QR_Queen_Inf,shape=as.factor(QR)), alpha = 1, size = BDSMeansNoOv$PointSize) +
+  scale_color_manual(
+    labels = c( "Queenright Worker","Queenless Worker","Queen","Influencer"),
+    values = c( "#429CF0","#161414","#7851A9","#AA1233"))+
+  scale_x_continuous() + # Use a continuous scale for x
+  scale_y_continuous() + # Use a continuous scale for y
+  xlab("Head Degree Centrality") +
+  ylab("Clustering Coeff") + # Adjust axis labels
+  theme(
+    text = element_text(size = 16),
+    plot.title = element_text(hjust = 0.5),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) 
+
+```
+
+```{r QR Connections}
+
+setwd("~/Downloads/QueenModelComplete_062424/")
+
+BigDataSheetQueenConnections = BigDataSheetQR
+Start = 0
+#Head Degree
+for(i in 1:10){
+  for(j in 0:95){
+    if(file.exists(paste(prefixes[i],sprintf("%03d", j),"Head_to_Head_False_QueenCentralities.csv",sep = "_"))) {
+      Deg = read.csv(paste(prefixes[i],sprintf("%03d", j),"Head_to_Head_False_QueenCentralities.csv",sep = "_"))
+      Deg$Node = sub('\\.0','',Deg$X)
+      Deg$ExpDay = as.factor(floor((j/24)+1))
+      Deg$Day = as.factor(floor(((j+17)/24)+1))
+      Deg$Zeit = as.numeric((j+17)%%24)
+      Deg$Hour = j
+      Deg$Col = prefixes[i]
+      Deg$QR = i %% 2 == 1
+      Deg$ID = paste(Deg$Col, Deg$Node, Deg$Hour, sep='_')
+      Deg$Bee = paste(Deg$Col, Deg$Node, sep='_')
+      Deg$Mod = "Head_Head"
+      Deg$Trial = str_extract(Deg$Col, ".+?(?=_)")
+      Deg$Queen = Deg$Bee %in% c("RooibosTea_QR_1216_1646_ArUcoTag#52", "MexHotChoc_QR_1216_1646_ArUcoTag#13", "20230213_1745_AlmdudlerGspritzt_C1_ArUcoTag#24", "20221209_1613_QR_ArUcoTag#47", "20221123_1543_AmericanoLatte_QR_ArUcoTag#43")
+      if(Start == 1){
+        TotalHQ = rbind(TotalHQ, Deg)
+      }
+      if(Start == 0){
+        TotalHQ = Deg
+        Start = 1
+      }
+    }
+  }
+}
+TotalHQ <- TotalHQ %>%
+  mutate(degree = ifelse(Trial == "MexHotChoc", degree * 1.428, degree))
+names(TotalHQ)[names(TotalHQ) == "degree"] <- "QueenHeadDegree"
+TotalHQSubset <- TotalHQ[, c("ID", "QueenHeadDegree")]
+BigDataSheetQueenConnections <- merge(BigDataSheetQueenConnections, TotalHQSubset, by = "ID")
+Start=0
+#Body Degree
+for(i in 1:10){
+  for(j in 0:95){
+    if(file.exists(paste(prefixes[i],sprintf("%03d", j),"Head_to_Body_False_QueenCentralities.csv",sep = "_"))) {
+      Deg = read.csv(paste(prefixes[i],sprintf("%03d", j),"Head_to_Body_False_QueenCentralities.csv",sep = "_"))
+      Deg$Node = sub('\\.0','',Deg$X)
+      Deg$ExpDay = as.factor(floor((j/24)+1))
+      Deg$Day = as.factor(floor(((j+17)/24)+1))
+      Deg$Zeit = as.numeric((j+17)%%24)
+      Deg$Hour = j
+      Deg$Col = prefixes[i]
+      Deg$QR = i %% 2 == 1
+      Deg$ID = paste(Deg$Col, Deg$Node, Deg$Hour, sep='_')
+      Deg$Bee = paste(Deg$Col, Deg$Node, sep='_')
+      Deg$Mod = "Head_Head"
+      Deg$Trial = str_extract(Deg$Col, ".+?(?=_)")
+      Deg$Queen = Deg$Bee %in% c("RooibosTea_QR_1216_1646_ArUcoTag#52", "MexHotChoc_QR_1216_1646_ArUcoTag#13", "20230213_1745_AlmdudlerGspritzt_C1_ArUcoTag#24", "20221209_1613_QR_ArUcoTag#47", "20221123_1543_AmericanoLatte_QR_ArUcoTag#43")
+      if(Start == 1){
+        TotalBQ = rbind(TotalBQ, Deg)
+      }
+      if(Start == 0){
+        TotalBQ = Deg
+        Start = 1
+      }
+    }
+  }
+}
+TotalBQ <- TotalBQ %>%
+  mutate(degree = ifelse(Trial == "MexHotChoc", degree * 1.428, degree))
+names(TotalBQ)[names(TotalBQ) == "degree"] <- "QueenBodyDegree"
+TotalBQSubset <- TotalBQ[, c("ID", "QueenBodyDegree")]
+BigDataSheetQueenConnections <- merge(BigDataSheetQueenConnections, TotalBQSubset, by = "ID")
+
+```
+
+```{r Queen-interaction analysis}
+
+BDSMeansQueenConn <- aggregate(cbind(QR,Queen,QueenHeadDegree,QueenBodyDegree) ~ Bee, BigDataSheetQueenConnections, mean)
+BDSMeansQueenConn$Trial = str_extract(BDSMeansQueenConn$Bee, ".+?(?=_)")
+BDSMeansQueenConn$Col = str_extract(BDSMeansQueenConn$Bee, ".+?(?=#)")
+BDSMeansQueenConn$Ratio = BDSMeansQueenConn$QueenHeadDegree / (BDSMeansQueenConn$QueenHeadDegree + BDSMeansQueenConn$QueenBodyDegree)
+
+BDSMeansQueenConn$Alpha <- ifelse(BDSMeansQueenConn$Queen, 1, 0.75)
+BDSMeansQueenConn$PointSize <- ifelse(BDSMeansQueenConn$Queen, 3, 1)
+BDSMeansQueenConn = BDSMeansQueenConn[BDSMeansQueenConn$QueenHeadDegree/20 <= 10,]
+ggplot(BDSMeansQueenConn, aes(x = QueenHeadDegree/20, y = Ratio)) +
+  geom_smooth(
+        color = "#161414",
+        method = "lm",
+        data = subset(BDSMeansQueenConn, Queen == FALSE),
+        se = T)+
+  #geom_smooth(
+  #  data = subset(BDSMeansNoOv, Queen == FALSE), # Subset the data to exclude queens
+  #  method = lm, # Change method to lm for linear model
+  #  se = T, # Standard error
+  #  size = .75, # Adjust size to match first plot
+  #  linetype = 1, # Line type
+  #  aes(color = interaction(QR, Queen))
+  #) + # Color by treatment
+  new_scale_color() +
+  geom_point(aes(color = Trial), alpha = BDSMeansQueenConn$Alpha,size = BDSMeansQueenConn$PointSize, data = subset(BDSMeansQueenConn, Queen == FALSE)
+) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  scale_x_continuous() + # Use a continuous scale for x
+  scale_y_continuous() + # Use a continuous scale for y
+  #   labs(title="Total Interaction Count vs Movement Percentage", color = "Treatment") +  # Adjust title and legend title
+  xlab("Time Interacting with Queen (s)") +
+  ylab("Proportion of Time Interacting Head-to-Head vs. Total") + # Adjust axis labels
+  theme_minimal() +
+  theme(
+    text = element_text(size = 16),
+    plot.title = element_text(hjust = 0.5),
+    panel.grid.major.x = element_line(color = "grey", linetype = "dashed"), # Keep vertical grid lines
+    panel.grid.minor.x = element_line(color = "grey", linetype = "dotted"), # Keep vertical grid lines
+    panel.grid.major.y = element_blank(), # Remove horizontal grid lines
+    panel.grid.minor.y = element_blank(), # Remove horizontal grid lines
+    axis.line.x = element_line(color = "black", size = 0.5), # Add x-axis line
+    axis.line.y = element_line(color = "black", size = 0.5), # Add y-axis line
+    strip.text = element_text(size = 14, face = "bold"), # Make facet plot titles larger and bold
+    axis.text.y.right = element_blank(), # Remove right y-axis text
+    axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
+    aspect.ratio = 1
+  ) 
+```
+
+```{r Models}
+# Load necessary libraries
+library(lme4)
+library(tidyverse)
+library(stringr)
+library(ggplot2)
+library(broom.mixed)
+library(lmerTest)
+
+
+# Read the data
+
+# Remove queens
+bds_no_queens <- BigDataSheet %>%
+  filter(Queen == FALSE)
+
+bds_no_queens <- bds_no_queens %>%
+  mutate(QR_Queen_Inf = case_when(
+    QR == 0 & Infl == 0 ~ "Queenless Worker",
+    QR == 1 & Queen == 0 ~ "Queenright Worker",
+    Queen == 1 ~ "Queen",
+    QR == 0 & Infl == 1 ~ "Influencer",
+    TRUE ~ NA_character_ # This handles any other case, which shouldn't exist in your scenario
+  )) %>%
+  mutate(QR_Queen_Inf = factor(QR_Queen_Inf, levels = c("Queenless Worker", "Queenright Worker", "Queen", "Influencer")))
+
+
+
+bds_pooled <- bds_no_queens %>%
+  filter(TimeOfDay == "Day") %>%
+  mutate(Day_Zeit = paste(Day, Zeit, sep = "_"))
+
+# List of features to test
+features <- c("Degree", "move_perc", "mean_vel", "N90.Day4", "Initiation.Freq", "Close", "Between","clust")
+
+# Function to fit and summarize the model for each feature
+fit_and_summarize <- function(feature) {
+  formula <- as.formula(paste(feature, "~ 1 + QR + (1 | Trial) + (1 | QR:Trial) + (1 | Day_Zeit) + (1 | Day_Zeit:Trial)"))
+  model <- lmer(formula, data = bds_pooled)
+  tidy_model <- tidy(model, effects = "fixed", conf.int = TRUE) %>%
+    mutate(feature = feature, model_spec = paste(deparse(formula), collapse = " "))
+  return(tidy_model)
+}
+
+# Fit and summarize models for each feature
+tidy_results_list <- lapply(features, fit_and_summarize)
+
+# Combine tidy results into a single data frame
+tidy_results <- bind_rows(tidy_results_list)
+
+# Ensure no truncation in the output display
+options(width = 200)
+
+# Display tidy results
+print(tidy_results)
+
+# Create a comprehensive summary table
+comprehensive_summary_table <- tidy_results %>%
+  select(feature, model_spec, term, estimate, std.error, statistic, p.value) %>%
+  arrange(feature, term)
+
+# Display comprehensive summary table
+print(comprehensive_summary_table)
+
+# Get significant features
+significant_features <- comprehensive_summary_table %>%
+  filter(p.value < 0.05) %>%
+  select(feature,term, p.value)
+
+write_csv(comprehensive_summary_table, "data/comprehensive_summary_table.csv")
+
+print(significant_features)
+```
+
