@@ -18,7 +18,7 @@ bds <- bds %>%
         QR == 1 & Queen == 0 ~ "Queenright",
         Queen == 1 ~ "Queen"
     )) %>%
-    mutate(QR_Queen_Condition = factor(QR_Queen_Condition, levels = c("Queenright", "Queenless", "Queen")))
+    mutate(QR_Queen_Condition = factor(QR_Queen_Condition, levels = c("Queen", "Queenright", "Queenless")))
 
 # Calculate mean values of QR, Queen, and Degree for each Bee (QR and Queen are binary so mean is the value itself)
 bds_means <- bds %>%
@@ -36,7 +36,7 @@ bds_means <- bds_means %>%
         QR == 1 & Queen == 0 ~ "Queenright",
         Queen == 1 ~ "Queen"
     )) %>%
-    mutate(QR_Queen_Condition = factor(QR_Queen_Condition, levels = c("Queenright", "Queenless", "Queen")))
+    mutate(QR_Queen_Condition = factor(QR_Queen_Condition, levels = c("Queen", "Queenright", "Queenless")))
 
 # Create ID column for aggregation
 bds_means <- bds_means %>%
@@ -53,12 +53,16 @@ bds_mean_of_means <- bds_mean_of_means %>%
 
 # Define QR_Queen_Condition based on QR and Queen values for mean of means
 bds_mean_of_means <- bds_mean_of_means %>%
+    rename(
+        WorkerQR = QR,
+        WorkerQueen = Queen
+    ) %>%
     mutate(QR_Queen_Condition = case_when(
-        QR == 0 & Queen == 0 ~ "Queenless",
-        QR == 1 & Queen == 0 ~ "Queenright",
-        Queen == 1 ~ "Queen"
+        WorkerQR == 0 & WorkerQueen == 0 ~ "Queenless\nWorker",
+        WorkerQR == 1 & WorkerQueen == 0 ~ "Queenright\nWorker",
+        WorkerQueen == 1 ~ "Queen"
     )) %>%
-    mutate(QR_Queen_Condition = factor(QR_Queen_Condition, levels = c("Queenright", "Queenless", "Queen")))
+    mutate(QR_Queen_Condition = factor(QR_Queen_Condition, levels = c("Queen", "Queenright\nWorker", "Queenless\nWorker")))
 
 # Plot Degree
 plot_degree <- ggplot(bds_mean_of_means, aes(x = QR_Queen_Condition, y = Degree)) +
@@ -96,8 +100,8 @@ degree_over_time <- ggplot(bds, aes(x = as.integer(Hour), y = Degree / 20, group
     geom_smooth(aes(group = QR_Queen_Condition, color = QR_Queen_Condition), se = FALSE) +
     scale_size(range = c(.001, .5)) +
     scale_color_manual(
-        labels = c("Queenright Worker", "Queenless Worker", "Queen"),
-        values = c(Q_QRW_INT_QLW$QRW, Q_QRW_INT_QLW$QLW, Q_QRW_INT_QLW$Q),
+        labels = c("Queen", "Queenright Worker", "Queenless Worker"),
+        values = setNames(c(Q_QRW_INT_QLW$Q, Q_QRW_INT_QLW$QRW, Q_QRW_INT_QLW$QLW), levels(bds$QR_Queen_Condition)),
         guide = guide_legend(direction = "horizontal")
     ) +
     scale_x_continuous(breaks = c(0, seq(24, 96, by = 24)), limits = c(0, NA), expand = c(0, 0)) + # Expand limits to include 0
