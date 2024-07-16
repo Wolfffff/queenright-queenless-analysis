@@ -22,10 +22,22 @@ bds_means_of_means <- bds_means_of_means %>%
 plot_degree <- ggplot(bds_means_of_means, aes(x = QR_Queen_Condition, y = Degree)) +
     geom_line(aes(group = Trial), color = "darkgray", linewidth = 0.2) +
     geom_point(aes(color = Trial), size = 3) +
-    scale_color_manual(values = COLONY_COLORS) +
+    scale_color_manual(
+        values = COLONY_COLORS,
+        labels = c("Col 1", "Col 2", "Col 3", "Col 4","Col 5") # Replace with your actual labels
+    ) +
     xlab("") +
     ylab("Std. Interactions per Hour") +
-    CONSISTENT_THEME
+    CONSISTENT_THEME +
+    theme(
+        legend.position = "top",
+        legend.direction = "horizontal",
+        legend.title = element_blank(), # Removes the legend title if not needed
+        legend.spacing.x = unit(0.2, 'cm'), # Reduces the space between legend labels
+        legend.margin = margin(t = 0, r = 0, b = 0, l = 0), # Reduces the margin around the legend
+        legend.key.width = unit(0.25, 'cm'), # Reduces the width of the legend keys
+        legend.key.height = unit(0.25, 'cm') # Reduces the height of the legend keys
+    ) 
 
 # Plot Initiation.Freq
 plot_init_freq <- ggplot(bds_means_of_means, aes(x = QR_Queen_Condition, y = Initiation.Freq)) +

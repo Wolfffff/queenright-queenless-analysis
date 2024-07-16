@@ -6,68 +6,12 @@ library(wesanderson)
 library(reshape2)
 
 source("scripts/manuscript/constants.R")
+source("scripts/manuscript/load_data.R")
 
-# Read the data
-bds <- read_csv("data/BigDataSheet.csv")
-bds <- bds %>%
-    mutate(Trial = str_extract(Bee, ".+?(?=_)"))
-
-bds <- bds %>%
-    mutate(QR_Queen_Condition = case_when(
-        QR == 0 & Queen == 0 ~ "Queenless",
-        QR == 1 & Queen == 0 ~ "Queenright",
-        Queen == 1 ~ "Queen"
-    )) %>%
-    mutate(QR_Queen_Condition = factor(QR_Queen_Condition, levels = c("Queenright", "Queenless", "Queen")))
-
-# Calculate mean values of QR, Queen, and Degree for each Bee (QR and Queen are binary so mean is the value itself)
-bds_means <- bds %>%
-    group_by(Bee) %>%
-    summarise(across(c(QR, Queen, Degree, Initiation.Freq, N90.Day4), mean, na.rm = TRUE))
-
-# Extract Trial information from Bee column
-bds_means <- bds_means %>%
-    mutate(Trial = str_extract(Bee, ".+?(?=_)"))
-
-# Define QR_Queen_Condition based on QR and Queen values
-bds_means <- bds_means %>%
-    mutate(QR_Queen_Condition = case_when(
-        QR == 0 & Queen == 0 ~ "Queenless",
-        QR == 1 & Queen == 0 ~ "Queenright",
-        Queen == 1 ~ "Queen"
-    )) %>%
-    mutate(QR_Queen_Condition = factor(QR_Queen_Condition, levels = c("Queenright", "Queenless", "Queen")))
-
-# Create ID column for aggregation
-bds_means <- bds_means %>%
-    mutate(ID = paste(Trial, QR_Queen_Condition))
-
-# Calculate mean of means for each ID
-bds_mean_of_means <- bds_means %>%
-    group_by(ID) %>%
-    summarise(across(c(QR, Queen, Degree, Initiation.Freq, N90.Day4), mean, na.rm = TRUE))
-
-# Extract Trial information from ID column
-bds_mean_of_means <- bds_mean_of_means %>%
-    mutate(Trial = str_extract(ID, ".+?(?= )"))
-
-# Define QR_Queen_Condition based on QR and Queen values for mean of means
-bds_mean_of_means <- bds_mean_of_means %>%
-    mutate(QR_Queen_Condition = case_when(
-        QR == 0 & Queen == 0 ~ "Queenless",
-        QR == 1 & Queen == 0 ~ "Queenright",
-        Queen == 1 ~ "Queen"
-    )) %>%
-    mutate(QR_Queen_Condition = factor(QR_Queen_Condition, levels = c("Queenright", "Queenless", "Queen")))
-
-# Degree — Head-Head vs Head-Body -----------------------------------------------------------
+# Degree — Head-Head vs Head-Body ----------
 TotalDeg <- bds
 # Add a new column to TotalDeg to indicate the group
-TotalDeg$Group <- ifelse(TotalDeg$QR & !TotalDeg$Queen, "Queenright Workers",
-  ifelse(!TotalDeg$QR, "Queenless Workers",
-    ifelse(TotalDeg$Queen, "Queens", NA)
-  )
-)
+TotalDeg$Group <- TotalDeg$QR_Queen_Condition
 
 # Order the factor levels of the 'Group' column
 TotalDeg$Group <- factor(TotalDeg$Group, levels = c("Queenless Workers", "Queenright Workers", "Queens"))
