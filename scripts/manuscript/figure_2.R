@@ -6,66 +6,20 @@ library(wesanderson)
 library(cowplot)
 
 source("scripts/manuscript/constants.R")
+source("scripts/manuscript/load_data.R")
 
-# Read the data
-bds <- read_csv("data/BigDataSheet.csv")
-bds <- bds %>%
-    mutate(Trial = str_extract(Bee, ".+?(?=_)"))
-
-bds <- bds %>%
-    mutate(QR_Queen_Condition = case_when(
-        QR == 0 & Queen == 0 ~ "Queenless",
-        QR == 1 & Queen == 0 ~ "Queenright",
-        Queen == 1 ~ "Queen"
-    )) %>%
-    mutate(QR_Queen_Condition = factor(QR_Queen_Condition, levels = c("Queen", "Queenright", "Queenless")))
-
-# Calculate mean values of QR, Queen, and Degree for each Bee (QR and Queen are binary so mean is the value itself)
-bds_means <- bds %>%
-    group_by(Bee) %>%
-    summarise(across(c(QR, Queen, Degree, Initiation.Freq, N90.Day4), mean, na.rm = TRUE))
-
-# Extract Trial information from Bee column
-bds_means <- bds_means %>%
-    mutate(Trial = str_extract(Bee, ".+?(?=_)"))
-
-# Define QR_Queen_Condition based on QR and Queen values
-bds_means <- bds_means %>%
-    mutate(QR_Queen_Condition = case_when(
-        QR == 0 & Queen == 0 ~ "Queenless",
-        QR == 1 & Queen == 0 ~ "Queenright",
-        Queen == 1 ~ "Queen"
-    )) %>%
-    mutate(QR_Queen_Condition = factor(QR_Queen_Condition, levels = c("Queen", "Queenright", "Queenless")))
-
-# Create ID column for aggregation
-bds_means <- bds_means %>%
-    mutate(ID = paste(Trial, QR_Queen_Condition))
-
-# Calculate mean of means for each ID
-bds_mean_of_means <- bds_means %>%
-    group_by(ID) %>%
-    summarise(across(c(QR, Queen, Degree, Initiation.Freq, N90.Day4), mean, na.rm = TRUE))
-
-# Extract Trial information from ID column
-bds_mean_of_means <- bds_mean_of_means %>%
-    mutate(Trial = str_extract(ID, ".+?(?= )"))
-
-# Define QR_Queen_Condition based on QR and Queen values for mean of means
-bds_mean_of_means <- bds_mean_of_means %>%
-    rename(
-        WorkerQR = QR,
-        WorkerQueen = Queen
-    ) %>%
-    mutate(QR_Queen_Condition = case_when(
-        WorkerQR == 0 & WorkerQueen == 0 ~ "Queenless\nWorker",
-        WorkerQR == 1 & WorkerQueen == 0 ~ "Queenright\nWorker",
-        WorkerQueen == 1 ~ "Queen"
-    )) %>%
-    mutate(QR_Queen_Condition = factor(QR_Queen_Condition, levels = c("Queen", "Queenright\nWorker", "Queenless\nWorker")))
+# Reorder and rename levels of bds$QR_Queen_Condition
+# Map the categories to new names
+bds_means_of_means <- bds_means_of_means %>%
+  mutate(QR_Queen_Condition = case_when(
+    QR_Queen_Condition == "Queenless" ~ "Queenless\nWorker",
+    QR_Queen_Condition == "Queenright" ~ "Queenright\nWorker",
+    TRUE ~ QR_Queen_Condition # This retains the names for "Queen" and "Keystone"
+  )) %>%
+  mutate(QR_Queen_Condition = factor(QR_Queen_Condition, levels = c("Queen", "Queenright\nWorker", "Queenless\nWorker")))
 
 # Plot Degree
-plot_degree <- ggplot(bds_mean_of_means, aes(x = QR_Queen_Condition, y = Degree)) +
+plot_degree <- ggplot(bds_means_of_means, aes(x = QR_Queen_Condition, y = Degree)) +
     geom_line(aes(group = Trial), color = "darkgray", linewidth = 0.2) +
     geom_point(aes(color = Trial), size = 3) +
     scale_color_manual(values = COLONY_COLORS) +
@@ -74,7 +28,7 @@ plot_degree <- ggplot(bds_mean_of_means, aes(x = QR_Queen_Condition, y = Degree)
     CONSISTENT_THEME
 
 # Plot Initiation.Freq
-plot_init_freq <- ggplot(bds_mean_of_means, aes(x = QR_Queen_Condition, y = Initiation.Freq)) +
+plot_init_freq <- ggplot(bds_means_of_means, aes(x = QR_Queen_Condition, y = Initiation.Freq)) +
     geom_line(aes(group = Trial), color = "darkgray", linewidth = 0.2) +
     geom_point(aes(color = Trial), size = 3) +
     scale_color_manual(values = COLONY_COLORS) +
@@ -83,7 +37,7 @@ plot_init_freq <- ggplot(bds_mean_of_means, aes(x = QR_Queen_Condition, y = Init
     CONSISTENT_THEME
 
 # Plot N90.Day4
-plot_n90_day4 <- ggplot(bds_mean_of_means, aes(x = QR_Queen_Condition, y = N90.Day4)) +
+plot_n90_day4 <- ggplot(bds_means_of_means, aes(x = QR_Queen_Condition, y = N90.Day4)) +
     geom_line(aes(group = Trial), color = "darkgray", linewidth = 0.2) +
     geom_point(aes(color = Trial), size = 3) +
     scale_color_manual(values = COLONY_COLORS) +
@@ -101,7 +55,7 @@ degree_over_time <- ggplot(bds, aes(x = as.integer(Hour), y = Degree / 20, group
     scale_size(range = c(.001, .5)) +
     scale_color_manual(
         labels = c("Queen", "Queenright Worker", "Queenless Worker"),
-        values = setNames(c(Q_QRW_INT_QLW$Q, Q_QRW_INT_QLW$QRW, Q_QRW_INT_QLW$QLW), levels(bds$QR_Queen_Condition)),
+        values = setNames(c(Q_QRW_KEY_QLW$Q, Q_QRW_KEY_QLW$QRW, Q_QRW_KEY_QLW$QLW), levels(bds$QR_Queen_Condition)),
         guide = guide_legend(direction = "horizontal")
     ) +
     scale_x_continuous(breaks = c(0, seq(24, 96, by = 24)), limits = c(0, NA), expand = c(0, 0)) + # Expand limits to include 0
