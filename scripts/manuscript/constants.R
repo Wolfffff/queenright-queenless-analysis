@@ -1,8 +1,8 @@
-Q_QRW_INT_QLW <- list(
-  Q = "#3f007b",
-  QRW = "#893F71",
-  INF = "#CC5500",
-  QLW = "#FFAE00"
+Q_QRW_KEY_QLW <- list(
+    Q = "#3f007b",
+    QRW = "#893F71",
+    KEY = "#CC5500",
+    QLW = "#FFAE00"
 )
 
 COLONY_COLORS <- wes_palette("Cavalcanti1")
@@ -45,3 +45,8 @@ CONSISTENT_THEME_NO_ASPECT <- theme_minimal() +
         axis.text.y = element_text(size = 9),
         plot.margin = unit(c(0.1, 0.1, 0.1, 0.1), "cm")
     )
+
+REMOVE_HASH_MARKS <- theme(
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank()
+)
