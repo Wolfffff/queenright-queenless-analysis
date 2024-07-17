@@ -10,11 +10,11 @@ source("scripts/manuscript/load_data.R")
 
 bds_means_of_means <- bds_means_of_means %>%
   mutate(QR_Queen_Condition = case_when(
-    QR_Queen_Condition == "Queenless" ~ "Queenless\nWorker",
-    QR_Queen_Condition == "Queenright" ~ "Queenright\nWorker",
+    QR_Queen_Condition == "Queenless" ~ "Queenless\nWorkers",
+    QR_Queen_Condition == "Queenright" ~ "Queenright\nWorkers",
     TRUE ~ QR_Queen_Condition
   )) %>%
-  mutate(QR_Queen_Condition = factor(QR_Queen_Condition, levels = c("Queen", "Queenright\nWorker", "Queenless\nWorker")))
+  mutate(QR_Queen_Condition = factor(QR_Queen_Condition, levels = c("Queen", "Queenright\nWorkers", "Queenless\nWorkers")))
 
 
 # Plot Degree
