@@ -167,7 +167,7 @@ def plot_hairball(
             [0],
             marker="o",
             color="w",
-            label="Queenright Worker" if title == "Queenright" else "Queenless Worker",
+            label="Queenright Worker" if title == "Queenright" else "Non-Keystone\nQueenless Worker",
             markerfacecolor=non_focal_color,
             markersize=10,
         ),
@@ -188,7 +188,7 @@ def save_plot(fig, set_name):
     """Save the plot with a specific filename format."""
     filename = f"figures/hairballs/{set_name}_spring_count.png"
     os.makedirs(os.path.dirname(filename), exist_ok=True)
-    fig.savefig(filename, dpi=600)
+    fig.savefig(filename, dpi=1200)
     plt.close(fig)
 
 
@@ -211,7 +211,7 @@ global_min_degree = min(all_degrees.values(), default=0)
 global_max_degree = max(all_degrees.values(), default=1)
 
 for seed in range(SEED_COUNT):
-    fig, axs = plt.subplots(1, len(FILENAMES), figsize=(8.5, 4.25))
+    fig, axs = plt.subplots(1, len(FILENAMES), figsize=(8.5, 2.5))
 
     for graph, ax, title, focal_nodes in zip(graphs, axs, TITLES, FOCAL_NODES):
         focal_color, non_focal_color = (
