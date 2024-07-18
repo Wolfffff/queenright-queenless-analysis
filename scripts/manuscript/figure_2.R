@@ -109,4 +109,4 @@ final_plot <- plot_grid(plots[[2]],top_row, ncol = 1, rel_heights = c(1, 1))
 
 # Save the combined plot
 # Adjust the plot saving command to include margins
-ggsave("figures/manuscript/figure_2_combined.jpeg", plot = final_plot + theme(plot.margin = margin(1, 1, 1, 1, "cm")), width = 8.5, height = 6,dpi =1200)
+ggsave("figures/manuscript/figure_2.jpeg", plot = final_plot + theme(plot.margin = margin(1, 1, 1, 1, "cm")), width = 8.5, height = 6,dpi =1200)
