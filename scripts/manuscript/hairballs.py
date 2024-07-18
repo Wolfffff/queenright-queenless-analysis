@@ -211,7 +211,7 @@ global_min_degree = min(all_degrees.values(), default=0)
 global_max_degree = max(all_degrees.values(), default=1)
 
 for seed in range(SEED_COUNT):
-    fig, axs = plt.subplots(1, len(FILENAMES), figsize=(8.5, 2.5))
+    fig, axs = plt.subplots(len(FILENAMES), 1, figsize=(2.5, 6))
 
     for graph, ax, title, focal_nodes in zip(graphs, axs, TITLES, FOCAL_NODES):
         focal_color, non_focal_color = (
