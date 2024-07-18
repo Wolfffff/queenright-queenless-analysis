@@ -1,11 +1,10 @@
-```{r Supp Figure 13 (Influencers are Less Specialized re: directionality)}
-
 ggplot(BDSMeansNoOv, aes(x = Degree, y = bodyDegree, group = QR_Queen_Inf)) +
   new_scale_color() +
-  geom_point(aes(color = QR_Queen_Inf,shape=as.factor(QR)), alpha = 1, size = BDSMeansNoOv$PointSize) +
+  geom_point(aes(color = QR_Queen_Inf, shape = as.factor(QR)), alpha = 1, size = BDSMeansNoOv$PointSize) +
   scale_color_manual(
-    labels = c( "Queenright Worker","Queenless Worker","Queen","Influencer"),
-    values = c( "#429CF0","#161414","#7851A9","#AA1233"))+
+    labels = c("Queenright Worker", "Queenless Worker", "Queen", "Influencer"),
+    values = c("#429CF0", "#161414", "#7851A9", "#AA1233")
+  ) +
   scale_x_continuous() + # Use a continuous scale for x
   scale_y_continuous() + # Use a continuous scale for y
   xlab("Head Degree Centrality") +
@@ -23,5 +22,4 @@ ggplot(BDSMeansNoOv, aes(x = Degree, y = bodyDegree, group = QR_Queen_Inf)) +
     axis.text.y.right = element_blank(), # Remove right y-axis text
     axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
     aspect.ratio = 1
-  ) 
-```
+  )

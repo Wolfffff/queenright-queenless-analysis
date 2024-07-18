@@ -29,9 +29,9 @@ bds_means_of_means_Q_QRW_QLW_Keystone$Group <- factor(bds_means_of_means_Q_QRW_Q
 bds_means_of_means_Q_QRW_QLW_Keystone <- bds_means_of_means_Q_QRW_QLW_Keystone %>%
   mutate(Q_QRW_QLW_Keystone = fct_recode(Q_QRW_QLW_Keystone,
                            "Queen" = "Queen",
-                           "Queenright\nWorker" = "Queenright",
-                           "Keystone\nIndividual" = "Keystone",
-                           "Queenless\nWorker" = "Queenless"))
+                           "Queenright Worker" = "Queenright",
+                           "Keystone Individual" = "Keystone",
+                           "Non-Keystone Queenless Worker" = "Queenless"))
 
 # Step 3: Plot with a cut in the x-axis using facets
 plot_degree <- ggplot(bds_means_of_means_Q_QRW_QLW_Keystone, aes(x = Q_QRW_QLW_Keystone, y = Degree)) +
@@ -88,5 +88,5 @@ plot_oi <- ggplot(bds_means_of_means_Q_QRW_QLW_Keystone, aes(x = Q_QRW_QLW_Keyst
   facet_grid(~Group, scales = "free_x", space = "free_x", switch = "x", labeller = labeller(.rows = label_both, .cols = label_both)) +
   SHARED_THEME
 
-plot_grid(plot_degree, plot_disp, plot_between,plot_oi, ncol = 2)
-ggsave("figures/manuscript/figure_4.jpeg", width = 8.5, height = 5, dpi = 1200)
+plot_grid(plot_degree, plot_disp, plot_between,plot_oi, ncol = 4)
+ggsave("figures/manuscript/figure_4.jpeg", width = 8.5, height = 3.5, dpi = 1200)

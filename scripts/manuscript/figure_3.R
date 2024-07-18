@@ -51,9 +51,8 @@ data_with_pca$Alpha <- as.numeric(data_with_pca$Alpha)
 pca_plot <- ggplot(data_with_pca, aes(x = PC1, y = PC2, color = QR_Queen_Condition, size = PointSize)) +
     geom_point(alpha = data_with_pca$Alpha, stroke = 0) +
     scale_size_manual(values = c("big" = 2.5, "small" = 1.5), guide = "none") +
-
     scale_color_manual(
-        labels = c("Queen", "Queenright Workers", "Queenless Worker"),
+        labels = c("Queen", "Queenright Worker", "Queenless Worker"),
         values = c(Q_QRW_KEY_QLW$Q, Q_QRW_KEY_QLW$QRW, Q_QRW_KEY_QLW$QLW),
         guide = guide_legend(direction = "horizontal", title = "")
     ) +
@@ -68,14 +67,14 @@ pca_plot <- ggplot(data_with_pca, aes(x = PC1, y = PC2, color = QR_Queen_Conditi
     ) +
     REMOVE_HASH_MARKS
 
-# Filter data for workers
-data_with_pca_workers <- data_with_pca %>%
+# Filter data for Worker
+data_with_pca_Worker <- data_with_pca %>%
     filter(Queen == 0)
 
 # Create density plots for various metrics
-plot_degree <- ggplot(data_with_pca_workers, aes(x = Degree, fill = QR_Queen_Condition)) +
+plot_degree <- ggplot(data_with_pca_Worker, aes(x = Degree, fill = QR_Queen_Condition)) +
     geom_density(alpha = 0.5) +
-    scale_fill_manual(labels = c("Queenright Workers", "Queenless Workers"), values = c(Q_QRW_KEY_QLW$QRW, Q_QRW_KEY_QLW$QLW)) +
+    scale_fill_manual(labels = c("Queenright Worker", "Queenless Worker"), values = c(Q_QRW_KEY_QLW$QRW, Q_QRW_KEY_QLW$QLW)) +
     labs(x = "Std. Interactions per Hour", y = "Density") +
     CONSISTENT_THEME +
     theme(
@@ -91,7 +90,7 @@ plot_degree <- ggplot(data_with_pca_workers, aes(x = Degree, fill = QR_Queen_Con
         legend.title = element_blank()
     )
 
-plot_dispersion <- ggplot(data_with_pca_workers, aes(x = N90.Day4, fill = QR_Queen_Condition)) +
+plot_dispersion <- ggplot(data_with_pca_Worker, aes(x = N90.Day4, fill = QR_Queen_Condition)) +
     geom_density(alpha = 0.5) +
     scale_fill_manual(values = c(Q_QRW_KEY_QLW$QRW, Q_QRW_KEY_QLW$QLW)) +
     labs(x = "N90 (Dispersion)", y = "Density") +
@@ -103,7 +102,7 @@ plot_dispersion <- ggplot(data_with_pca_workers, aes(x = N90.Day4, fill = QR_Que
     scale_alpha_continuous() +
     REMOVE_HASH_MARKS
 
-plot_move_perc <- ggplot(data_with_pca_workers, aes(x = move_perc * 100, fill = QR_Queen_Condition)) +
+plot_move_perc <- ggplot(data_with_pca_Worker, aes(x = move_perc * 100, fill = QR_Queen_Condition)) +
     geom_density(alpha = 0.5) +
     scale_fill_manual(values = c(Q_QRW_KEY_QLW$QRW, Q_QRW_KEY_QLW$QLW)) +
     labs(x = "Percent of Time Moving", y = "Density") +
@@ -115,7 +114,7 @@ plot_move_perc <- ggplot(data_with_pca_workers, aes(x = move_perc * 100, fill = 
     scale_alpha_continuous() +
     REMOVE_HASH_MARKS
 
-plot_clustering <- ggplot(data_with_pca_workers, aes(x = clust, fill = QR_Queen_Condition)) +
+plot_clustering <- ggplot(data_with_pca_Worker, aes(x = clust, fill = QR_Queen_Condition)) +
     geom_density(alpha = 0.5) +
     scale_fill_manual(values = c(Q_QRW_KEY_QLW$QRW, Q_QRW_KEY_QLW$QLW)) +
     labs(x = "Clustering Coefficient", y = "Density") +
@@ -160,7 +159,7 @@ final_grid <- plot_grid(
 
 final_pca_plot <- plot_grid(pca_legend,pca_plot_no_legend, ncol = 1, align = "tb", rel_heights = c(0.1, 1))
 
-final_layout <- plot_grid(final_pca_plot, final_grid, ncol = 2, align = "tb", rel_heights = c(1, 1))
+final_layout <- plot_grid(final_pca_plot, grid_no_legend, ncol = 2, align = "tb", rel_heights = c(1, 1))
 
 
 
