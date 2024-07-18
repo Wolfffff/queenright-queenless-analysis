@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import h5py
-import numpy as
+import numpy as np
 
 # Define the file path
 import h5py
@@ -17,7 +17,9 @@ import h5py
 import numpy as np
 
 # Define the file path
-file_path = "/Users/wolf/20230213_1745_AlmdudlerGspritzt_C1_008_8_8_3_1_10_interp_filtered.h5"
+file_path = (
+    "/Users/wolf/20230213_1745_AlmdudlerGspritzt_C1_008_8_8_3_1_10_interp_filtered.h5"
+)
 
 # Open the HDF5 file
 import h5py
@@ -26,13 +28,13 @@ import numpy as np
 # file_path = '/Users/wolf/labels_test.slp'
 
 # Step 1: Open the HDF5 file in read-write mode
-with h5py.File(file_path, 'r+') as file:
+with h5py.File(file_path, "r+") as file:
     # Load the "tracks" dataset
-    original_tracks = file['tracks']
-    
+    original_tracks = file["tracks"]
+
     # Get the shape of the "tracks" dataset
     original_shape = original_tracks.shape
-    
+
     # Create a new dataset with the same shape, filled with zeros
     new_tracks = np.zeros(original_shape, dtype=original_tracks.dtype)
 
@@ -41,7 +43,7 @@ with h5py.File(file_path, 'r+') as file:
     new_tracks[..., 1:] = original_tracks[..., :-1]
 
     # Delete the original "tracks" dataset
-    del file['tracks']
-    
+    del file["tracks"]
+
     # Create a new "tracks" dataset with the modified data
-    file.create_dataset('tracks', data=new_tracks)
+    file.create_dataset("tracks", data=new_tracks)

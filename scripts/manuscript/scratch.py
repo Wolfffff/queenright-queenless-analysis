@@ -1,7 +1,5 @@
 import networkx as nx
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 # Hardcoded values
 FILENAMES = [
@@ -109,39 +107,4 @@ bds_pooled["ovary_wing_ratio"] = (
 # Merge the interactions with the big data sheet
 bds_pooled = pd.merge(bds_pooled, interaction_df, on="Bee", how="left")
 
-# Plot the distribution of bees based on interactions
-plt.figure(figsize=(6, 6))
-sns.scatterplot(data=bds_pooled, x="interactions_with_queen", y="ovary_wing_ratio")
-plt.xticks(rotation=45)
-plt.tight_layout()
-plt.savefig("figures/ovidx_by_queen_interactions.jpeg", dpi=600)
-
-
-# Plot the distribution of bees based on interactions
-plt.figure(figsize=(6, 6))
-sns.scatterplot(data=bds_pooled, x="interactions_with_queen", y="AverageWingLength")
-plt.xticks(rotation=45)
-plt.tight_layout()
-plt.savefig("figures/size_by_queen_interactions.jpeg", dpi=600)
-
-
-# Plot the distribution of bees based on interactions
-plt.figure(figsize=(6, 6))
-sns.scatterplot(data=bds_pooled, x="interactions_with_queen", y="move_perc")
-plt.xticks(rotation=45)
-plt.tight_layout()
-plt.savefig("figures/move_perc_by_queen_interactions.jpeg", dpi=600)
-
-
-plt.figure(figsize=(6, 6))
-sns.scatterplot(data=bds_pooled, x="interactions_with_queen", y="Degree")
-plt.xticks(rotation=45)
-plt.tight_layout()
-plt.savefig("figures/degree_by_queen_interactions.jpeg", dpi=600)
-
-
-plt.figure(figsize=(6, 6))
-sns.scatterplot(data=bds_pooled, x="interactions_with_queen", y="AverageOvaryWidth")
-plt.xticks(rotation=45)
-plt.tight_layout()
-plt.savefig("figures/ovary_width_by_queen_interactions.jpeg", dpi=600)
+bds_pooled.to_csv("data/bds_pooled.csv", index=False)
