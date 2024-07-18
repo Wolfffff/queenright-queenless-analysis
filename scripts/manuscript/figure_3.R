@@ -135,9 +135,9 @@ plot_degree <- plot_degree + theme(legend.position = "none")
 # Step 3: Create a plot grid without legends
 grid_no_legend <- plot_grid(
     plot_degree,
+    plot_clustering,
     plot_move_perc,
     plot_dispersion,
-    plot_clustering,
     ncol = 2,
     nrow = 2,
     align = "hv",
