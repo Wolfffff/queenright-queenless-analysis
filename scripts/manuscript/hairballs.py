@@ -33,7 +33,7 @@ COLORS = {
 }
 EDGE_WEIGHT = "count"
 SEED_COUNT = 3  # Number of times to replot with different seeds
-THRESHOLD = 600  # Edge weight threshold for pruning
+THRESHOLD = 0  # Edge weight threshold for pruning
 EDGE_WIDTH_SCALE = 3  # Scaling factor for edge widths
 NODE_SIZE_SCALE = 100  # Scaling factor for node sizes
 
@@ -74,7 +74,9 @@ def get_normalized_node_sizes(graph, global_min_degree, global_max_degree):
         node: (degree - global_min_degree) / (global_max_degree - global_min_degree)
         for node, degree in degrees.items()
     }
-    normalized_sizes = {node: max(0.1, min(1, size)) for node, size in normalized_sizes.items()}
+    normalized_sizes = {
+        node: max(0.1, min(1, size)) for node, size in normalized_sizes.items()
+    }
     print(min(normalized_sizes.values()), max(normalized_sizes.values()))
     return normalized_sizes
 
@@ -118,22 +120,24 @@ def plot_hairball(
     )
     scaled_node_sizes = scale_node_sizes(normalized_node_sizes, NODE_SIZE_SCALE)
 
-    nx.draw_networkx_nodes(
-        graph,
-        pos,
-        nodelist=focal,
-        node_color=focal_color,
-        ax=ax,
-        node_size=[scaled_node_sizes.get(node, 1) for node in focal],
-    )
-    nx.draw_networkx_nodes(
-        graph,
-        pos,
-        nodelist=non_focal,
-        node_color=non_focal_color,
-        ax=ax,
-        node_size=[scaled_node_sizes.get(node, 1) for node in non_focal],
-    )
+    # Combine focal and non-focal nodes into a single list with their attributes
+    nodes_with_attributes = [
+        (node, {"type": "focal", "color": focal_color}) for node in focal
+    ] + [(node, {"type": "non_focal", "color": non_focal_color}) for node in non_focal]
+
+    # Shuffle the combined list
+    np.random.shuffle(nodes_with_attributes)
+
+    # Plot each node individually, using its attributes
+    for node, attributes in nodes_with_attributes:
+        nx.draw_networkx_nodes(
+            graph,
+            pos,
+            nodelist=[node],
+            node_color=attributes["color"],
+            ax=ax,
+            node_size=[scaled_node_sizes.get(node, 1)],
+        )
 
     all_edges = focal_edges + non_focal_edges
     np.random.shuffle(all_edges)
@@ -141,7 +145,7 @@ def plot_hairball(
     for edge in all_edges:
         color = focal_color if edge in focal_edges else non_focal_color
         width = scaled_weights.get(edge, 1)
-        alpha = 0.25 + 0.5*(width/EDGE_WIDTH_SCALE)
+        alpha = 0.25 + 0.5 * (width / EDGE_WIDTH_SCALE)
         nx.draw_networkx_edges(
             graph,
             pos,
@@ -158,7 +162,7 @@ def plot_hairball(
             [0],
             marker="o",
             color="w",
-            label="Queen" if title == "Queenright" else "Keystone Individual",
+            label="Queen" if title == "Queenright" else "Queenless Keystone Worker",
             markerfacecolor=focal_color,
             markersize=10,
         ),
@@ -167,7 +171,11 @@ def plot_hairball(
             [0],
             marker="o",
             color="w",
-            label="Queenright Worker" if title == "Queenright" else "Non-Keystone\nQueenless Worker",
+            label=(
+                "Queenright Worker"
+                if title == "Queenright"
+                else "Queenless Non-Keystone Worker"
+            ),
             markerfacecolor=non_focal_color,
             markersize=10,
         ),
@@ -178,7 +186,7 @@ def plot_hairball(
         fontsize=10,
         loc="upper right",
         frameon=False,
-        bbox_to_anchor=(1.15, 1.15),
+        bbox_to_anchor=(1.15, 1.05),
     )
     ax.set_aspect("equal", adjustable="datalim")
     ax.axis("off")
@@ -188,7 +196,7 @@ def save_plot(fig, set_name):
     """Save the plot with a specific filename format."""
     filename = f"figures/hairballs/{set_name}_spring_count.png"
     os.makedirs(os.path.dirname(filename), exist_ok=True)
-    fig.savefig(filename, dpi=1200)
+    fig.savefig(filename, dpi=1200, bbox_inches="tight", pad_inches=0)
     plt.close(fig)
 
 
@@ -211,7 +219,12 @@ global_min_degree = min(all_degrees.values(), default=0)
 global_max_degree = max(all_degrees.values(), default=1)
 
 for seed in range(SEED_COUNT):
-    fig, axs = plt.subplots(len(FILENAMES), 1, figsize=(2.5, 6))
+    fig, axs = plt.subplots(
+        1,
+        len(FILENAMES),
+        figsize=(8.5, 3.5),
+        gridspec_kw={"hspace": 0.0, "wspace": 0},
+    )
 
     for graph, ax, title, focal_nodes in zip(graphs, axs, TITLES, FOCAL_NODES):
         focal_color, non_focal_color = (
@@ -234,5 +247,5 @@ for seed in range(SEED_COUNT):
             global_max_degree,
         )
 
-    plt.tight_layout(rect=[0, 0, 1, 0.96])
+    plt.tight_layout()
     save_plot(fig, f"example_seed_{seed}")
