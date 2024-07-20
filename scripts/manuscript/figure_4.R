@@ -30,8 +30,8 @@ bds_means_of_means_Q_QRW_QLW_Keystone <- bds_means_of_means_Q_QRW_QLW_Keystone %
   mutate(Q_QRW_QLW_Keystone = fct_recode(Q_QRW_QLW_Keystone,
                            "Queen" = "Queen",
                            "Queenright Worker" = "Queenright",
-                           "Keystone Individual" = "Keystone",
-                           "Non-Keystone Queenless Worker" = "Queenless"))
+                           "Queenless Keystone Worker" = "Keystone",
+                           "Queenless Non-Keystone Worker" = "Queenless"))
 
 # Step 3: Plot with a cut in the x-axis using facets
 plot_degree <- ggplot(bds_means_of_means_Q_QRW_QLW_Keystone, aes(x = Q_QRW_QLW_Keystone, y = Degree)) +

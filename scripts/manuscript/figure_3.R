@@ -68,13 +68,17 @@ pca_plot <- ggplot(data_with_pca, aes(x = PC1, y = PC2, color = QR_Queen_Conditi
     REMOVE_HASH_MARKS
 
 # Filter data for Worker
-data_with_pca_Worker <- data_with_pca %>%
+data_with_pca_worker <- data_with_pca %>%
     filter(Queen == 0)
 
+data_with_pca_queen <- data_with_pca %>%
+    filter(Queen == 1)
+
 # Create density plots for various metrics
-plot_degree <- ggplot(data_with_pca_Worker, aes(x = Degree, fill = QR_Queen_Condition)) +
+plot_degree <- ggplot(data_with_pca_worker, aes(x = Degree, fill = QR_Queen_Condition)) +
     geom_density(alpha = 0.5) +
     scale_fill_manual(labels = c("Queenright Worker", "Queenless Worker"), values = c(Q_QRW_KEY_QLW$QRW, Q_QRW_KEY_QLW$QLW)) +
+    geom_rug(data=data_with_pca_queen, aes(x=Degree,color=Trial,fill=NULL), color=COLONY_COLORS) + 
     labs(x = "Std. Interactions per Hour", y = "Density") +
     CONSISTENT_THEME +
     theme(
@@ -90,9 +94,10 @@ plot_degree <- ggplot(data_with_pca_Worker, aes(x = Degree, fill = QR_Queen_Cond
         legend.title = element_blank()
     )
 
-plot_dispersion <- ggplot(data_with_pca_Worker, aes(x = N90.Day4, fill = QR_Queen_Condition)) +
+plot_dispersion <- ggplot(data_with_pca_worker, aes(x = N90.Day4, fill = QR_Queen_Condition)) +
     geom_density(alpha = 0.5) +
     scale_fill_manual(values = c(Q_QRW_KEY_QLW$QRW, Q_QRW_KEY_QLW$QLW)) +
+    geom_rug(data=data_with_pca_queen, aes(x=N90.Day4,color=Trial,fill=NULL), color=COLONY_COLORS) + 
     labs(x = "N90 (Dispersion)", y = "Density") +
     CONSISTENT_THEME +
     theme(
@@ -102,9 +107,10 @@ plot_dispersion <- ggplot(data_with_pca_Worker, aes(x = N90.Day4, fill = QR_Quee
     scale_alpha_continuous() +
     REMOVE_HASH_MARKS
 
-plot_move_perc <- ggplot(data_with_pca_Worker, aes(x = move_perc * 100, fill = QR_Queen_Condition)) +
+plot_move_perc <- ggplot(data_with_pca_worker, aes(x = move_perc * 100, fill = QR_Queen_Condition)) +
     geom_density(alpha = 0.5) +
     scale_fill_manual(values = c(Q_QRW_KEY_QLW$QRW, Q_QRW_KEY_QLW$QLW)) +
+    geom_rug(data=data_with_pca_queen, aes(x=move_perc * 100,color=Trial,fill=NULL), color=COLONY_COLORS) +
     labs(x = "Percent of Time Moving", y = "Density") +
     CONSISTENT_THEME +
     theme(
@@ -114,9 +120,10 @@ plot_move_perc <- ggplot(data_with_pca_Worker, aes(x = move_perc * 100, fill = Q
     scale_alpha_continuous() +
     REMOVE_HASH_MARKS
 
-plot_clustering <- ggplot(data_with_pca_Worker, aes(x = clust, fill = QR_Queen_Condition)) +
+plot_clustering <- ggplot(data_with_pca_worker, aes(x = clust, fill = QR_Queen_Condition)) +
     geom_density(alpha = 0.5) +
     scale_fill_manual(values = c(Q_QRW_KEY_QLW$QRW, Q_QRW_KEY_QLW$QLW)) +
+    geom_rug(data=data_with_pca_queen, aes(x=clust,color=Trial,fill=NULL), color=COLONY_COLORS) + 
     labs(x = "Clustering Coefficient", y = "Density") +
     CONSISTENT_THEME +
     theme(
