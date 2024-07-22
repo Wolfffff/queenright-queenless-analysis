@@ -1,5 +1,4 @@
 import ast
-
 import glob
 import gzip
 
@@ -9,6 +8,8 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 import pandas as pd
+from scipy.cluster.hierarchy import dendrogram, linkage
+from scipy.spatial.distance import pdist
 
 
 def get_prop_type(value, key=None):
@@ -217,9 +218,7 @@ GROUPS = [
     "20221123_1543_AmericanoLatte_QR",
     "20221123_1543_AmericanoLatte_QL",
 ]
-from matplotlib import colors
-from scipy.cluster.hierarchy import dendrogram, linkage
-from scipy.spatial.distance import pdist
+
 
 # Normalize color scale
 norm = colors.LogNorm()
@@ -349,4 +348,3 @@ def visualize_graph(g, norm_vertex_betweenness, blocks):
 
 
 visualize_graph(g, nvb, b)
-

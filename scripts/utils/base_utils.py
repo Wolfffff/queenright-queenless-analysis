@@ -1,5 +1,6 @@
-import pandas as pd
 from typing import Dict, List, Union
+
+import pandas as pd
 
 
 def process_tags_to_list_and_queen_per_group(

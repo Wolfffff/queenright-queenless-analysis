@@ -144,20 +144,20 @@ process_files <- function(suffix) {
 process_ovaries <- function(filename) {
   Ovaries <- read.csv(filename)
 
-  OvariesRT = Ovaries[Ovaries$Colony=="RooibosTea",]
+  OvariesRT <- Ovaries[Ovaries$Colony == "RooibosTea", ]
   OvariesRT$ID <- paste("RooibosTea_", OvariesRT$Treatment, "_1216_1646_ArUcoTag#", OvariesRT$Tag, sep = "")
 
-  OvariesMHC = Ovaries[Ovaries$Colony=="MexicanHotChocolate",]
-  OvariesMHC$ID = paste("MexHotChoc_",OvariesMHC$Treatment,"_1216_1646_ArUcoTag#",OvariesMHC$Tag,sep="")
+  OvariesMHC <- Ovaries[Ovaries$Colony == "MexicanHotChocolate", ]
+  OvariesMHC$ID <- paste("MexHotChoc_", OvariesMHC$Treatment, "_1216_1646_ArUcoTag#", OvariesMHC$Tag, sep = "")
 
-  OvariesAM = Ovaries[Ovaries$Colony=="ArgentinanMate",]
-  OvariesAM$ID = paste("20221209_1613_",OvariesAM$Treatment,"_ArUcoTag#",OvariesAM$Tag,sep="")
+  OvariesAM <- Ovaries[Ovaries$Colony == "ArgentinanMate", ]
+  OvariesAM$ID <- paste("20221209_1613_", OvariesAM$Treatment, "_ArUcoTag#", OvariesAM$Tag, sep = "")
 
-  OvariesAG = Ovaries[Ovaries$Colony=="AlmdudlerGspritzt",]
-  OvariesAG$ID = paste("20230213_1745_AlmdudlerGspritzt_",OvariesAG$Treatment,"_ArUcoTag#",OvariesAG$Tag,sep="")
+  OvariesAG <- Ovaries[Ovaries$Colony == "AlmdudlerGspritzt", ]
+  OvariesAG$ID <- paste("20230213_1745_AlmdudlerGspritzt_", OvariesAG$Treatment, "_ArUcoTag#", OvariesAG$Tag, sep = "")
 
-  OvariesAL = Ovaries[Ovaries$Colony=="AmericanoLatte",]
-  OvariesAL$ID = paste("20221123_1543_AmericanoLatte_",OvariesAL$Treatment,"_ArUcoTag#",OvariesAL$Tag,sep="")
+  OvariesAL <- Ovaries[Ovaries$Colony == "AmericanoLatte", ]
+  OvariesAL$ID <- paste("20221123_1543_AmericanoLatte_", OvariesAL$Treatment, "_ArUcoTag#", OvariesAL$Tag, sep = "")
 
   # Merge the data
   Ovaries <- rbind(OvariesRT, OvariesMHC, OvariesAM, OvariesAG, OvariesAL)

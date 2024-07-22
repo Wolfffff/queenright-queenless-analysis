@@ -1,17 +1,23 @@
 repos:
--   repo: https://github.com/pycqa/isort
+  - repo: https://github.com/pycqa/isort
     rev: 5.12.0
     hooks:
       - id: isort
         name: isort (python)
         args: ["--settings-path=.isort.cfg"]
--   repo: https://github.com/psf/black
+  - repo: https://github.com/psf/black
     rev: 23.11.0
     hooks:
       - id: black
         language_version: python3
--   repo: https://github.com/pycqa/flake8
-    rev: '6.1.0'
+  - repo: https://github.com/pycqa/flake8
+    rev: "6.1.0"
     hooks:
       - id: flake8
         args: ["--config=.flake8"]
+  - repo: https://github.com/lorenzwalthert/precommit
+    rev: v0.4.2
+    hooks:
+      - id: style-files
+        args: [--style_pkg=styler, --cache-root=styler-perm]
+      - id: lintr

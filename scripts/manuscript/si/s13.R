@@ -42,12 +42,12 @@ ggplot(bds_means, aes(x = Degree, y = bodyDegree, group = Q_QRW_QLW_Keystone)) +
   ylab("Body Degree Centrality") +
   CONSISTENT_THEME +
   REMOVE_HASH_MARKS +
-theme(
-  legend.position = "top", # Position the legend at the top
-  legend.direction = "horizontal", # Make the legend horizontal
-  legend.title = element_blank(), # Remove the legend title
-  legend.spacing.x = unit(0.0, "cm"), # Reduces the space between legend labels
-  legend.key.width = unit(0.2, "cm") # Adjust the width of the legend keys (symbols)
-)
+  theme(
+    legend.position = "top", # Position the legend at the top
+    legend.direction = "horizontal", # Make the legend horizontal
+    legend.title = element_blank(), # Remove the legend title
+    legend.spacing.x = unit(0.0, "cm"), # Reduces the space between legend labels
+    legend.key.width = unit(0.2, "cm") # Adjust the width of the legend keys (symbols)
+  )
 
-ggsave("figures/manuscript/si/figure_s13.jpeg", width = 4.25, height = 4.25, units = "in", dpi = 1200)
+ggsave("figures/manuscript/si/figure_s13.jpeg", width = 4.5, height = 4.5, units = "in", dpi = 600)

@@ -22,11 +22,11 @@ bds_means_of_means <- bds_means_of_means %>%
 plot_ovaries <- ggplot(bds_means_of_means, aes(x = QR_Queen_Condition, y = ovary_idx)) +
   geom_line(aes(group = Trial), color = "darkgray") +
   geom_point(aes(color = Trial), size = 5) +
-  scale_color_manual(values =COLONY_COLORS) +
+  scale_color_manual(values = COLONY_COLORS) +
   xlab("") +
   labs(color = "Source Colony") +
-  ylab("Ovary Index") + 
+  ylab("Ovary Index") +
   CONSISTENT_THEME
 plot_ovaries
 
-ggsave("figures/manuscript/si/figure_s11.jpeg", plot = plot_ovaries, width = 4.25, height = 4.25, units = "in", dpi = 1200)
+ggsave("figures/manuscript/si/figure_s11.jpeg", plot = plot_ovaries, width = 4.5, height = 4.5, units = "in", dpi = 600)
