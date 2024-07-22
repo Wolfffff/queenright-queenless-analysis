@@ -31,7 +31,7 @@ bds_pooled <- bds_no_queens %>%
   mutate(Day_Zeit = paste(Day, Zeit, sep = "_"))
 
 # List of features to test
-features <- c("Degree", "move_perc", "mean_vel", "N90.Day4", "Initiation.Freq", "Close", "Between","clust")
+features <- c("Degree", "move_perc", "mean_vel", "N90.Day4", "Initiation.Freq", "Close", "Between", "clust")
 
 # Function to fit and summarize the model for each feature
 fit_and_summarize <- function(feature) {
@@ -65,8 +65,8 @@ print(comprehensive_summary_table)
 # Get significant features
 significant_features <- comprehensive_summary_table %>%
   filter(p.value < 0.05) %>%
-  select(feature,term, p.value)
+  select(feature, term, p.value)
 
-write_csv(comprehensive_summary_table, "data/comprehensive_summary_table.csv")
+write_csv(comprehensive_summary_table, "result/comprehensive_summary_table.csv")
 
 print(significant_features)

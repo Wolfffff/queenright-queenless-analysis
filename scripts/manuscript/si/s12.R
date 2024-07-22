@@ -10,15 +10,16 @@ source("scripts/manuscript/load_data.R")
 
 nwp <- read_csv("data/TotalNWP.csv")
 
-total_nwp_key_assort_per <- nwp[nwp$params == 'KeystoneAssPercentile',]
+total_nwp_key_assort_per <- nwp[nwp$params == "KeystoneAssPercentile", ]
 
 ggplot(total_nwp_key_assort_per, aes(x = as.integer(Hour), y = values, group = ID)) +
-  geom_jitter(aes(color = QR, alpha = 0.005, size=0.01)) +
+  geom_jitter(aes(color = QR, alpha = 0.005, size = 0.01)) +
   geom_smooth(aes(group = QR, color = QR)) +
   scale_size(range = c(.001, .2)) +
   scale_color_manual(
     labels = c("Queenless Worker"),
-    values = c("#161414")) +
+    values = c("#161414")
+  ) +
   scale_x_continuous(breaks = c(0, seq(24, 96, by = 24)), limits = c(0, NA), expand = c(0, 0)) + # Expand limits to include 0
   labs(color = "") +
   xlab("Hour") +
@@ -44,4 +45,4 @@ ggplot(total_nwp_key_assort_per, aes(x = as.integer(Hour), y = values, group = I
   # scale_y_log10() +
   guides(alpha = "none", size = "none")
 
-ggsave("figures/manuscript/si/figure_s12.jpeg", width = 4.25, height = 4.25, units = "in", dpi = 1200)
+ggsave("figures/manuscript/si/figure_s12.jpeg", width = 4.5, height = 4.5, units = "in", dpi = 600)

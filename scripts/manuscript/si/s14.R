@@ -37,7 +37,7 @@ ov_idx_by_queen_ints <- ggplot(col5_with_network_info, aes(x = interactions_with
   REMOVE_HASH_MARKS +
   theme(aspect.ratio = 1)
 
-move_perc_by_queen_ints <- ggplot(col5_with_network_info, aes(x = interactions_with_queen, y = 100*move_perc)) +
+move_perc_by_queen_ints <- ggplot(col5_with_network_info, aes(x = interactions_with_queen, y = 100 * move_perc)) +
   geom_point(size = 2, alpha = 0.5, color = blue_color, stroke = 0) +
   geom_smooth(method = "lm", se = TRUE, color = gray_color) +
   scale_color_manual(values = c(gray_color, blue_color)) +
@@ -57,6 +57,6 @@ size_by_queen_ints <- ggplot(col5_with_network_info, aes(x = interactions_with_q
   REMOVE_HASH_MARKS +
   theme(aspect.ratio = 1)
 
-plot_grid(deg_by_queen_ints, ov_idx_by_queen_ints, move_perc_by_queen_ints, size_by_queen_ints, ncol = 2,align = "hv")
+plot_grid(deg_by_queen_ints, ov_idx_by_queen_ints, move_perc_by_queen_ints, size_by_queen_ints, ncol = 2, align = "hv")
 
-ggsave("figures/manuscript/si/figure_s14.jpeg", width = 4.25, height = 4.25, units = "in", dpi = 1200)
+ggsave("figures/manuscript/si/figure_s14.jpeg", width = 4.5, height = 4.5, units = "in", dpi = 600)

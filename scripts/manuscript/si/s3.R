@@ -1,39 +1,44 @@
 library(tidyverse)
-library(cowplot)
+library(wesanderson)
+library(reshape2)
 
 source("scripts/manuscript/constants.R")
-source("scripts/manuscript/load_data.R")
 
-bds_means <- bds_means %>%
-  mutate(QR = factor(QR, levels = c(0, 1), labels = c("QL", "QR")))
+treatment <- c("QL", "QR")
+preinterp <- c(2.4638e7, 2.427e7)
+deadbeefilter <- c(2.4635e7, 2.422e7)
+speedfilter <- c(2.09e7, 2.09e7)
+sizefilter <- c(2.063e7, 2.064e7)
+spacefilter <- c(2.061e7, 2.062e7)
+interp <- c(2.54e7, 2.48e7)
 
-bds_means <- bds_means %>%
-  mutate(Trial = factor(Trial,
-    levels = c("20221123", "20221209", "20230213", "MexHotChoc", "RooibosTea"),
-    labels = c("Colony 1", "Colony 2", "Colony 3", "Colony 4", "Colony 5")
+data <- data.frame(treatment, preinterp, deadbeefilter, speedfilter, sizefilter, spacefilter, interp)
+
+df <- melt(data, id.vars = "treatment", variable.name = "filter")
+
+df <- df %>% mutate(treatment = fct_recode(treatment, "Queenright" = "QR", "Queenless" = "QL"))
+
+df <- df %>%
+  mutate(filter = fct_recode(filter,
+    "Pre-Interpolation" = "preinterp",
+    "Tag Filter" = "deadbeefilter",
+    "Speed Filter" = "speedfilter",
+    "Size Filter" = "sizefilter",
+    "Space Filter" = "spacefilter",
+    "Interpolation" = "interp"
   ))
 
-bds_means <- bds_means %>%
-  mutate(QR = fct_recode(factor(QR), "Queenright Worker" = "QR", "Queenless Worker" = "QL"))
 
-bds_means_no_q <- bds_means %>% filter(!Queen)
+ggplot(data = df, aes(x = filter, y = value)) +
+  geom_bar(stat = "identity", aes(fill = treatment)) +
+  scale_fill_manual(
+    values = c(Q_QRW_KEY_QLW$QRW, Q_QRW_KEY_QLW$QLW)
+  ) +
+  CONSISTENT_THEME_NO_ASPECT +
+  REMOVE_HASH_MARKS +
+  facet_wrap(~treatment, scales = "free_x") +
+  xlab("") +
+  ylab("Number of Instances") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-ggplot_obj <- ggplot(bds_means_no_q, aes(AntPresence, group = as.factor(QR))) +
-  geom_density(alpha = 0.4, aes(fill = as.factor(QR)), color = "black") +
-  scale_fill_manual(labels = c("Queenright Worker", "Queenless Worker"), values = c(Q_QRW_KEY_QLW$QRW, Q_QRW_KEY_QLW$QLW), guide = guide_legend(direction = "horizontal", title = "")) +
-  CONSISTENT_THEME +
-  theme(legend.position = "none") +
-  xlab("Ant. Presence") +
-  ylab("Density")
-
-
-plot_list <- bds_means_no_q %>%
-  split(.$Trial) %>%
-  map(~ ggplot_obj %+% . + facet_wrap(~Trial, scales = "free_y"))
-plot_list$`Colony 1` <- plot_list$`Colony 1` + theme(legend.position = c(.84, 1.35))
-
-# Use cowplot to arrange the plots horizontally with 5 columns
-plot_grid(plotlist = plot_list, ncol = 5, align = "hv")
-
-# Save the combined plot
-ggsave("figures/manuscript/si/figure_s3.jpeg", plot = last_plot(), width = 8.5, height = 2.6, dpi = 1200)
+ggsave("figures/manuscript/si/figure_s3.jpeg", width = 8.5, height = 4.5, dpi = 600)
