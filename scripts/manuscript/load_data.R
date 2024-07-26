@@ -9,6 +9,12 @@ bds <- read_csv("data/BigDataSheet.csv")
 bds <- bds %>%
   mutate(Trial = str_extract(Bee, ".+?(?=_)"))
 
+# Force order of Trial levels levels
+bds <- bds %>% mutate(Trial = factor(Trial,
+    levels = c("20221123", "20221209", "20230213", "MexicanHotChocolate", "RooibosTea"),
+    labels = c("Colony 1", "Colony 2", "Colony 3", "Colony 4", "Colony 5")
+  ))
+
 # Add Q_QRW_QLW_Keystone to bds
 bds <- bds %>%
   mutate(Q_QRW_QLW_Keystone = case_when(
@@ -121,3 +127,26 @@ bds_means_of_means_Q_QRW_QLW_Keystone <- bds_means %>%
   group_by(Trial, Q_QRW_QLW_Keystone) %>%
   summarise(across(c(ovary_idx, Degree, Close, Eigen, Between, QR, Queen, boutDegree, boutBetween, boutClose, boutEigen, bodyDegree, bodyBetween, bodyClose, bodyEigen, AverageBoutLength, Presence, AntPresence, mean_vel, move_perc, N90.Day4, MRSD.Day4, Initiation.Freq, clust), mean, na.rm = TRUE))
 
+
+
+nwp <- read_csv("data/TotalNWP.csv")
+
+
+# Map the trial names to human-readable colony names that match the ordering in the figure
+nwp <- nwp %>%
+  mutate(Trial = recode(Col,
+    "RooibosTea_QR_1216_1646" = "RooibosTea",
+    "RooibosTea_QL_1216_1646" = "RooibosTea",
+    "MexHotChoc_QR_1216_1646" = "MexicanHotChocolate",
+    "MexHotChoc_QL_1216_1646" = "MexicanHotChocolate",
+    "20230213_1745_AlmdudlerGspritzt_C1" = "20230213",
+    "20230213_1745_AlmdudlerGspritzt_C0" = "20230213",
+    "20221209_1613_QR" = "20221209",
+    "20221209_1613_QL" = "20221209",
+    "20221123_1543_AmericanoLatte_QR" = "20221123",
+    "20221123_1543_AmericanoLatte_QL" = "20221123"
+  )) %>%
+  mutate(Trial = factor(Trial,
+    levels = c("20221123", "20221209", "20230213", "MexicanHotChocolate", "RooibosTea"),
+    labels = c("Colony 1", "Colony 2", "Colony 3", "Colony 4", "Colony 5")
+  ))
