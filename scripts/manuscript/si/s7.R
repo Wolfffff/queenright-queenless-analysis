@@ -28,7 +28,7 @@ pca_data <- as.data.frame(data.pca$x)
 rownames(data.pca$rotation) <- human_readable_names
 
 # Create a data frame for PCA variable loadings with updated, human-readable variable names
-loadings <- as.data.frame(data.pca$rotation)
+loadings <- -as.data.frame(data.pca$rotation)
 loadings$variables <- rownames(loadings)
 
 

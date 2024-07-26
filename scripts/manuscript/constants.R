@@ -23,7 +23,7 @@ CONSISTENT_THEME <- theme_minimal() +
     axis.ticks.y.right = element_blank(),
     aspect.ratio = 1,
     axis.text.x = element_text(size = 8),
-    axis.text.y = element_text(size = 9),
+    axis.text.y = element_text(size = 8),
     plot.margin = unit(c(1, 1, 1, 1), "mm")
   )
 

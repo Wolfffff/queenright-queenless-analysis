@@ -120,3 +120,4 @@ bds_means_of_means <- bds_means_of_means %>%
 bds_means_of_means_Q_QRW_QLW_Keystone <- bds_means %>%
   group_by(Trial, Q_QRW_QLW_Keystone) %>%
   summarise(across(c(ovary_idx, Degree, Close, Eigen, Between, QR, Queen, boutDegree, boutBetween, boutClose, boutEigen, bodyDegree, bodyBetween, bodyClose, bodyEigen, AverageBoutLength, Presence, AntPresence, mean_vel, move_perc, N90.Day4, MRSD.Day4, Initiation.Freq, clust), mean, na.rm = TRUE))
+

@@ -47,7 +47,7 @@ ggplot(bds_means, aes(x = Degree, y = bodyDegree, group = Q_QRW_QLW_Keystone)) +
     legend.direction = "horizontal", # Make the legend horizontal
     legend.title = element_blank(), # Remove the legend title
     legend.spacing.x = unit(0.0, "cm"), # Reduces the space between legend labels
-    legend.key.width = unit(0.2, "cm") # Adjust the width of the legend keys (symbols)
+    # legend.key.width = unit(0.2, "cm") # Adjust the width of the legend keys (symbols)
   )
 
 ggsave("figures/manuscript/si/figure_s13.jpeg", width = 4.5, height = 4.5, units = "in", dpi = 600)
