@@ -12,10 +12,6 @@ library(cowplot)
 source("scripts/manuscript/constants.R")
 source("scripts/manuscript/load_data.R")
 
-
-# Read the data
-nwp <- read_csv("data/TotalNWP.csv")
-
 nwp_means <- nwp %>%
   group_by(Trial, QR, params) %>%
   summarise(mean_value = mean(values, na.rm = TRUE), .groups = "drop")

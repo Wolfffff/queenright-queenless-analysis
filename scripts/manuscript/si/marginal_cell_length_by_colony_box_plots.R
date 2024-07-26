@@ -21,6 +21,12 @@ source("scripts/manuscript/constants.R")
 # MexHotChoc = MexicanHotChocolate
 # RooibosTea = RooibosTea
 
+#  [1] "RooibosTea_QR_1216_1646"            "RooibosTea_QL_1216_1646"           
+#  [3] "MexHotChoc_QR_1216_1646"            "MexHotChoc_QL_1216_1646"           
+#  [5] "20230213_1745_AlmdudlerGspritzt_C1" "20230213_1745_AlmdudlerGspritzt_C0"
+#  [7] "20221209_1613_QR"                   "20221209_1613_QL"                  
+#  [9] "20221123_1543_AmericanoLatte_QR"    "20221123_1543_AmericanoLatte_QL"
+
 # Read the CSV file
 wing_morphometrics <- read_csv("data/2023_macros_qr_v_ql_wings.csv")
 
