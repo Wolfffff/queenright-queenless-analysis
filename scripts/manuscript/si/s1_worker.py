@@ -9,13 +9,13 @@ mpl.style.use("seaborn-v0_8-deep")
 sleap.versions()
 
 metrics = sleap.load_metrics(
-    "/Users/wolf/Downloads/models_for_scott/221025_172051_os4.centered_instance",
+    "/Users/wolf/Downloads/drive-download-20240723T134021Z-001/Worker.centered_instance",
     split="val",
 )
 
 # It doesn't actually matter which slp file we read since we just need the node names.
 labels = sleap.load_file(
-    "/Users/wolf/Downloads/models_for_scott/221025_172051_os4.centered_instance/labels_gt.val.slp"
+    "/Users/wolf/Downloads/drive-download-20240723T134021Z-001/Worker.centered_instance/labels_gt.val.slp"
 )
 node_names = labels.skeleton.node_names
 
