@@ -11,16 +11,21 @@ This repository contains the code and data for the paper “Social Network Chang
 
 ## Directory Structure
 
-* `script`
-  * Contains all the scripts used for data processing, analysis, and visualization.
+* `scripts`
+  * Contains all the scripts used for analysis and visualization.
 * `figures`
-  * Includes all the figures used in the paper, as well as scripts to generate these figures.
+  * Includes all the figures used in the paper along with some additional visualizations.
 * `data`
   * Raw and processed data files used in the analysis.
-* `results:
+* `results`:
   * Outputs from the analysis, including processed data and summary statistics.
 
-### BibTeX:
+## Other Relevant Repositories
+
+* [SocioQC](https://github.com/itraniello/socioQC)
+  * Provides key functions for quality control and data processing of tracking data. Additional, contains information about the recording setup and video post-processing.
+
+## BibTeX:
 
 ```bibtex
 @article{ruttenberg2024social,
