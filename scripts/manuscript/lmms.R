@@ -70,3 +70,50 @@ significant_features <- comprehensive_summary_table %>%
 write_csv(comprehensive_summary_table, "result/comprehensive_summary_table.csv")
 
 print(significant_features)
+
+
+# Compare variance between QR_QL dist
+
+# bds_no_queens
+
+source("scripts/manuscript/load_data.R")
+library(lme4)
+library(lmerTest)
+# get sd per group
+bds_means_no_queens <- bds_means %>%
+  filter(Queen == 0)
+
+# Get sd per group
+sd_per_group <- bds_means_no_queens %>%
+  group_by(Trial, QR_Queen_Condition) %>%
+  summarise(sd = sd(Degree, na.rm = TRUE), Trial = first(Trial), QR_Queen_Condition = first(QR_Queen_Condition))
+
+lmm_model <- lmer(sd ~ QR_Queen_Condition + (1 | Trial), data = sd_per_group)
+
+summary(lmm_model)
+
+
+# Compare variance between QR_QL dist using Levene's and Brown-Forsythe tests
+library(car)
+
+# Fit a linear model with Trial as a factor
+lm_model <- lm(Degree ~ Trial, data = bds_means_no_queens)
+
+# Extract residuals
+bds_means_no_queens$residuals <- residuals(lm_model)
+
+# Perform Levene's Test on residuals
+levene_test_result <- leveneTest(residuals ~ QR_Queen_Condition, data = bds_means_no_queens)
+print(levene_test_result)
+
+# Function for Brown-Forsythe Test
+brown_forsythe_test <- function(response, group) {
+  med <- median(response)
+  group_med <- tapply(response, group, median)
+  abs_dev <- abs(response - group_med[group])
+  leveneTest(abs_dev ~ group)
+}
+
+# Perform Brown-Forsythe Test on residuals
+brown_forsythe_test_result <- brown_forsythe_test(bds_means_no_queens$residuals, bds_means_no_queens$QR_Queen_Condition)
+print(brown_forsythe_test_result)

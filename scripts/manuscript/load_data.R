@@ -58,11 +58,21 @@ bds_means <- bds_means %>%
   mutate(ID = paste(Trial, QR_Queen_Condition))
 
 bds_means$ovary_idx <- bds_means$ovary_idx
-# Calculate mean of means for each ID
+
+
+se <- function(x) {
+  tryCatch({
+    sd(x, na.rm = TRUE) / sqrt(length(na.omit(x)))
+  }, error = function(e) {
+    NA
+  })
+}
+
 bds_means_of_means <- bds_means %>%
   group_by(ID, Trial) %>%
-  summarise(across(c(ovary_idx, Degree, Close, Eigen, Between, QR, Queen, boutDegree, boutBetween, boutClose, boutEigen, bodyDegree, bodyBetween, bodyClose, bodyEigen, AverageBoutLength, Presence, AntPresence, mean_vel, move_perc, N90.Day4, MRSD.Day4, Initiation.Freq, clust), mean, na.rm = TRUE))
-
+  summarise(across(c(ovary_idx, Degree, Close, Eigen, Between, QR, Queen, boutDegree, boutBetween, boutClose, boutEigen, bodyDegree, bodyBetween, bodyClose, bodyEigen, AverageBoutLength, Presence, AntPresence, mean_vel, move_perc, N90.Day4, MRSD.Day4, Initiation.Freq, clust), 
+                   list(mean = ~mean(.x, na.rm = TRUE), se = se))) %>%
+  rename_with(~str_replace(., "_mean", ""), ends_with("_mean"))
 # Add QR_Queen_Condition and Q_QRW_QLW_Keystone to each level
 bds <- bds %>%
   mutate(QR_Queen_Condition = case_when(
