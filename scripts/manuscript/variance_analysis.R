@@ -8,8 +8,6 @@ library(lmerTest)
 
 source("scripts/manuscript/constants.R")
 source("scripts/manuscript/load_data.R")
-# Get paired variance difference mean
-
 bds_means <- bds_means %>%
   mutate(QR_Queen_Condition = case_when(
     QR_Queen_Condition == "Queenless" ~ "Queenless\nWorker",
@@ -57,8 +55,10 @@ data.frame(perm_mean_var_diffs) %>%
   geom_histogram(bins = 20, fill = "darkgrey") +
   geom_vline(xintercept = mean_var_diff, color = "red", size = 1) +
   CONSISTENT_THEME +
-  labs(title = "Permutation distribution of mean variance difference", x = "Mean variance difference")
-
+  labs(
+    title = "Permutation Distribution of Paired Mean Variance Difference (Queenless Workers - Queenright Workers)",
+    x = "Mean Difference of Variances"
+  )
 pval <- (p_value <- sum(perm_mean_var_diffs < mean_var_diff) / n_perm)
 pval
 
