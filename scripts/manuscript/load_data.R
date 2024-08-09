@@ -3,7 +3,7 @@ library(readr)
 library(stringr)
 
 # Read the data
-bds <- read_csv("data/BigDataSheet.csv")
+bds <- read_csv("data/data_sheet.csv")
 
 # Add Trial information to bds
 bds <- bds %>%
@@ -139,7 +139,7 @@ bds_means_of_means_Q_QRW_QLW_Keystone <- bds_means %>%
 
 
 
-nwp <- read_csv("data/TotalNWP.csv")
+nwp <- read_csv("data/network_parameters.csv")
 
 
 # Map the trial names to human-readable colony names that match the ordering in the figure
