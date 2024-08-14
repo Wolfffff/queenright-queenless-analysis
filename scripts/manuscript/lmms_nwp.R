@@ -12,18 +12,29 @@ source("scripts/manuscript/constants.R")
 source("scripts/manuscript/load_data.R")
 
 
-TotalNWP_Wider <- nwp %>%
+nwp$ID_Time <- paste(nwp$ID, nwp$Hour)
+
+nwpModularity <- nwp[nwp$params == "Modularity", ]
+nwpEfficiency <- nwp[nwp$params == "GlobalEfficiency", ]
+nwpTransitivity <- nwp[nwp$params == "Transitivity", ]
+nwpClustering <- nwp[nwp$params == "Average Clustering", ]
+nwpAssortativity <- nwp[nwp$params == "Assortativity", ]
+nwp_filtered <- nwp[nwp$params != "KeystoneAssortativity", ]
+nwp_filtered <- nwp_filtered[nwp_filtered$params != "KeystoneAssPercentile", ]
+
+nwp_wide <- nwp_filtered %>%
   mutate(n = 1) %>%
   tidyr::pivot_wider(names_from = params, values_from = values, values_fill = NA)
+names(nwp_wide)[names(nwp_wide) == "Average Clustering"] <- "Average.Clustering"
 
-names(TotalNWP_Wider)[names(TotalNWP_Wider) == "Average Clustering"] <- "Average.Clustering"
-TotalNWP_Merge <- TotalNWP_Wider %>%
-  group_by(ID) %>%
+
+
+nwp_merge <- nwp_wide %>%
+  group_by(ID_Time) %>%
   summarise_all(na.omit)
 
-TotalNWP_One <- TotalNWP_Merge[TotalNWP_Merge$X == 1, ]
 
-TotalNWP_Pooled <- TotalNWP_One %>%
+nwp_Pooled <- nwp_One %>%
   filter(TimeOfDay == "Day") %>%
   mutate(Day_Zeit = paste(Day, Zeit, sep = "_"))
 
@@ -34,7 +45,7 @@ features <- c("Modularity", "GlobalEfficiency", "Transitivity", "Average.Cluster
 # Function to fit and summarize the model for each feature
 fit_and_summarize <- function(feature) {
   formula <- as.formula(paste(feature, "~ 1 + QR + (1 | Trial) + (1 | QR:Trial) + (1 | Day_Zeit) + (1 | Day_Zeit:Trial)"))
-  model <- lmer(formula, data = TotalNWP_Pooled)
+  model <- lmer(formula, data = nwp_Pooled)
   tidy_model <- tidy(model, effects = "fixed", conf.int = TRUE) %>%
     mutate(feature = feature, model_spec = paste(deparse(formula), collapse = " "))
   return(tidy_model)
@@ -64,4 +75,5 @@ print(comprehensive_summary_table)
 significant_features <- comprehensive_summary_table %>%
   filter(p.value < 0.05) %>%
   select(feature, term, p.value)
+
 print(significant_features)
