@@ -1,17 +1,19 @@
 library(dplyr)
 library(readr)
 library(stringr)
+library(forcats)
 
 # Read the data
 bds <- read_csv("data/data_sheet.csv")
+# If we want to filter to day only...
+bds <- bds[bds$TimeOfDay == "Day",]
 
 # Add Trial information to bds
 bds <- bds %>%
   mutate(Trial = str_extract(Bee, ".+?(?=_)"))
 
-# Force order of Trial levels levels
 bds <- bds %>% mutate(Trial = factor(Trial,
-    levels = c("20221123", "20221209", "20230213", "MexicanHotChocolate", "RooibosTea"),
+    levels = c("20221123", "MexicanHotChocolate", "20221209", "RooibosTea", "20230213"),
     labels = c("Colony 1", "Colony 2", "Colony 3", "Colony 4", "Colony 5")
   ))
 
@@ -160,3 +162,5 @@ nwp <- nwp %>%
     levels = c("20221123", "20221209", "20230213", "MexicanHotChocolate", "RooibosTea"),
     labels = c("Colony 1", "Colony 2", "Colony 3", "Colony 4", "Colony 5")
   ))
+
+nwp$QR <- factor(nwp$QR, levels = c(TRUE, FALSE), labels = c("Queenright", "Queenless"))

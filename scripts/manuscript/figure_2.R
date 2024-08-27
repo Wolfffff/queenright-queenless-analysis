@@ -4,11 +4,22 @@ library(tidyverse)
 library(stringr)
 library(wesanderson)
 library(cowplot)
+library(ggbeeswarm)
 
 source("scripts/manuscript/constants.R")
 source("scripts/manuscript/load_data.R")
 
 # Reorder and rename levels of bds$QR_Queen_Condition
+
+bds_means <- bds_means %>%
+  mutate(QR_Queen_Condition = case_when(
+    QR_Queen_Condition == "Queenless" ~ "Queenless\nWorker",
+    QR_Queen_Condition == "Queenright" ~ "Queenright\nWorker",
+    TRUE ~ QR_Queen_Condition # This retains the names for "Queen" and "Keystone"
+  )) %>%
+  mutate(QR_Queen_Condition = factor(QR_Queen_Condition, levels = c("Queen", "Queenright\nWorker", "Queenless\nWorker")))
+
+
 # Map the categories to new names
 bds_means_of_means <- bds_means_of_means %>%
   mutate(QR_Queen_Condition = case_when(
@@ -22,11 +33,11 @@ bds_means_of_means <- bds_means_of_means %>%
 dodge <- position_dodge(width = 0.6)
 
 # Plot Degree with SE error bars
-plot_degree <- ggplot(bds_means_of_means, aes(x = QR_Queen_Condition, y = Degree)) +
-  geom_errorbar(aes(ymin = Degree - 1.96 * Degree_se, ymax = Degree + 1.96 * Degree_se, group = Trial),
-    position = dodge, width = 0, color = "black", linewidth=0.4
-  ) +
-  geom_point(aes(fill = Trial), shape = 21, color = "black", position = dodge, size = 2, stroke = 0.2) +
+plot_degree <- ggplot(bds_means %>% filter(QR_Queen_Condition != "Queen"), aes(x = QR_Queen_Condition, y = Degree)) +
+  geom_line(data = bds_means_of_means, aes(group = Trial), color = "darkgray", linewidth = 0.2) +
+  geom_point(data = bds_means_of_means %>% filter(Queen == 1), aes(color = Trial, fill = Trial), size = 3, shape = 21, stroke = 0.2, position = position_dodge(width = 0), color = "black") +
+  geom_beeswarm(aes(color = Trial), stroke = 0, size = 1, alpha = .2, method = "hex") +
+  geom_point(data = bds_means_of_means %>% filter(Queen == 0), aes(color = Trial, fill = Trial), size = 3, shape = 21, stroke = 0.2, position = position_dodge(width = 0), color = "black") +
   scale_color_manual(
     values = COLONY_COLORS,
     labels = c("Col 1", "Col 2", "Col 3", "Col 4", "Col 5") # Replace with your actual labels
@@ -42,15 +53,16 @@ plot_degree <- ggplot(bds_means_of_means, aes(x = QR_Queen_Condition, y = Degree
     legend.spacing.x = unit(0.2, "cm"), # Reduces the space between legend labels
     legend.margin = margin(t = 0, r = 0, b = 0, l = 0), # Reduces the margin around the legend
     legend.key.width = unit(0.25, "cm"), # Reduces the width of the legend keys
-    legend.key.height = unit(0.25, "cm") # Reduces the height of the legend keys
+    legend.key.height = unit(0.25, "cm"), # Reduces the height of the legend keys
+    axis.title.y = element_text(size = 8)
   )
 
 # Plot Initiation.Freq with SE error bars
-plot_init_freq <- ggplot(bds_means_of_means, aes(x = QR_Queen_Condition, y = Initiation.Freq)) +
-  geom_errorbar(aes(ymin = Initiation.Freq - 1.96 * Initiation.Freq_se, ymax = Initiation.Freq + 1.96 * Initiation.Freq_se, group = Trial),
-    position = dodge, width = 0, color = "black", linewidth=0.4
-  ) +
-  geom_point(aes(fill = Trial), shape = 21, color = "black", position = dodge, size = 2, stroke = 0.2) +
+plot_init_freq <- ggplot(bds_means %>% filter(QR_Queen_Condition != "Queen"), aes(x = QR_Queen_Condition, y = Initiation.Freq)) +
+  geom_line(data = bds_means_of_means, aes(group = Trial), color = "darkgray", linewidth = 0.2) +
+  geom_point(data = bds_means_of_means %>% filter(Queen == 1), aes(color = Trial, fill = Trial), size = 3, shape = 21, stroke = 0.2, position = position_dodge(width = 0), color = "black") +
+  geom_beeswarm(aes(color = Trial), stroke = 0, size = 1, alpha = .2, method = "hex") +
+  geom_point(data = bds_means_of_means %>% filter(Queen == 0), aes(color = Trial, fill = Trial), size = 3, shape = 21, stroke = 0.2, position = position_dodge(width = 0), color = "black") +
   scale_color_manual(values = COLONY_COLORS) +
   scale_fill_manual(values = COLONY_COLORS) +
   xlab("") +
@@ -58,11 +70,11 @@ plot_init_freq <- ggplot(bds_means_of_means, aes(x = QR_Queen_Condition, y = Ini
   CONSISTENT_THEME
 
 # Plot N90.Day4 with SE error bars
-plot_n90_day4 <- ggplot(bds_means_of_means, aes(x = QR_Queen_Condition, y = N90.Day4, color = Trial)) +
-  geom_errorbar(aes(ymin = N90.Day4 - 1.96 * N90.Day4_se, ymax = N90.Day4 + 1.96 * N90.Day4_se, group = Trial),
-    position = dodge, width = 0, color = "black", linewidth=0.4
-  ) +
-  geom_point(aes(fill = Trial), shape = 21, color = "black", position = dodge, size = 2, stroke = 0.2) +
+plot_n90_day4 <- ggplot(bds_means %>% filter(QR_Queen_Condition != "Queen"), aes(x = QR_Queen_Condition, y = N90.Day4)) +
+  geom_line(data = bds_means_of_means, aes(group = Trial), color = "darkgray", linewidth = 0.2) +
+  geom_point(data = bds_means_of_means %>% filter(Queen == 1), aes(color = Trial, fill = Trial), size = 3, shape = 21, stroke = 0.2, position = position_dodge(width = 0), color = "black") +
+  geom_beeswarm(aes(color = Trial), stroke = 0, size = 1, alpha = .2, method = "hex") +
+  geom_point(data = bds_means_of_means %>% filter(Queen == 0), aes(color = Trial, fill = Trial), size = 3, shape = 21, stroke = 0.2, position = position_dodge(width = 0), color = "black") +
   scale_color_manual(values = COLONY_COLORS) +
   scale_fill_manual(values = COLONY_COLORS) +
   xlab("") +
@@ -121,4 +133,4 @@ final_plot <- plot_grid(plots[[2]], top_row, ncol = 1, rel_heights = c(1, 1))
 
 # Save the combined plot
 # Adjust the plot saving command to include margins
-ggsave("figures/manuscript/figure_2_ci.jpeg", plot = final_plot + theme(plot.margin = margin(1, 1, 1, 1, "cm")), width = 8.5, height = 6, dpi = 600)
+ggsave("figures/manuscript/figure_2.jpeg", plot = final_plot, width = 8.5, height = 6, dpi = 600)
