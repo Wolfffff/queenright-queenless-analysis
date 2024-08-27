@@ -165,3 +165,4 @@ raw_data/
 .DS_Store
 figures/*.jpg
 .vscode/launch.json
+figures/manuscript/hairballs/*

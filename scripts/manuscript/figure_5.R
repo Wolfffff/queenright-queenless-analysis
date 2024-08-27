@@ -16,22 +16,21 @@ nwp_means <- nwp %>%
   group_by(Trial, QR, params) %>%
   summarise(mean_value = mean(values, na.rm = TRUE), .groups = "drop")
 
-
 # nwp_means_transitivity
 nwp_means_transitivity <- nwp_means %>%
   filter(params == "Transitivity")
 
 plot_trans <- ggplot(nwp_means_transitivity, aes(x = QR, y = mean_value)) +
   geom_line(aes(group = Trial), color = "darkgray", linewidth = 0.2) +
-  geom_point(aes(color = Trial), size = 3) +
-  scale_color_manual(values = COLONY_COLORS) +
+  geom_point(aes(color = Trial, fill = Trial), size = 3,shape = 21, stroke = 0.2, color = "black") +
+  scale_fill_manual(values = COLONY_COLORS) +
   xlab("") +
   labs(color = "Source Colony") +
   ylab("Transitivity") +
   theme_minimal() +
   CONSISTENT_THEME +
   scale_x_discrete(labels = c("Queenright\nNetwork", "Queenless\nNetwork")) + # Update x-axis labels to be two lines
-  guides(color = guide_legend(title.position = "top", title.hjust = 0.5))
+  guides(fill = guide_legend(title.position = "top", title.hjust = 0.5))
 # nwp_means_efficiency
 
 nwp_means_eff <- nwp_means %>%
@@ -39,8 +38,8 @@ nwp_means_eff <- nwp_means %>%
 
 plot_eff <- ggplot(nwp_means_eff, aes(x = QR, y = mean_value)) +
   geom_line(aes(group = Trial), color = "darkgray", linewidth = 0.2) +
-  geom_point(aes(color = Trial), size = 3) +
-  scale_color_manual(values = COLONY_COLORS) +
+  geom_point(aes(color = Trial, fill = Trial), size = 3,shape = 21, stroke = 0.2, color = "black") +
+  scale_fill_manual(values = COLONY_COLORS) +
   xlab("") +
   labs(color = "Source Colony") +
   ylab("Efficiency") +
@@ -54,8 +53,8 @@ nwp_means_assortativity <- nwp_means %>%
 
 plot_assort <- ggplot(nwp_means_assortativity, aes(x = QR, y = mean_value)) +
   geom_line(aes(group = Trial), color = "darkgray", linewidth = 0.2) +
-  geom_point(aes(color = Trial), size = 3) +
-  scale_color_manual(values = COLONY_COLORS) +
+  geom_point(aes(color = Trial, fill = Trial), size = 3,shape = 21, stroke = 0.2, color = "black") +
+  scale_fill_manual(values = COLONY_COLORS) +
   xlab("") +
   labs(color = "Source Colony") +
   ylab("Degree Assortativity") +

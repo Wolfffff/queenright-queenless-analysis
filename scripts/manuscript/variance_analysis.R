@@ -8,6 +8,7 @@ library(lmerTest)
 
 source("scripts/manuscript/constants.R")
 source("scripts/manuscript/load_data.R")
+
 bds_means <- bds_means %>%
   mutate(QR_Queen_Condition = case_when(
     QR_Queen_Condition == "Queenless" ~ "Queenless\nWorker",
@@ -22,7 +23,7 @@ bds_means <- bds_means %>%
 
 bds_means$condition <- as.integer(factor(bds_means$QR)) - 1
 bds_means$group <- as.integer(factor(bds_means$Trial))
-bds_means$value <- bds_means$Degree
+bds_means$value <- bds_means$clust
 
 n_groups <- length(unique(bds_means$group))
 n_conditions <- length(unique(bds_means$condition))
@@ -39,7 +40,7 @@ mean_var_diff <- mean(var_diffs)
 
 # Generate Null distribution of paired variance difference mean
 perm_data <- data
-n_perm <- 100000
+n_perm <- 10000
 perm_mean_var_diffs <- rep(NA, n_perm)
 for (i in 1:n_perm) {
   p_var_diffs <- rep(NA, n_groups)

@@ -6,8 +6,8 @@ import numpy as np
 
 # Hardcoded values
 FILENAMES = [
-    "data/RooibosTea_QR_1216_1646_Time_AllDays.gml",
-    "data/RooibosTea_QL_1216_1646_Time_AllDays.gml",
+    "data/RooibosTea_QR_1216_1646_Time_DayOnly.gml",
+    "data/RooibosTea_QL_1216_1646_Time_DayOnly.gml",
 ]
 FOCAL_NODES = [
     ["ArUcoTag#52"],  # Replace with actual focal nodes for the first file
