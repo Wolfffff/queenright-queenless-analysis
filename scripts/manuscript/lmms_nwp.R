@@ -34,7 +34,7 @@ nwp_merge <- nwp_wide %>%
   summarise_all(na.omit)
 
 
-nwp_Pooled <- nwp_One %>%
+nwp_Pooled <- nwp_merge %>%
   filter(TimeOfDay == "Day") %>%
   mutate(Day_Zeit = paste(Day, Zeit, sep = "_"))
 
