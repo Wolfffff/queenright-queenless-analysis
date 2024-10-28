@@ -4,9 +4,7 @@ library(stringr)
 library(forcats)
 
 # Read the data
-bds <- read_csv("data/data_sheet.csv")
-# If we want to filter to day only...
-bds <- bds[bds$TimeOfDay == "Day",]
+bds <- read_csv("data/old_data_sheet.csv")
 
 # Add Trial information to bds
 bds <- bds %>%
@@ -29,6 +27,31 @@ bds <- bds %>%
   mutate(Q_QRW_QLW_Keystone = factor(Q_QRW_QLW_Keystone,
     levels = c("Queenless", "Queenright", "Queen", "Keystone")
   ))
+
+
+# Keep a copy of the original data
+bds_all <- bds 
+
+# Add QR_Queen_Condition and Q_QRW_QLW_Keystone to each level
+bds_all <- bds_all %>%
+  mutate(QR_Queen_Condition = case_when(
+    QR == 0 & Queen == 0 ~ "Queenless",
+    QR == 1 & Queen == 0 ~ "Queenright",
+    Queen == 1 ~ "Queen"
+  ), Q_QRW_QLW_Keystone = case_when(
+    QR == 0 & Infl == 0 ~ "Queenless",
+    QR == 1 & Queen == 0 ~ "Queenright",
+    Queen == 1 ~ "Queen",
+    QR == 0 & Infl == 1 ~ "Keystone",
+    TRUE ~ "NA_character_" # This handles any other case, which shouldn't exist in your scenario
+  )) %>%
+  mutate(
+    QR_Queen_Condition = factor(QR_Queen_Condition, levels = c("Queen", "Queenright", "Queenless")),
+    Q_QRW_QLW_Keystone = factor(Q_QRW_QLW_Keystone, levels = c("Queen", "Queenright", "Keystone", "Queenless"))
+  )
+
+# If we want to filter to day only...
+bds <- bds[bds$TimeOfDay == "Day",]
 
 # Calculate mean values of QR, Queen, and Degree for each Bee (QR and Queen are binary so mean is the value itself)
 bds_means <- bds %>%
