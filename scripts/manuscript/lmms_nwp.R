@@ -77,3 +77,6 @@ significant_features <- comprehensive_summary_table %>%
   select(feature, term, p.value)
 
 print(significant_features)
+
+write_csv(comprehensive_summary_table_, "results/comprehensive_summary_table_nwp.csv")
+

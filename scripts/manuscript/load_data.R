@@ -4,16 +4,16 @@ library(stringr)
 library(forcats)
 
 # Read the data
-bds <- read_csv("data/old_data_sheet.csv")
+bds <- read_csv("data/data_sheet.csv")
 
 # Add Trial information to bds
 bds <- bds %>%
   mutate(Trial = str_extract(Bee, ".+?(?=_)"))
 
 bds <- bds %>% mutate(Trial = factor(Trial,
-    levels = c("20221123", "MexicanHotChocolate", "20221209", "RooibosTea", "20230213"),
-    labels = c("Colony 1", "Colony 2", "Colony 3", "Colony 4", "Colony 5")
-  ))
+  levels = c("20221123", "MexicanHotChocolate", "20221209", "RooibosTea", "20230213"),
+  labels = c("Colony 1", "Colony 2", "Colony 3", "Colony 4", "Colony 5")
+))
 
 # Add Q_QRW_QLW_Keystone to bds
 bds <- bds %>%
@@ -30,7 +30,7 @@ bds <- bds %>%
 
 
 # Keep a copy of the original data
-bds_all <- bds 
+bds_all <- bds
 
 # Add QR_Queen_Condition and Q_QRW_QLW_Keystone to each level
 bds_all <- bds_all %>%
@@ -51,7 +51,7 @@ bds_all <- bds_all %>%
   )
 
 # If we want to filter to day only...
-bds <- bds[bds$TimeOfDay == "Day",]
+bds <- bds[bds$TimeOfDay == "Day", ]
 
 # Calculate mean values of QR, Queen, and Degree for each Bee (QR and Queen are binary so mean is the value itself)
 bds_means <- bds %>%
@@ -86,18 +86,23 @@ bds_means$ovary_idx <- bds_means$ovary_idx
 
 
 se <- function(x) {
-  tryCatch({
-    sd(x, na.rm = TRUE) / sqrt(length(na.omit(x)))
-  }, error = function(e) {
-    NA
-  })
+  tryCatch(
+    {
+      sd(x, na.rm = TRUE) / sqrt(length(na.omit(x)))
+    },
+    error = function(e) {
+      NA
+    }
+  )
 }
 
 bds_means_of_means <- bds_means %>%
   group_by(ID, Trial) %>%
-  summarise(across(c(ovary_idx, Degree, Close, Eigen, Between, QR, Queen, boutDegree, boutBetween, boutClose, boutEigen, bodyDegree, bodyBetween, bodyClose, bodyEigen, AverageBoutLength, Presence, AntPresence, mean_vel, move_perc, N90.Day4, MRSD.Day4, Initiation.Freq, clust), 
-                   list(mean = ~mean(.x, na.rm = TRUE), se = se))) %>%
-  rename_with(~str_replace(., "_mean", ""), ends_with("_mean"))
+  summarise(across(
+    c(ovary_idx, Degree, Close, Eigen, Between, QR, Queen, boutDegree, boutBetween, boutClose, boutEigen, bodyDegree, bodyBetween, bodyClose, bodyEigen, AverageBoutLength, Presence, AntPresence, mean_vel, move_perc, N90.Day4, MRSD.Day4, Initiation.Freq, clust),
+    list(mean = ~ mean(.x, na.rm = TRUE), se = se)
+  )) %>%
+  rename_with(~ str_replace(., "_mean", ""), ends_with("_mean"))
 # Add QR_Queen_Condition and Q_QRW_QLW_Keystone to each level
 bds <- bds %>%
   mutate(QR_Queen_Condition = case_when(

@@ -17,7 +17,7 @@ library(lmerTest)
 
 prefixes <- c("RooibosTea_QR_1216_1646", "RooibosTea_QL_1216_1646", "MexHotChoc_QR_1216_1646", "MexHotChoc_QL_1216_1646", "20230213_1745_AlmdudlerGspritzt_C1", "20230213_1745_AlmdudlerGspritzt_C0", "20221209_1613_QR", "20221209_1613_QL", "20221123_1543_AmericanoLatte_QR", "20221123_1543_AmericanoLatte_QL")
 setwd("~/BigDataSheetDeDup_100924/")
-#setwd("~/NWP_073024/")
+# setwd("~/NWP_073024/")
 Start <- 0
 for (i in 1:10) {
   for (j in 1:95) {
@@ -58,19 +58,19 @@ TotalNWPEfficiency <- TotalNWP[TotalNWP$params == "GlobalEfficiency", ]
 TotalNWPTransitivity <- TotalNWP[TotalNWP$params == "Transitivity", ]
 TotalNWPClustering <- TotalNWP[TotalNWP$params == "Average Clustering", ]
 TotalNWPAssortativity <- TotalNWP[TotalNWP$params == "Assortativity", ]
-TotalNWP_New = TotalNWP[TotalNWP$params != 'KeystoneAssortativity',]
-TotalNWP_Wider = TotalNWP_New %>%
+TotalNWP_New <- TotalNWP[TotalNWP$params != "KeystoneAssortativity", ]
+TotalNWP_Wider <- TotalNWP_New %>%
   mutate(n = 1) %>%
   tidyr::pivot_wider(names_from = params, values_from = values, values_fill = NA)
-names(TotalNWP_Wider)[names(TotalNWP_Wider) == 'Average Clustering'] <- 'Average.Clustering'
+names(TotalNWP_Wider)[names(TotalNWP_Wider) == "Average Clustering"] <- "Average.Clustering"
 
 
 
-TotalNWP_Merge = TotalNWP_Wider %>%
-    group_by(ID) %>%
-    summarise_all(na.omit)
+TotalNWP_Merge <- TotalNWP_Wider %>%
+  group_by(ID) %>%
+  summarise_all(na.omit)
 
-TotalNWP_One = TotalNWP_Merge[TotalNWP_Merge$X == 1,]
+TotalNWP_One <- TotalNWP_Merge[TotalNWP_Merge$X == 1, ]
 
 
 TotalNWP_Pooled <- TotalNWP_One %>%

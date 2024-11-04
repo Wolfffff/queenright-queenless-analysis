@@ -1,19 +1,19 @@
-BDSMeans$OvaryIndex = BDSMeans$AverageOvaryWidth/BDSMeans$AverageWingLength
+BDSMeans$OvaryIndex <- BDSMeans$AverageOvaryWidth / BDSMeans$AverageWingLength
 
 BDSMeans <- BDSMeans %>%
   mutate(QR_Queen_Condition = case_when(
-    QR==0 & Queen==0 ~ "Queenless",
-    QR==1 & Queen==0 ~ "Queenright",
-    Queen==1 ~ "Queen",
-    TRUE ~ NA_character_  # This handles any other case, which shouldn't exist in your scenario
+    QR == 0 & Queen == 0 ~ "Queenless",
+    QR == 1 & Queen == 0 ~ "Queenright",
+    Queen == 1 ~ "Queen",
+    TRUE ~ NA_character_ # This handles any other case, which shouldn't exist in your scenario
   )) %>%
-  mutate(QR_Queen_Condition = factor(QR_Queen_Condition, levels = c( "Queenright","Queenless", "Queen")))
+  mutate(QR_Queen_Condition = factor(QR_Queen_Condition, levels = c("Queenright", "Queenless", "Queen")))
 
-BDSMeansOvNoQueen = BDSMeans[BDSMeans$Queen==FALSE,]
+BDSMeansOvNoQueen <- BDSMeans[BDSMeans$Queen == FALSE, ]
 
-ggplot(BDSMeansOvNoQueen, aes(AverageWingLength, fill = QR_Queen_Condition)) + 
-  geom_density(alpha = 0.2) + 
-  scale_fill_manual(labels = c("Queenless Worker","Queenright Worker"), values = c("#161414","#429CF0"))+
+ggplot(BDSMeansOvNoQueen, aes(AverageWingLength, fill = QR_Queen_Condition)) +
+  geom_density(alpha = 0.2) +
+  scale_fill_manual(labels = c("Queenless Worker", "Queenright Worker"), values = c("#161414", "#429CF0")) +
   theme_minimal() +
   theme(
     text = element_text(size = 16),
@@ -29,4 +29,4 @@ ggplot(BDSMeansOvNoQueen, aes(AverageWingLength, fill = QR_Queen_Condition)) +
     axis.ticks.y.right = element_blank(), # Remove right y-axis ticks
     aspect.ratio = 1
   ) +
-  facet_wrap(~Trial, scales="free_y")
+  facet_wrap(~Trial, scales = "free_y")

@@ -2,7 +2,6 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 
-
 # Hardcoded values
 FILENAMES = [
     "data/gmls/RooibosTea_QR_1216_1646_Time.daysonly.gml",
