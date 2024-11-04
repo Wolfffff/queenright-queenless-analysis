@@ -66,4 +66,4 @@ significant_features <- comprehensive_summary_table_inf %>%
 
 print(significant_features)
 
-write_csv(comprehensive_summary_table_inf, "output/comprehensive_summary_table_inf.csv")
+write_csv(comprehensive_summary_table_inf, "results/comprehensive_summary_table_inf.csv")
