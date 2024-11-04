@@ -75,9 +75,10 @@ plot_degree <- ggplot(bds_means_with_diff %>% filter(QR_Queen_Condition != "Quee
 # Plot Initiation.Freq
 plot_init_freq <- ggplot(bds_means_of_means, aes(x = QR_Queen_Condition, y = N90.Day4, color = Trial)) +
   # geom_line(aes(group = Trial), color = "darkgray", linewidth = 0.2, position = position_dodge(width = 0.5)) +
-  geom_errorbar(aes(ymin = N90.Day4 - N90.Day4_se, ymax = N90.Day4 + N90.Day4_se, group = Trial), 
-                position = position_dodge(width = 0.5), width = 0, color = "black") +
-  geom_point(aes(fill = Trial), shape= 21, color="black", position = position_dodge(width = 0.5), size = 2.5, stroke = 0.2) +
+  geom_errorbar(aes(ymin = N90.Day4 - N90.Day4_se, ymax = N90.Day4 + N90.Day4_se, group = Trial),
+    position = position_dodge(width = 0.5), width = 0, color = "black"
+  ) +
+  geom_point(aes(fill = Trial), shape = 21, color = "black", position = position_dodge(width = 0.5), size = 2.5, stroke = 0.2) +
   scale_color_manual(values = COLONY_COLORS) +
   scale_fill_manual(values = COLONY_COLORS) +
   xlab("") +
@@ -100,4 +101,3 @@ plots <- plot_grid(plot_degree, plot_init_freq, ncol = 2, align = "vh")
 
 # Save the combined plot
 ggsave("figures/scratch.jpeg", plot = plots + theme(plot.margin = margin(1, 1, 1, 1, "cm")), width = 8.5, height = 4, dpi = 600)
- 

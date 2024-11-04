@@ -1,0 +1,13 @@
+feature,model_spec,term,estimate,std.error,statistic,p.value
+Assortativity,Assortativity ~ 1 + QR + (1 | Trial) + (1 | QR:Trial) + (1 |      Day_Zeit) + (1 | Day_Zeit:Trial),(Intercept),-0.026313269802973372,0.0013734687331666245,-19.158259061570597,6.748992517593943e-9
+Assortativity,Assortativity ~ 1 + QR + (1 | Trial) + (1 | QR:Trial) + (1 |      Day_Zeit) + (1 | Day_Zeit:Trial),QRQueenless,0.004719767001531209,0.0012533707376947954,3.765659161799025,0.019670249928940762
+Average.Clustering,Average.Clustering ~ 1 + QR + (1 | Trial) + (1 | QR:Trial) +      (1 | Day_Zeit) + (1 | Day_Zeit:Trial),(Intercept),0.9226969220598632,0.009718258393723483,94.94467883831788,3.81036459147511e-14
+Average.Clustering,Average.Clustering ~ 1 + QR + (1 | Trial) + (1 | QR:Trial) +      (1 | Day_Zeit) + (1 | Day_Zeit:Trial),QRQueenless,0.021571029579537587,0.009572794837347803,2.253368002349663,0.08731991975705883
+GlobalEfficiency,GlobalEfficiency ~ 1 + QR + (1 | Trial) + (1 | QR:Trial) + (1 |      Day_Zeit) + (1 | Day_Zeit:Trial),(Intercept),75.9234342712036,13.117261607229493,5.788055201198313,0.0015284985196262154
+GlobalEfficiency,GlobalEfficiency ~ 1 + QR + (1 | Trial) + (1 | QR:Trial) + (1 |      Day_Zeit) + (1 | Day_Zeit:Trial),QRQueenless,30.72552444284939,10.66882324256975,2.8799356540327006,0.04501716875080157
+Modularity,Modularity ~ 1 + QR + (1 | Trial) + (1 | QR:Trial) + (1 | Day_Zeit) +      (1 | Day_Zeit:Trial),(Intercept),0.017537487610436404,0.006864291298929542,2.554886855278316,0.03924941498771496
+Modularity,Modularity ~ 1 + QR + (1 | Trial) + (1 | QR:Trial) + (1 | Day_Zeit) +      (1 | Day_Zeit:Trial),QRQueenless,0.004270518036958251,0.00699811325435005,0.6102384859667258,0.5746738394925772
+Sum,Sum ~ 1 + QR + (1 | Trial) + (1 | QR:Trial) + (1 | Day_Zeit) +      (1 | Day_Zeit:Trial),(Intercept),102955.91794973961,19653.947792254334,5.238434488480466,0.0023138304126548905
+Sum,Sum ~ 1 + QR + (1 | Trial) + (1 | QR:Trial) + (1 | Day_Zeit) +      (1 | Day_Zeit:Trial),QRQueenless,55061.56923053866,16339.655769907366,3.36981206984453,0.02804913006427045
+Transitivity,Transitivity ~ 1 + QR + (1 | Trial) + (1 | QR:Trial) + (1 | Day_Zeit) +      (1 | Day_Zeit:Trial),(Intercept),0.9215132810725081,0.009990559011501955,92.23841028430802,5.822940126946449e-14
+Transitivity,Transitivity ~ 1 + QR + (1 | Trial) + (1 | QR:Trial) + (1 | Day_Zeit) +      (1 | Day_Zeit:Trial),QRQueenless,0.021975592967441414,0.009657036767360032,2.275604152374884,0.08519760326635147

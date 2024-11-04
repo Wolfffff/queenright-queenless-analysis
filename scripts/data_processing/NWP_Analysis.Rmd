@@ -57,19 +57,19 @@ TotalNWPEfficiency <- TotalNWP[TotalNWP$params == "GlobalEfficiency", ]
 TotalNWPTransitivity <- TotalNWP[TotalNWP$params == "Transitivity", ]
 TotalNWPClustering <- TotalNWP[TotalNWP$params == "Average Clustering", ]
 TotalNWPAssortativity <- TotalNWP[TotalNWP$params == "Assortativity", ]
-TotalNWP_New = TotalNWP[TotalNWP$params != 'KeystoneAssortativity',]
-TotalNWP_Wider = TotalNWP_New %>%
+TotalNWP_New <- TotalNWP[TotalNWP$params != "KeystoneAssortativity", ]
+TotalNWP_Wider <- TotalNWP_New %>%
   mutate(n = 1) %>%
   tidyr::pivot_wider(names_from = params, values_from = values, values_fill = NA)
-names(TotalNWP_Wider)[names(TotalNWP_Wider) == 'Average Clustering'] <- 'Average.Clustering'
+names(TotalNWP_Wider)[names(TotalNWP_Wider) == "Average Clustering"] <- "Average.Clustering"
 
 
 
-TotalNWP_Merge = TotalNWP_Wider %>%
-    group_by(ID) %>%
-    summarise_all(na.omit)
+TotalNWP_Merge <- TotalNWP_Wider %>%
+  group_by(ID) %>%
+  summarise_all(na.omit)
 
-TotalNWP_One = TotalNWP_Merge[TotalNWP_Merge$X == 1,]
+TotalNWP_One <- TotalNWP_Merge[TotalNWP_Merge$X == 1, ]
 
 
 TotalNWP_Pooled <- TotalNWP_One %>%
