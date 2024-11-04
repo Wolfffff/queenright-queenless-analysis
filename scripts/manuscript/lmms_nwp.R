@@ -78,5 +78,4 @@ significant_features <- comprehensive_summary_table %>%
 
 print(significant_features)
 
-write_csv(comprehensive_summary_table_, "results/comprehensive_summary_table_nwp.csv")
-
+write_csv(comprehensive_summary_table, "results/comprehensive_summary_table_nwp.csv")

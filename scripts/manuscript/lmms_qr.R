@@ -23,7 +23,7 @@ workers_data <- workers_data %>%
     QR == 1 & Queen == 0 ~ "Queenright Worker",
     Queen == 1 ~ "Queen",
     QR == 0 & Infl == 1 ~ "Influencer",
-    TRUE ~ NA_character_  # This handles any other case, which shouldn't exist in your scenario
+    TRUE ~ NA_character_ # This handles any other case, which shouldn't exist in your scenario
   )) %>%
   mutate(RoleClassification = factor(RoleClassification, levels = c("Queenless Worker", "Queenright Worker", "Queen", "Influencer")))
 
