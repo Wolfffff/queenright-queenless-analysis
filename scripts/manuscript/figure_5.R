@@ -68,3 +68,7 @@ bottom_row <- plot_grid(plot_trans, plot_eff, plot_assort, ncol = 3, align = "hv
 
 # Save the final layout with adjusted margins
 save_plot("figures/manuscript/figure_5_bottom.jpeg", bottom_row + theme(plot.margin = unit(c(0, 0, 0, 0), "cm")), base_width = 8.5, base_height = 2.8333, dpi = 600)
+
+# trim tailing _ like "RooibosTea_QL_1216_1646_ArUcoTag#60_72" shoul be trimmed to "RooibosTea_QL_1216_1646_ArUcoTag#60"
+unique(str_remove(bds$ID[bds$Col == "RooibosTea_QL_1216_1646" & bds$Infl], "_\\d+$"))
+

@@ -1,21 +1,25 @@
-import os
-
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 
+
 # Hardcoded values
 FILENAMES = [
-    "data/RooibosTea_QR_1216_1646_Time_DayOnly.gml",
-    "data/RooibosTea_QL_1216_1646_Time_DayOnly.gml",
+    "data/gmls/RooibosTea_QR_1216_1646_Time.daysonly.gml",
+    "data/gmls/RooibosTea_QL_1216_1646_Time.daysonly.gml",
 ]
+
+# First is queenright, second is queenless influencers
 FOCAL_NODES = [
-    ["ArUcoTag#52"],  # Replace with actual focal nodes for the first file
+    ["ArUcoTag#52"],
     [
         "ArUcoTag#11",
         "ArUcoTag#12",
         "ArUcoTag#17",
+        "ArUcoTag#19",
+        "ArUcoTag#20",
         "ArUcoTag#22",
+        "ArUcoTag#26",
         "ArUcoTag#45",
         "ArUcoTag#47",
         "ArUcoTag#5",
@@ -23,6 +27,7 @@ FOCAL_NODES = [
         "ArUcoTag#53",
         "ArUcoTag#55",
         "ArUcoTag#58",
+        "ArUcoTag#60",
     ],  # Replace with actual focal nodes for the second file
 ]
 TITLES = ["Queenright", "Queenless"]
@@ -191,7 +196,6 @@ def plot_hairball(
     )
     ax.set_aspect("equal", adjustable="datalim")
     ax.axis("off")
-
 
 
 # Main plotting logic
