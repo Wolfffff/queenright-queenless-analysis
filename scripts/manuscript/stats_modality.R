@@ -6,8 +6,8 @@ library(ggplot2)
 library(broom.mixed)
 library(lmerTest)
 
-source("constants.R")
-source("load_data.R")
+source("scripts/manuscript/constants.R")
+source("scripts/manuscript/load_data.R")
 
 # QR Workers
 bds_QR_Work <- bds %>%
