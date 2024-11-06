@@ -10,20 +10,20 @@ source("scripts/manuscript/constants.R")
 source("scripts/manuscript/load_data.R")
 
 # Remove queens
-bds_no_queens <- bds %>%
-  filter(Queen == FALSE)
+bds_ql <- bds %>%
+  filter(QR == FALSE)
 
-bds_no_queens$OvaryIndex <- bds_no_queens$AverageOvaryWidth / bds_no_queens$AverageWingLength
-bds_no_queens <- bds_no_queens %>%
-  mutate(QR_Queen_Inf = case_when(
+bds_ql$OvaryIndex <- bds_ql$AverageOvaryWidth / bds_ql$AverageWingLength
+bds_ql <- bds_ql %>%
+  mutate(worker_v_infl = case_when(
     QR == 0 & Infl == 0 ~ "Queenless Worker",
     QR == 1 & Queen == 0 ~ "Queenright Worker",
     Queen == 1 ~ "Queen",
     QR == 0 & Infl == 1 ~ "Influencer"
   )) %>%
-  mutate(QR_Queen_Inf = factor(QR_Queen_Inf, levels = c("Queenless Worker", "Queenright Worker", "Queen", "Influencer")))
+  mutate(worker_v_infl = factor(worker_v_infl, levels = c("Queenless Worker", "Queenright Worker", "Queen", "Influencer")))
 
-bds_pooled <- bds_no_queens %>%
+bds_ql <- bds_ql %>%
   filter(TimeOfDay == "Day") %>%
   mutate(Day_Zeit = paste(Day, Zeit, sep = "_"))
 
@@ -32,8 +32,8 @@ features <- c("Degree", "move_perc", "mean_vel", "N90.Day4", "Initiation.Freq", 
 
 # Function to fit and summarize the model for each feature
 fit_and_summarize <- function(feature) {
-  formula <- as.formula(paste(feature, "~ 1 + QR_Queen_Inf + (1 | Trial) + (1 | QR_Queen_Inf:Trial) + (1 | Day_Zeit) + (1 | Day_Zeit:Trial)"))
-  model <- lmer(formula, data = bds_pooled)
+  formula <- as.formula(paste(feature, "~ 1 + worker_v_infl + (1 | Trial) + (1 | Day_Zeit) + (1 | Day_Zeit:Trial)"))
+  model <- lmer(formula, data = bds_ql)
   tidy_model <- tidy(model, effects = "fixed", conf.int = TRUE) %>%
     mutate(feature = feature, model_spec = paste(deparse(formula), collapse = " "))
   return(tidy_model)

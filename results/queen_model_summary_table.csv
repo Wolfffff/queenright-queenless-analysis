@@ -1,0 +1,19 @@
+metric,model_specification,term,estimate,std.error,statistic,p.value
+Between,Between ~ 1 + Queen + (1 | Trial) + (1 | DayTimePeriod) + (1 |      DayTimePeriod:Trial),(Intercept),0.02505340191660976,7.34029392389777e-4,34.13133339939356,4.680118027720305e-5
+Between,Between ~ 1 + Queen + (1 | Trial) + (1 | DayTimePeriod) + (1 |      DayTimePeriod:Trial),QueenTRUE,0.16408928029797676,0.0032943893658063973,49.80870870975846,0
+Close,Close ~ 1 + Queen + (1 | Trial) + (1 | DayTimePeriod) + (1 |      DayTimePeriod:Trial),(Intercept),66.63844974525556,5.4837993785819705,12.151875943077858,9.142735837814603e-4
+Close,Close ~ 1 + Queen + (1 | Trial) + (1 | DayTimePeriod) + (1 |      DayTimePeriod:Trial),QueenTRUE,20.97808026376907,1.0811479466219571,19.403524123886104,5.812023729082794e-82
+Degree,Degree ~ 1 + Queen + (1 | Trial) + (1 | DayTimePeriod) + (1 |      DayTimePeriod:Trial),(Intercept),2839.567369387055,241.76716753006798,11.74504957971146,0.0012201879874430064
+Degree,Degree ~ 1 + Queen + (1 | Trial) + (1 | DayTimePeriod) + (1 |      DayTimePeriod:Trial),QueenTRUE,2290.394724617648,83.78969838168675,27.335039615302417,3.033935077198844e-157
+Initiation.Freq,Initiation.Freq ~ 1 + Queen + (1 | Trial) + (1 | DayTimePeriod) +      (1 | DayTimePeriod:Trial),(Intercept),0.4962069544864608,0.0017498923734990076,283.56427058097705,0
+Initiation.Freq,Initiation.Freq ~ 1 + Queen + (1 | Trial) + (1 | DayTimePeriod) +      (1 | DayTimePeriod:Trial),QueenTRUE,-0.20973694606391793,0.012427188415327434,-16.877264515055778,7.970404101314669e-63
+N90.Day4,N90.Day4 ~ 1 + Queen + (1 | Trial) + (1 | DayTimePeriod) + (1 |      DayTimePeriod:Trial),(Intercept),58.025858404477894,4.9649752697929355,11.687038756770658,0.001345671413370291
+N90.Day4,N90.Day4 ~ 1 + Queen + (1 | Trial) + (1 | DayTimePeriod) + (1 |      DayTimePeriod:Trial),QueenTRUE,-24.21724418022947,1.8866034164366015,-12.836425487859431,2.386037459478738e-37
+OvaryIndex,OvaryIndex ~ 1 + Queen + (1 | Trial) + (1 | DayTimePeriod) +      (1 | DayTimePeriod:Trial),(Intercept),0.18501983458552052,0.01293952976237254,14.298806678705457,7.461778533540988e-4
+OvaryIndex,OvaryIndex ~ 1 + Queen + (1 | Trial) + (1 | DayTimePeriod) +      (1 | DayTimePeriod:Trial),QueenTRUE,0.0772771943544244,0.007544172343817411,10.243296525132342,2.419843879278085e-24
+clust,clust ~ 1 + Queen + (1 | Trial) + (1 | DayTimePeriod) + (1 |      DayTimePeriod:Trial),(Intercept),0.030450545937125553,0.0014638280711069503,20.801996175752237,3.1095044594924953e-4
+clust,clust ~ 1 + Queen + (1 | Trial) + (1 | DayTimePeriod) + (1 |      DayTimePeriod:Trial),QueenTRUE,0.01229263329607384,5.878978141262096e-4,20.9094727020619,1.5816562130473918e-94
+mean_vel,mean_vel ~ 1 + Queen + (1 | Trial) + (1 | DayTimePeriod) + (1 |      DayTimePeriod:Trial),(Intercept),4.641396341867582,0.4330054616935897,10.719024937269731,0.0015743440785648331
+mean_vel,mean_vel ~ 1 + Queen + (1 | Trial) + (1 | DayTimePeriod) + (1 |      DayTimePeriod:Trial),QueenTRUE,-0.9967256958574094,0.15663963920016422,-6.363176657881146,2.0868728109494085e-10
+move_perc,move_perc ~ 1 + Queen + (1 | Trial) + (1 | DayTimePeriod) + (1 |      DayTimePeriod:Trial),(Intercept),0.5352247297171948,0.015076148952848442,35.5014222392696,3.72596141056479e-6
+move_perc,move_perc ~ 1 + Queen + (1 | Trial) + (1 | DayTimePeriod) + (1 |      DayTimePeriod:Trial),QueenTRUE,0.09276677572877025,0.009625394622976948,9.637711425080179,7.316175040270223e-22
