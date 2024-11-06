@@ -1,13 +1,13 @@
 feature,model_spec,term,estimate,std.error,statistic,p.value
-Assortativity,Assortativity ~ 1 + QR + (1 | Trial) + (1 | QR:Trial) + (1 |      Day_Zeit) + (1 | Day_Zeit:Trial),(Intercept),-0.026313269802973372,0.0013734687331666245,-19.158259061570597,6.748992517593943e-9
-Assortativity,Assortativity ~ 1 + QR + (1 | Trial) + (1 | QR:Trial) + (1 |      Day_Zeit) + (1 | Day_Zeit:Trial),QRQueenless,0.004719767001531209,0.0012533707376947954,3.765659161799025,0.019670249928940762
-Average.Clustering,Average.Clustering ~ 1 + QR + (1 | Trial) + (1 | QR:Trial) +      (1 | Day_Zeit) + (1 | Day_Zeit:Trial),(Intercept),0.9226969220598632,0.009718258393723483,94.94467883831788,3.81036459147511e-14
-Average.Clustering,Average.Clustering ~ 1 + QR + (1 | Trial) + (1 | QR:Trial) +      (1 | Day_Zeit) + (1 | Day_Zeit:Trial),QRQueenless,0.021571029579537587,0.009572794837347803,2.253368002349663,0.08731991975705883
-GlobalEfficiency,GlobalEfficiency ~ 1 + QR + (1 | Trial) + (1 | QR:Trial) + (1 |      Day_Zeit) + (1 | Day_Zeit:Trial),(Intercept),75.9234342712036,13.117261607229493,5.788055201198313,0.0015284985196262154
-GlobalEfficiency,GlobalEfficiency ~ 1 + QR + (1 | Trial) + (1 | QR:Trial) + (1 |      Day_Zeit) + (1 | Day_Zeit:Trial),QRQueenless,30.72552444284939,10.66882324256975,2.8799356540327006,0.04501716875080157
-Modularity,Modularity ~ 1 + QR + (1 | Trial) + (1 | QR:Trial) + (1 | Day_Zeit) +      (1 | Day_Zeit:Trial),(Intercept),0.017537487610436404,0.006864291298929542,2.554886855278316,0.03924941498771496
-Modularity,Modularity ~ 1 + QR + (1 | Trial) + (1 | QR:Trial) + (1 | Day_Zeit) +      (1 | Day_Zeit:Trial),QRQueenless,0.004270518036958251,0.00699811325435005,0.6102384859667258,0.5746738394925772
-Sum,Sum ~ 1 + QR + (1 | Trial) + (1 | QR:Trial) + (1 | Day_Zeit) +      (1 | Day_Zeit:Trial),(Intercept),102955.91794973961,19653.947792254334,5.238434488480466,0.0023138304126548905
-Sum,Sum ~ 1 + QR + (1 | Trial) + (1 | QR:Trial) + (1 | Day_Zeit) +      (1 | Day_Zeit:Trial),QRQueenless,55061.56923053866,16339.655769907366,3.36981206984453,0.02804913006427045
-Transitivity,Transitivity ~ 1 + QR + (1 | Trial) + (1 | QR:Trial) + (1 | Day_Zeit) +      (1 | Day_Zeit:Trial),(Intercept),0.9215132810725081,0.009990559011501955,92.23841028430802,5.822940126946449e-14
-Transitivity,Transitivity ~ 1 + QR + (1 | Trial) + (1 | QR:Trial) + (1 | Day_Zeit) +      (1 | Day_Zeit:Trial),QRQueenless,0.021975592967441414,0.009657036767360032,2.275604152374884,0.08519760326635147
+Assortativity,Assortativity ~ 1 + QR + (1 | Trial) + (1 | Day_Zeit) + (1 |      Day_Zeit:Trial),(Intercept),-0.02631326980298449,0.0012335225914512993,-21.33181020383717,1.5528046541602846e-07
+Assortativity,Assortativity ~ 1 + QR + (1 | Trial) + (1 | Day_Zeit) + (1 |      Day_Zeit:Trial),QRQueenless,0.004719767001529769,3.3419575680251575e-4,14.122761601425095,1.1906033225676577e-43
+Average.Clustering,Average.Clustering ~ 1 + QR + (1 | Trial) + (1 | Day_Zeit) +      (1 | Day_Zeit:Trial),(Intercept),0.9226969220590698,0.00846414321325783,109.01244211154194,1.653804160052448e-10
+Average.Clustering,Average.Clustering ~ 1 + QR + (1 | Trial) + (1 | Day_Zeit) +      (1 | Day_Zeit:Trial),QRQueenless,0.021571029577381235,6.761079180571592e-4,31.90471373174717,4.55535819680792e-188
+GlobalEfficiency,GlobalEfficiency ~ 1 + QR + (1 | Trial) + (1 | Day_Zeit) + (1 |      Day_Zeit:Trial),(Intercept),75.92343427230803,11.98679010665639,6.333925395936228,0.0031239491835591843
+GlobalEfficiency,GlobalEfficiency ~ 1 + QR + (1 | Trial) + (1 | Day_Zeit) + (1 |      Day_Zeit:Trial),QRQueenless,30.725524443550366,0.6199275676887418,49.56308776217754,0
+Modularity,Modularity ~ 1 + QR + (1 | Trial) + (1 | Day_Zeit) + (1 | Day_Zeit:Trial),(Intercept),0.017537487610505494,0.005915806907686192,2.9645131905369793,0.03921368815477392
+Modularity,Modularity ~ 1 + QR + (1 | Trial) + (1 | Day_Zeit) + (1 | Day_Zeit:Trial),QRQueenless,0.004270518036972048,7.374181548497157e-4,5.791175615743242,7.85310679469535e-9
+Sum,Sum ~ 1 + QR + (1 | Trial) + (1 | Day_Zeit) + (1 | Day_Zeit:Trial),(Intercept),102955.91794788816,17882.09750963777,5.75748554622291,0.004335819061660772
+Sum,Sum ~ 1 + QR + (1 | Trial) + (1 | Day_Zeit) + (1 | Day_Zeit:Trial),QRQueenless,55061.5692307692,963.3647091094156,57.15547674740024,0
+Transitivity,Transitivity ~ 1 + QR + (1 | Trial) + (1 | Day_Zeit) + (1 | Day_Zeit:Trial),(Intercept),0.9215132810716724,0.008753261922174663,105.2765573868183,1.824508811808975e-10
+Transitivity,Transitivity ~ 1 + QR + (1 | Trial) + (1 | Day_Zeit) + (1 | Day_Zeit:Trial),QRQueenless,0.021975592966363294,6.986877264600927e-4,31.452667814422362,1.3116215683581386e-183
