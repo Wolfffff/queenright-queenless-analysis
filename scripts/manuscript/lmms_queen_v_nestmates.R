@@ -27,7 +27,7 @@ metrics_for_queen_model <- c("Degree", "move_perc", "mean_vel", "N90.Day4", "Ini
 # Function to fit and summarize the Queen model for each metric
 fit_and_summarize_queen_model <- function(metric) {
 
-  formula <- as.formula(paste(metric, "~ 1 + Queen + (1 | Trial) + (1 | DayTimePeriod) + (1 | DayTimePeriod:Trial)"))
+  formula <- as.formula(paste(metric, "~ 1 + Queen + (1 | Trial) + (1 | DayTimePeriod)"))
   model <- lmer(formula, data = daytime_filtered_data)
 
   tidy_model <- tidy(model, effects = "fixed", conf.int = TRUE) %>%

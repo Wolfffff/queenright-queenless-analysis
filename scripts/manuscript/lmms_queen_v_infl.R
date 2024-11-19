@@ -24,7 +24,7 @@ features <- c("Degree", "move_perc", "mean_vel", "N90.Day4", "Initiation.Freq", 
 
 # Function to fit and summarize the model for each feature
 fit_and_summarize <- function(feature) {
-  formula <- as.formula(paste(feature, "~ 1 + Type + (1 | Trial) + (1 | Day_Zeit) + (1 | Day_Zeit:Trial)"))
+  formula <- as.formula(paste(feature, "~ 1 + Type + (1 | Trial) + (1 | Day_Zeit)"))
   model <- lmer(formula, data = bds_queen_infl)
   tidy_model <- tidy(model, effects = "fixed", conf.int = TRUE) %>%
     mutate(feature = feature, 
