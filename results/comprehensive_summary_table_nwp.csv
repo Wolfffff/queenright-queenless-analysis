@@ -1,13 +1,13 @@
 feature,model_spec,term,estimate,std.error,statistic,p.value
-Assortativity,Assortativity ~ 1 + QR + (1 | Trial) + (1 | Day_Zeit) + (1 |      Day_Zeit:Trial),(Intercept),-0.02631326980298449,0.0012335225914512993,-21.33181020383717,1.5528046541602846e-07
-Assortativity,Assortativity ~ 1 + QR + (1 | Trial) + (1 | Day_Zeit) + (1 |      Day_Zeit:Trial),QRQueenless,0.004719767001529769,3.3419575680251575e-4,14.122761601425095,1.1906033225676577e-43
-Average.Clustering,Average.Clustering ~ 1 + QR + (1 | Trial) + (1 | Day_Zeit) +      (1 | Day_Zeit:Trial),(Intercept),0.9226969220590698,0.00846414321325783,109.01244211154194,1.653804160052448e-10
-Average.Clustering,Average.Clustering ~ 1 + QR + (1 | Trial) + (1 | Day_Zeit) +      (1 | Day_Zeit:Trial),QRQueenless,0.021571029577381235,6.761079180571592e-4,31.90471373174717,4.55535819680792e-188
-GlobalEfficiency,GlobalEfficiency ~ 1 + QR + (1 | Trial) + (1 | Day_Zeit) + (1 |      Day_Zeit:Trial),(Intercept),75.92343427230803,11.98679010665639,6.333925395936228,0.0031239491835591843
-GlobalEfficiency,GlobalEfficiency ~ 1 + QR + (1 | Trial) + (1 | Day_Zeit) + (1 |      Day_Zeit:Trial),QRQueenless,30.725524443550366,0.6199275676887418,49.56308776217754,0
-Modularity,Modularity ~ 1 + QR + (1 | Trial) + (1 | Day_Zeit) + (1 | Day_Zeit:Trial),(Intercept),0.017537487610505494,0.005915806907686192,2.9645131905369793,0.03921368815477392
-Modularity,Modularity ~ 1 + QR + (1 | Trial) + (1 | Day_Zeit) + (1 | Day_Zeit:Trial),QRQueenless,0.004270518036972048,7.374181548497157e-4,5.791175615743242,7.85310679469535e-9
-Sum,Sum ~ 1 + QR + (1 | Trial) + (1 | Day_Zeit) + (1 | Day_Zeit:Trial),(Intercept),102955.91794788816,17882.09750963777,5.75748554622291,0.004335819061660772
-Sum,Sum ~ 1 + QR + (1 | Trial) + (1 | Day_Zeit) + (1 | Day_Zeit:Trial),QRQueenless,55061.5692307692,963.3647091094156,57.15547674740024,0
-Transitivity,Transitivity ~ 1 + QR + (1 | Trial) + (1 | Day_Zeit) + (1 | Day_Zeit:Trial),(Intercept),0.9215132810716724,0.008753261922174663,105.2765573868183,1.824508811808975e-10
-Transitivity,Transitivity ~ 1 + QR + (1 | Trial) + (1 | Day_Zeit) + (1 | Day_Zeit:Trial),QRQueenless,0.021975592966363294,6.986877264600927e-4,31.452667814422362,1.3116215683581386e-183
+Assortativity,Assortativity ~ 1 + QR + (1 | Trial) + (1 | Day_Zeit),(Intercept),-0.026313269802987822,0.0013560765438061849,-19.403970906489334,2.6524626540566986e-9
+Assortativity,Assortativity ~ 1 + QR + (1 | Trial) + (1 | Day_Zeit),QRQueenless,0.004719767001529857,4.2839554456865404e-4,11.017311130726464,1.2204913981912277e-27
+Average.Clustering,Average.Clustering ~ 1 + QR + (1 | Trial) + (1 | Day_Zeit),(Intercept),0.922696922057947,0.0086349346378476,106.85627173293166,3.887897819815558e-11
+Average.Clustering,Average.Clustering ~ 1 + QR + (1 | Trial) + (1 | Day_Zeit),QRQueenless,0.021571029577383282,0.0010567399722895775,20.412807448408124,3.2237764734905595e-86
+GlobalEfficiency,GlobalEfficiency ~ 1 + QR + (1 | Trial) + (1 | Day_Zeit),(Intercept),75.92343427073445,12.026523861049077,6.312999096657646,0.0030231705792093176
+GlobalEfficiency,GlobalEfficiency ~ 1 + QR + (1 | Trial) + (1 | Day_Zeit),QRQueenless,30.7255244435505,0.7752381484612366,39.63365903050221,6.767506534631461e-271
+Modularity,Modularity ~ 1 + QR + (1 | Trial) + (1 | Day_Zeit),(Intercept),0.01753748761045435,0.006072195732101006,2.888162434840733,0.03751268787117164
+Modularity,Modularity ~ 1 + QR + (1 | Trial) + (1 | Day_Zeit),QRQueenless,0.0042705180369720964,9.826653836347789e-4,4.345851709130006,1.4389131344268658e-5
+Sum,Sum ~ 1 + QR + (1 | Trial) + (1 | Day_Zeit),(Intercept),102955.91794817935,17941.31638001044,5.738481824159184,0.004213125095068836
+Sum,Sum ~ 1 + QR + (1 | Trial) + (1 | Day_Zeit),QRQueenless,55061.56923076909,1187.2939788694018,46.37568303277454,0
+Transitivity,Transitivity ~ 1 + QR + (1 | Trial) + (1 | Day_Zeit),(Intercept),0.9215132810759055,0.008943278618480885,103.03975984507957,3.842633294615492e-11
+Transitivity,Transitivity ~ 1 + QR + (1 | Trial) + (1 | Day_Zeit),QRQueenless,0.021975592966362464,0.001117805937174859,19.65957796028848,1.6762942682860354e-80
