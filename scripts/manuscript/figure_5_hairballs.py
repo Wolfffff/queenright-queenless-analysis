@@ -167,7 +167,7 @@ def plot_hairball(
             [0],
             marker="o",
             color="w",
-            label="Queen" if title == "Queenright" else "Queenless Keystone Worker",
+            label="Queen" if title == "Queenright" else "Queenless Influencer",
             markerfacecolor=focal_color,
             markersize=10,
         ),
@@ -179,7 +179,7 @@ def plot_hairball(
             label=(
                 "Queenright Worker"
                 if title == "Queenright"
-                else "Queenless Non-Keystone Worker"
+                else "Queenless Non-Influencer Worker"
             ),
             markerfacecolor=non_focal_color,
             markersize=10,
@@ -191,7 +191,7 @@ def plot_hairball(
         fontsize=10,
         loc="upper right",
         frameon=False,
-        bbox_to_anchor=(1.15, 1.05),
+        bbox_to_anchor=(1, 1.08),
     )
     ax.set_aspect("equal", adjustable="datalim")
     ax.axis("off")
