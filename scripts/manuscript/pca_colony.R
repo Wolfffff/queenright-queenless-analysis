@@ -69,4 +69,4 @@ pca_plot <- ggplot(data_with_pca, aes(x = PC1, y = PC2, color = Trial, size = Po
   REMOVE_HASH_MARKS
 
 
-ggsave("figure_s8.jpeg", pca_plot, width = 4.5, height = 4.5, units = "in", dpi = 600)
+ggsave("pca_colony.jpeg", pca_plot, width = 4.5, height = 4.5, units = "in", dpi = 600)
