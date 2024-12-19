@@ -35,4 +35,4 @@ ggplot(bds_means, aes(x = ovary_idx, color = QR_Queen_Condition, fill = QR_Queen
     legend.title = element_blank() # Remove the legend title
   )
 
-ggsave("figure_s10.jpeg", width = 4.5, height = 4.5, units = "in", dpi = 600)
+ggsave("ovary_index_distribution.jpeg", width = 4.5, height = 4.5, units = "in", dpi = 600)
