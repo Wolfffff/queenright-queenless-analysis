@@ -28,4 +28,4 @@ plot_ovaries <- ggplot(bds_means_of_means, aes(x = QR_Queen_Condition, y = ovary
   CONSISTENT_THEME
 plot_ovaries
 
-ggsave("figure_s11.jpeg", plot = plot_ovaries, width = 4.5, height = 4.5, units = "in", dpi = 600)
+ggsave("ovary_index_by_status.jpeg", plot = plot_ovaries, width = 4.5, height = 4.5, units = "in", dpi = 600)
