@@ -41,4 +41,4 @@ plot3 <- ggplot(wing_morphometrics, aes(x = IT_span_mm, y = avg_MargCell_mm)) +
 combined_plot <- plot_grid(plot1, plot2, plot3, ncol = 3, align = "vh")
 
 # Save the combined plot
-ggsave("figure_s9.jpeg", combined_plot, width = 8.5, height = 4.5, dpi = 600)
+ggsave("size_relationships", combined_plot, width = 8.5, height = 4.5, dpi = 600)
