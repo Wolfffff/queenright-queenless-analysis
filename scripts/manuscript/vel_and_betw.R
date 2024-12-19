@@ -58,4 +58,4 @@ plot_lm <- ggplot(bds_means, aes(y = move_perc * 100, x = Degree, color = Q_QRW_
 # Create the top row with plot_centrality and plot_lm
 final_layout <- plot_grid(plot_lm, plot_centrality, ncol = 2, align = "h")
 # Save the final layout with adjusted margins
-save_plot("figure_s15.jpeg", final_layout + theme(plot.margin = unit(c(0, 0, 0, 0), "cm")), base_width = 8.5, base_height = 4.5, dpi = 600)
+save_plot("vel_and_betw.jpeg", final_layout + theme(plot.margin = unit(c(0, 0, 0, 0), "cm")), base_width = 8.5, base_height = 4.5, dpi = 600)
