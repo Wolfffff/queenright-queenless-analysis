@@ -49,4 +49,4 @@ ggplot(bds_means, aes(x = Degree, y = bodyDegree, group = Q_QRW_QLW_Keystone)) +
     # legend.key.width = unit(0.2, "cm") # Adjust the width of the legend keys (symbols)
   )
 
-ggsave("figure_s13.jpeg", width = 4.5, height = 4.5, units = "in", dpi = 600)
+ggsave("headdeg_v_bodydeg.jpeg", width = 4.5, height = 4.5, units = "in", dpi = 600)
