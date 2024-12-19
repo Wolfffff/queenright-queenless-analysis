@@ -68,4 +68,4 @@ pca_biplot <- ggplot() +
   ) +
   CONSISTENT_THEME
 # Save the PCA biplot as figure_s7.jpeg
-ggsave("figure_s7.jpeg", pca_biplot, width = 8.5, height = 4.5, units = "in", dpi = 600)
+ggsave("loading_params.jpeg", pca_biplot, width = 8.5, height = 4.5, units = "in", dpi = 600)
