@@ -43,4 +43,4 @@ degree_over_time <- ggplot(total_nwp_key_assort_per, aes(x = as.integer(Hour), y
   ) +
   guides(alpha = "none", size = "none")
 
-ggsave("figure_s12.jpeg", width = 8.5, height = 4.5, units = "in", dpi = 600)
+ggsave("influencer_assortativity.jpeg", width = 8.5, height = 4.5, units = "in", dpi = 600)
