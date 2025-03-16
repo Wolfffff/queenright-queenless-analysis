@@ -27,6 +27,11 @@ bds_ql <- bds_ql %>%
   filter(TimeOfDay == "Day") %>%
   mutate(Day_Zeit = paste(Day, Zeit, sep = "_"))
 
+# Get number of influencers
+num_influencers <- bds_ql %>%
+  filter(Infl == 1)
+  summarise(num_influencers = n_distinct(Bee))
+
 # List of features to test
 features <- c("Degree", "move_perc", "mean_vel", "N90.Day4", "Initiation.Freq", "Close", "Between", "clust", "OvaryIndex")
 
