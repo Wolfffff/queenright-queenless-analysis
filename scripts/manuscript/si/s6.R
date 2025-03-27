@@ -80,6 +80,6 @@ plot_unstd <- ggplot(bds_means_of_means_unstandardized, aes(x = as.factor(QR_Que
   ylab("Number of Int. per Hour (Unstandardized)") + # Adjust axis labels
   CONSISTENT_THEME
 
-final_plot <- plot_grid(plot_move_perc, plot_bouts, plot_unstd, ncol = 3, align="hv")
+final_plot <- plot_grid(plot_move_perc, plot_bouts, plot_unstd, ncol = 3, align = "hv")
 
 ggsave("figures/manuscript/si/figure_s6.jpeg", plot = final_plot, width = 8.5, height = 3, dpi = 600)

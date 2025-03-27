@@ -1,3 +1,5 @@
+library(wesanderson)
+
 Q_QRW_KEY_QLW <- list(
   Q = "#3f007b",
   QRW = "#893F71",

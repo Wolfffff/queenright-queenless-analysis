@@ -40,7 +40,7 @@ plot_degree <- ggplot(bds_means %>% filter(QR_Queen_Condition != "Queen"), aes(x
   geom_point(data = bds_means_of_means %>% filter(Queen == 0), aes(color = Trial, fill = Trial), size = 3, shape = 21, stroke = 0.2, position = position_dodge(width = 0), color = "black") +
   scale_color_manual(
     values = COLONY_COLORS,
-    labels = c("Col 1", "Col 2", "Col 3", "Col 4", "Col 5") # Replace with your actual labels
+    labels = c("Col 1", "Col 2", "Col 3", "Col 4", "Col 5")
   ) +
   scale_fill_manual(values = COLONY_COLORS, labels = c("Col 1", "Col 2", "Col 3", "Col 4", "Col 5")) +
   xlab("") +
@@ -82,10 +82,11 @@ plot_n90_day4 <- ggplot(bds_means %>% filter(QR_Queen_Condition != "Queen"), aes
   CONSISTENT_THEME
 
 # Rug
-bds$Alpha <- ifelse(bds$Queen, .5, 0.1)
-bds$PointSize <- ifelse(bds$Queen, .05, .005)
+bds_all$Alpha <- ifelse(bds_all$Queen, .5, 0.1)
+bds_all$PointSize <- ifelse(bds_all$Queen, .05, .005)
 
-degree_over_time <- ggplot(bds, aes(x = as.integer(Hour), y = Degree / 20, group = ID)) +
+
+degree_over_time <- ggplot(bds_all, aes(x = as.integer(Hour), y = Degree / 20, group = ID)) +
   geom_jitter(aes(color = QR_Queen_Condition, alpha = Alpha, size = PointSize)) +
   geom_smooth(aes(group = QR_Queen_Condition, color = QR_Queen_Condition), se = FALSE) +
   scale_size(range = c(.001, .5)) +

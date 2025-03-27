@@ -44,7 +44,7 @@ features <- c("Modularity", "GlobalEfficiency", "Transitivity", "Average.Cluster
 
 # Function to fit and summarize the model for each feature
 fit_and_summarize <- function(feature) {
-  formula <- as.formula(paste(feature, "~ 1 + QR + (1 | Trial) + (1 | QR:Trial) + (1 | Day_Zeit) + (1 | Day_Zeit:Trial)"))
+  formula <- as.formula(paste(feature, "~ 1 + QR + (1 | Trial) + (1 | Day_Zeit)"))
   model <- lmer(formula, data = nwp_Pooled)
   tidy_model <- tidy(model, effects = "fixed", conf.int = TRUE) %>%
     mutate(feature = feature, model_spec = paste(deparse(formula), collapse = " "))
@@ -77,3 +77,5 @@ significant_features <- comprehensive_summary_table %>%
   select(feature, term, p.value)
 
 print(significant_features)
+
+write_csv(comprehensive_summary_table, "results/comprehensive_summary_table_nwp.csv")

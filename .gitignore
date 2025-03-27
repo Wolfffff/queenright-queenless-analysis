@@ -166,3 +166,4 @@ raw_data/
 figures/*.jpg
 .vscode/launch.json
 figures/manuscript/hairballs/*
+data/tmp/
