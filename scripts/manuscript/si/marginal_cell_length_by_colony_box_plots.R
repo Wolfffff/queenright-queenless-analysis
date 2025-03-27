@@ -6,13 +6,13 @@ library(dplyr)
 source("scripts/manuscript/constants.R")
 
 # > bds_means_of_means_Q_QRW_QLW_Keystone$Trial
-#  [1] "20221123"   "20221123"   "20221123"   "20221123"   "20221209"  
-#  [6] "20221209"   "20221209"   "20221209"   "20230213"   "20230213"  
+#  [1] "20221123"   "20221123"   "20221123"   "20221123"   "20221209"
+#  [6] "20221209"   "20221209"   "20221209"   "20230213"   "20230213"
 # [11] "20230213"   "20230213"   "MexHotChoc" "MexHotChoc" "MexHotChoc"
 # [16] "MexHotChoc" "RooibosTea" "RooibosTea" "RooibosTea" "RooibosTea"
 
-# [1] "AlmdudlerGspritzt"   "AmericanoLatte"      "ArgentinanMate"     
-# [4] "MexicanHotChocolate" "RooibosTea"  
+# [1] "AlmdudlerGspritzt"   "AmericanoLatte"      "ArgentinanMate"
+# [4] "MexicanHotChocolate" "RooibosTea"
 
 
 # 20221123 = AmericanoLatte
@@ -21,10 +21,10 @@ source("scripts/manuscript/constants.R")
 # MexHotChoc = MexicanHotChocolate
 # RooibosTea = RooibosTea
 
-#  [1] "RooibosTea_QR_1216_1646"            "RooibosTea_QL_1216_1646"           
-#  [3] "MexHotChoc_QR_1216_1646"            "MexHotChoc_QL_1216_1646"           
+#  [1] "RooibosTea_QR_1216_1646"            "RooibosTea_QL_1216_1646"
+#  [3] "MexHotChoc_QR_1216_1646"            "MexHotChoc_QL_1216_1646"
 #  [5] "20230213_1745_AlmdudlerGspritzt_C1" "20230213_1745_AlmdudlerGspritzt_C0"
-#  [7] "20221209_1613_QR"                   "20221209_1613_QL"                  
+#  [7] "20221209_1613_QR"                   "20221209_1613_QL"
 #  [9] "20221123_1543_AmericanoLatte_QR"    "20221123_1543_AmericanoLatte_QL"
 
 # Read the CSV file
@@ -32,11 +32,13 @@ wing_morphometrics <- read_csv("data/2023_macros_qr_v_ql_wings.csv")
 
 
 # Create the mapping of names to trial codes
-name_to_trial <- c("AlmdudlerGspritzt" = "Colony 1",
-                   "AmericanoLatte" = "Colony 2",
-                   "ArgentinanMate" = "Colony 3",
-                   "MexicanHotChocolate" = "Colony 4",
-                   "RooibosTea" = "Colony 5")
+name_to_trial <- c(
+  "AlmdudlerGspritzt" = "Colony 1",
+  "AmericanoLatte" = "Colony 2",
+  "ArgentinanMate" = "Colony 3",
+  "MexicanHotChocolate" = "Colony 4",
+  "RooibosTea" = "Colony 5"
+)
 
 # Update bds_means dataset with the new mapping
 wing_morphometrics <- wing_morphometrics %>%
@@ -57,10 +59,11 @@ ggplot(wing_morphometrics, aes(x = Trial, y = wing_mean, fill = QR_QL)) +
   geom_boxplot() +
   CONSISTENT_THEME +
   REMOVE_HASH_MARKS +
-  labs(y = "Mean Marginal Cell Length (mm)", x = "",
-       fill = "") +
+  labs(
+    y = "Mean Marginal Cell Length (mm)", x = "",
+    fill = ""
+  ) +
   scale_fill_manual(values = c(Q_QRW_KEY_QLW$QRW, Q_QRW_KEY_QLW$QLW)) +
   theme(legend.position = "top")
 
 ggsave("figures/manuscript/si/marginal_cell_length_by_colony_box_plots.jpeg", width = 4.5, height = 4.5, dpi = 600)
-

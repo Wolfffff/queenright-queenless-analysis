@@ -22,7 +22,7 @@ nwp_means_transitivity <- nwp_means %>%
 
 plot_trans <- ggplot(nwp_means_transitivity, aes(x = QR, y = mean_value)) +
   geom_line(aes(group = Trial), color = "darkgray", linewidth = 0.2) +
-  geom_point(aes(color = Trial, fill = Trial), size = 3,shape = 21, stroke = 0.2, color = "black") +
+  geom_point(aes(color = Trial, fill = Trial), size = 3, shape = 21, stroke = 0.2, color = "black") +
   scale_fill_manual(values = COLONY_COLORS) +
   xlab("") +
   labs(color = "Source Colony") +
@@ -38,7 +38,7 @@ nwp_means_eff <- nwp_means %>%
 
 plot_eff <- ggplot(nwp_means_eff, aes(x = QR, y = mean_value)) +
   geom_line(aes(group = Trial), color = "darkgray", linewidth = 0.2) +
-  geom_point(aes(color = Trial, fill = Trial), size = 3,shape = 21, stroke = 0.2, color = "black") +
+  geom_point(aes(color = Trial, fill = Trial), size = 3, shape = 21, stroke = 0.2, color = "black") +
   scale_fill_manual(values = COLONY_COLORS) +
   xlab("") +
   labs(color = "Source Colony") +
@@ -53,7 +53,7 @@ nwp_means_assortativity <- nwp_means %>%
 
 plot_assort <- ggplot(nwp_means_assortativity, aes(x = QR, y = mean_value)) +
   geom_line(aes(group = Trial), color = "darkgray", linewidth = 0.2) +
-  geom_point(aes(color = Trial, fill = Trial), size = 3,shape = 21, stroke = 0.2, color = "black") +
+  geom_point(aes(color = Trial, fill = Trial), size = 3, shape = 21, stroke = 0.2, color = "black") +
   scale_fill_manual(values = COLONY_COLORS) +
   xlab("") +
   labs(color = "Source Colony") +
@@ -68,3 +68,6 @@ bottom_row <- plot_grid(plot_trans, plot_eff, plot_assort, ncol = 3, align = "hv
 
 # Save the final layout with adjusted margins
 save_plot("figures/manuscript/figure_5_bottom.jpeg", bottom_row + theme(plot.margin = unit(c(0, 0, 0, 0), "cm")), base_width = 8.5, base_height = 2.8333, dpi = 600)
+
+# trim tailing _ like "RooibosTea_QL_1216_1646_ArUcoTag#60_72" shoul be trimmed to "RooibosTea_QL_1216_1646_ArUcoTag#60"
+unique(str_remove(bds$ID[bds$Col == "RooibosTea_QL_1216_1646" & bds$Infl], "_\\d+$"))

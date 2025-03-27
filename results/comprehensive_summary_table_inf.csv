@@ -1,0 +1,19 @@
+feature,model_spec,term,estimate,std.error,statistic,p.value
+Between,Between ~ 1 + worker_v_infl + (1 | Trial) + (1 | Day_Zeit),(Intercept),0.020675116791883757,0.0022705813436942725,9.105649022133251,0.0026949541234232055
+Between,Between ~ 1 + worker_v_infl + (1 | Trial) + (1 | Day_Zeit),worker_v_inflInfluencer,0.049214016468296935,0.001474498536134676,33.376782182035264,1.1730305468610862e-228
+Close,Close ~ 1 + worker_v_infl + (1 | Trial) + (1 | Day_Zeit),(Intercept),88.34210132612615,12.573163685598846,7.02624284032126,0.005425035983666485
+Close,Close ~ 1 + worker_v_infl + (1 | Trial) + (1 | Day_Zeit),worker_v_inflInfluencer,28.32759356390993,0.8788043681160287,32.23424301433357,1.435800143530886e-214
+Degree,Degree ~ 1 + worker_v_infl + (1 | Trial) + (1 | Day_Zeit),(Intercept),3817.398653488878,524.8009200111068,7.273993828760985,0.005177856909849804
+Degree,Degree ~ 1 + worker_v_infl + (1 | Trial) + (1 | Day_Zeit),worker_v_inflInfluencer,2968.34344491408,70.47586458980639,42.11858147737318,0
+Initiation.Freq,Initiation.Freq ~ 1 + worker_v_infl + (1 | Trial) + (1 | Day_Zeit),(Intercept),0.5026461549076693,0.003991909042089908,125.91623446523118,6.292047291364415e-7
+Initiation.Freq,Initiation.Freq ~ 1 + worker_v_infl + (1 | Trial) + (1 | Day_Zeit),worker_v_inflInfluencer,-0.041162343938084434,0.004954990198481566,-8.307250325277828,1.2132170867567686e-16
+N90.Day4,N90.Day4 ~ 1 + worker_v_infl + (1 | Trial) + (1 | Day_Zeit),(Intercept),56.28200386083532,2.2440440971646036,25.08061402712576,1.3441027191689515e-4
+N90.Day4,N90.Day4 ~ 1 + worker_v_infl + (1 | Trial) + (1 | Day_Zeit),worker_v_inflInfluencer,-13.37156085033082,0.7843670821505037,-17.047580341681265,4.703143573443646e-64
+OvaryIndex,OvaryIndex ~ 1 + worker_v_infl + (1 | Trial) + (1 | Day_Zeit),(Intercept),0.22413060407000449,0.00709272105592251,31.60008723067611,6.297774617402084e-5
+OvaryIndex,OvaryIndex ~ 1 + worker_v_infl + (1 | Trial) + (1 | Day_Zeit),worker_v_inflInfluencer,0.07540028146314172,0.002973255653745923,25.359501584785345,2.877122958348705e-133
+clust,clust ~ 1 + worker_v_infl + (1 | Trial) + (1 | Day_Zeit),(Intercept),0.03906304840100783,0.0032559751196335833,11.997342413784738,1.1391632810803477e-5
+clust,clust ~ 1 + worker_v_infl + (1 | Trial) + (1 | Day_Zeit),worker_v_inflInfluencer,0.01502851345266265,6.683715505122437e-4,22.485268023668443,1.1760782540943917e-108
+mean_vel,mean_vel ~ 1 + worker_v_infl + (1 | Trial) + (1 | Day_Zeit),(Intercept),5.31860458377146,0.5705131931641826,9.322491832788991,0.002109774873215945
+mean_vel,mean_vel ~ 1 + worker_v_infl + (1 | Trial) + (1 | Day_Zeit),worker_v_inflInfluencer,0.8531513091200602,0.08327559575957649,10.244913907108852,1.7595790299043725e-24
+move_perc,move_perc ~ 1 + worker_v_infl + (1 | Trial) + (1 | Day_Zeit),(Intercept),0.5698697926803149,0.008453566125045373,67.41176259235286,2.0785083978032357e-7
+move_perc,move_perc ~ 1 + worker_v_infl + (1 | Trial) + (1 | Day_Zeit),worker_v_inflInfluencer,0.08251417291481794,0.004236645569907997,19.476298300924384,1.396336821696914e-82
