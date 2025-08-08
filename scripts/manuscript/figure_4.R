@@ -49,6 +49,47 @@ bds_means <- bds_means %>%
     "Queenless Non-Influencer Worker" = "Queenless"
   ))
 
+bds_means_of_means_Q_QRW_QLW_Keystone <- bds_means_of_means_Q_QRW_QLW_Keystone %>%
+  mutate(Q_QRW_QLW_Keystone = fct_recode(Q_QRW_QLW_Keystone,
+    "Queen" = "Queen",
+    "Queenright Worker" = "Queenright",
+    "Queenless Influencer" = "Keystone",
+    "Queenless Non-Influencer Worker" = "Queenless"
+  ))
+
+# Set the factor levels with line breaks for plotting for both dataframes
+bds_means$Q_QRW_QLW_Keystone <- factor(
+  bds_means$Q_QRW_QLW_Keystone,
+  levels = c(
+    "Queen",
+    "Queenright Worker",
+    "Queenless Influencer",
+    "Queenless Non-Influencer Worker"
+  ),
+  labels = c(
+    "Queen",
+    "Queenright Worker",
+    "Queenless Influencer",
+    "Queenless\nNon-Influencer Worker"
+  )
+)
+
+bds_means_of_means_Q_QRW_QLW_Keystone$Q_QRW_QLW_Keystone <- factor(
+  bds_means_of_means_Q_QRW_QLW_Keystone$Q_QRW_QLW_Keystone,
+  levels = c(
+    "Queen",
+    "Queenright Worker",
+    "Queenless Influencer",
+    "Queenless Non-Influencer Worker"
+  ),
+  labels = c(
+    "Queen",
+    "Queenright Worker",
+    "Queenless Influencer",
+    "Queenless\nNon-Influencer Worker"
+  )
+)
+
 # Step 3: Plot with a cut in the x-axis using facets
 plot_degree <- ggplot(bds_means %>% filter(QR_Queen_Condition != "Queen"), aes(x = Q_QRW_QLW_Keystone, y = Degree)) +
   geom_line(data = bds_means_of_means_Q_QRW_QLW_Keystone, aes(group = Trial), color = "darkgray", linewidth = 0.2) +
@@ -118,11 +159,20 @@ plot_oi <- ggplot(bds_means %>% filter(QR_Queen_Condition != "Queen"), aes(x = Q
   xlab("") +
   labs(color = "Source Colony") +
   ylab("Ovary Index") +
+  scale_x_discrete(labels = c(
+    "Queen" = "Queen",
+    "Queenright\nWorker" = "Queenright\nWorker",
+    "Queenless\nInfluencer" = "Queenless\nInfluencer",
+    "Queenless\nNon-Influencer\nWorker" = "Queenless\nNon-\nInfluencer\nWorker"
+  )) +
   theme_minimal() +
   CONSISTENT_THEME_NO_ASPECT +
   guides(color = guide_legend(title.position = "top", title.hjust = 0.5)) +
   facet_grid(~Group, scales = "free_x", space = "free_x", switch = "x", labeller = labeller(.rows = label_both, .cols = label_both)) +
-  SHARED_THEME
+  SHARED_THEME +
+  theme(axis.text.x = element_text(size = 7, angle = 45, vjust = 1, hjust = 1))
 
 plot_grid(plot_degree, plot_disp, plot_between, plot_oi, ncol = 4)
 ggsave("figures/manuscript/figure_4.jpeg", width = 8.5, height = 3.5, dpi = 600)
+
+ggsave("figures/manuscript/fig4_oi.jpeg", plot = plot_oi, width = 4, height = 2.5, dpi = 600)
