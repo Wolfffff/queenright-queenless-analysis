@@ -1,3 +1,6 @@
+#INPUT: Interaction Csv file
+#OUTPUT: Folder of network parameters for each colony
+
 import sys
 from itertools import permutations
 
