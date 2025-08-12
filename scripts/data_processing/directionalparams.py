@@ -1,5 +1,6 @@
+#INPUT: Directed Interactions csv file and the type of interaction you're analyzing
+#OUTPUT: Table with a range of network parameters 
 import sys
-
 import networkx as nx
 import numpy as np
 import pandas as pd
