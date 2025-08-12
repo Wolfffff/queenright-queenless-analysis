@@ -1,3 +1,7 @@
+#INPUT: Prefix for all Interaction files (check to make sure suffix is same for everything)
+#OUTPUT: Gml file to make pretty social netwwork plots
+
+
 import sys
 
 import networkx as nx
