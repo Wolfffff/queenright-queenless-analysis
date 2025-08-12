@@ -1,3 +1,5 @@
+#INPUT: Directed interactions csv
+#OUTPUT: In and Out Degree for interactions
 from __future__ import division
 
 import sys
