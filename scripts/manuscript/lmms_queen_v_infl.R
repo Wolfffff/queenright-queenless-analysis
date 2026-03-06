@@ -1,10 +1,10 @@
 # Load necessary libraries
-library(lme4)
+library(glmmTMB)
 library(tidyverse)
 library(stringr)
 library(ggplot2)
 library(broom.mixed)
-library(lmerTest)
+library(emmeans)
 
 source("scripts/manuscript/constants.R")
 source("scripts/manuscript/load_data.R")
@@ -25,10 +25,18 @@ features <- c("Degree", "move_perc", "mean_vel", "N90.Day4", "Initiation.Freq", 
 # Function to fit and summarize the model for each feature
 fit_and_summarize <- function(feature) {
   formula <- as.formula(paste(feature, "~ 1 + Type + (1 | Trial) + (1 | Day_Zeit)"))
-  model <- lmer(formula, data = bds_queen_infl)
+  model <- glmmTMB(formula, data = bds_queen_infl, family = gaussian(), dispformula = ~ Type)
   tidy_model <- tidy(model, effects = "fixed", conf.int = TRUE) %>%
-    mutate(feature = feature, 
+    mutate(feature = feature,
            model_spec = paste(deparse(formula), collapse = " "))
+
+  # Compare dispersion estimates between Type groups using emmeans
+  disp_emm <- emmeans(model, ~ Type, component = "disp")
+  disp_contrast <- pairs(disp_emm)
+  cat("\n--- Dispersion comparison for", feature, "---\n")
+  print(summary(disp_emm))
+  print(summary(disp_contrast))
+
   return(tidy_model)
 }
 
