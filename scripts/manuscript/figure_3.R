@@ -61,9 +61,13 @@ pca_plot <- ggplot(data_with_pca, aes(x = PC1, y = PC2, color = QR_Queen_Conditi
   stat_ellipse(alpha = 1, type = "t", level = 0.95, linetype = "dashed", size = 0.5) +
   scale_alpha_continuous() +
   theme(
-    plot.margin = unit(c(0, 0, 0, 0), "cm"),
+    plot.margin = unit(c(0.2, 0.2, 0.2, 0.2), "cm"),
     legend.position = "top",
     legend.direction = "horizontal",
+    axis.text = element_text(size = 10),
+    axis.title = element_text(size = 11),
+    legend.text = element_text(size = 9),
+    legend.title = element_text(size = 9)
   ) +
   REMOVE_HASH_MARKS
 
@@ -83,16 +87,16 @@ plot_degree <- ggplot(data_with_pca_worker, aes(x = Degree, fill = QR_Queen_Cond
   CONSISTENT_THEME +
   theme(
     aspect.ratio = 1,
-    plot.margin = unit(c(0, 0, 0, 0), "cm")
-  ) +
-  scale_alpha_continuous() +
-  REMOVE_HASH_MARKS +
-  theme(
-    plot.margin = unit(c(0, 0, 0, 0), "cm"),
+    plot.margin = unit(c(0.2, 0.2, 0.2, 0.2), "cm"),
+    axis.text = element_text(size = 10),
+    axis.title = element_text(size = 11),
+    legend.text = element_text(size = 9),
     legend.position = "right",
     legend.direction = "horizontal",
     legend.title = element_blank()
-  )
+  ) +
+  scale_alpha_continuous() +
+  REMOVE_HASH_MARKS
 
 plot_dispersion <- ggplot(data_with_pca_worker, aes(x = N90.Day4, fill = QR_Queen_Condition)) +
   geom_density(alpha = 0.5) +
@@ -102,7 +106,10 @@ plot_dispersion <- ggplot(data_with_pca_worker, aes(x = N90.Day4, fill = QR_Quee
   CONSISTENT_THEME +
   theme(
     aspect.ratio = 1,
-    plot.margin = unit(c(0, 0, 0, 0), "cm")
+    plot.margin = unit(c(0.2, 0.2, 0.2, 0.2), "cm"),
+    axis.text = element_text(size = 10),
+    axis.title = element_text(size = 11),
+    legend.text = element_text(size = 9)
   ) +
   scale_alpha_continuous() +
   REMOVE_HASH_MARKS
@@ -115,7 +122,10 @@ plot_move_perc <- ggplot(data_with_pca_worker, aes(x = move_perc * 100, fill = Q
   CONSISTENT_THEME +
   theme(
     aspect.ratio = 1,
-    plot.margin = unit(c(0, 0, 0, 0), "cm")
+    plot.margin = unit(c(0.2, 0.2, 0.2, 0.2), "cm"),
+    axis.text = element_text(size = 10),
+    axis.title = element_text(size = 11),
+    legend.text = element_text(size = 9)
   ) +
   scale_alpha_continuous() +
   REMOVE_HASH_MARKS
@@ -128,7 +138,10 @@ plot_clustering <- ggplot(data_with_pca_worker, aes(x = clust, fill = QR_Queen_C
   CONSISTENT_THEME +
   theme(
     aspect.ratio = 1,
-    plot.margin = unit(c(0, 0, 0, 0), "cm")
+    plot.margin = unit(c(0.2, 0.2, 0.2, 0.2), "cm"),
+    axis.text = element_text(size = 10),
+    axis.title = element_text(size = 11),
+    legend.text = element_text(size = 9)
   ) +
   scale_alpha_continuous() +
   REMOVE_HASH_MARKS
@@ -163,12 +176,22 @@ final_grid <- plot_grid(
 
 final_pca_plot <- plot_grid(pca_legend, pca_plot_no_legend, ncol = 1, align = "tb", rel_heights = c(0.1, 1))
 
+# Create a 3-panel horizontal layout with equal widths
 final_layout <- plot_grid(
-  final_pca_plot,
-  grid_no_legend,
-  ncol = 2,
-  align = "h",
-  scale = c(0.8, 1.2)  # this directly scales plot sizes
+  pca_plot_no_legend,
+  plot_degree + theme(legend.position = "none"),
+  plot_clustering + theme(legend.position = "none"),
+  ncol = 3,
+  align = "hv",
+  rel_widths = c(1, 1, 1)  # Equal widths for all panels
 )
 
-ggsave("figures/manuscript/figure_3.jpeg", final_layout, width = 12.75, height = 4.25, units = "in", dpi = 600)
+# Put legend above the plots with padding above legend
+final_layout_with_legend <- plot_grid(
+  pca_legend,
+  final_layout,
+  ncol = 1,
+  rel_heights = c(0.05, 1)
+) + theme(plot.margin = unit(c(0.5, 0, 0, 0), "cm"))
+
+ggsave("figures/manuscript/figure_3.jpeg", final_layout_with_legend, width = 8.5, height = 3, units = "in", dpi = 600)

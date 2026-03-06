@@ -1,10 +1,10 @@
 # Load necessary libraries
-library(lme4)
+library(glmmTMB)
 library(tidyverse)
 library(stringr)
 library(ggplot2)
 library(broom.mixed)
-library(lmerTest)
+library(emmeans)
 
 source("scripts/manuscript/load_data.R")
 source("scripts/manuscript/constants.R")
@@ -28,10 +28,18 @@ metrics_for_queen_model <- c("Degree", "move_perc", "mean_vel", "N90.Day4", "Ini
 fit_and_summarize_queen_model <- function(metric) {
 
   formula <- as.formula(paste(metric, "~ 1 + Queen + (1 | Trial) + (1 | DayTimePeriod)"))
-  model <- lmer(formula, data = daytime_filtered_data)
+  model <- glmmTMB(formula, data = daytime_filtered_data, family = gaussian(), dispformula = ~ Queen)
 
   tidy_model <- tidy(model, effects = "fixed", conf.int = TRUE) %>%
     mutate(metric = metric, model_specification = paste(deparse(formula), collapse = " "))
+
+  # Compare dispersion estimates between Queen groups using emmeans
+  disp_emm <- emmeans(model, ~ Queen, component = "disp")
+  disp_contrast <- pairs(disp_emm)
+  cat("\n--- Dispersion comparison for", metric, "---\n")
+  print(summary(disp_emm))
+  print(summary(disp_contrast))
+
   return(tidy_model)
 }
 
