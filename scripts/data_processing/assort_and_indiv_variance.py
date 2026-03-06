@@ -1,5 +1,5 @@
 #INPUT: Total List of Interactions for ONE colony
-#OUTPUT: Degree Assortativity and Influencer Assortativity, as well as a table of how individuals in that colony vary
+#OUTPUT: Degree Assortativity and Hub Bee Assortativity, as well as a table of how individuals in that colony vary
 import sys
 import networkx as nx
 import numpy as np

@@ -44,7 +44,7 @@ plot_centrality <- ggplot(bds_means, aes(y = Between, x = Degree, group = Q_QRW_
 plot_lm <- ggplot(bds_means, aes(y = move_perc * 100, x = Degree, color = Q_QRW_QLW_Keystone)) +
   geom_point(aes(size = Q_QRW_QLW_Keystone %in% c("Queen", "Keystone")), stroke = 0, alpha = .75) + # Conditional size for "Queen"
   geom_smooth(data = subset(bds_means, Q_QRW_QLW_Keystone %in% c("Queenright", "Queen")), method = "lm", se = TRUE, color = "#642076") + # Red line for Queen and Queenright Worker combined
-  geom_smooth(data = subset(bds_means, Q_QRW_QLW_Keystone %in% c("Queenless", "Keystone")), method = "lm", se = TRUE, color = "#E68200") + # Green line for Queenless Worker and Influencer combined
+  geom_smooth(data = subset(bds_means, Q_QRW_QLW_Keystone %in% c("Queenless", "Keystone")), method = "lm", se = TRUE, color = "#E68200") + # Green line for Queenless Worker and Hub Bee combined
   scale_color_manual(
     labels = c("Queen", "Queenright Worker", "Queenless Keystone Worker", "Queenless Non-Keystone Worker"),
     values = c(Q_QRW_KEY_QLW$Q, Q_QRW_KEY_QLW$QRW, Q_QRW_KEY_QLW$KEY, Q_QRW_KEY_QLW$QLW),

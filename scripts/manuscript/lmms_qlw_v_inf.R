@@ -19,18 +19,18 @@ bds_ql <- bds_ql %>%
     QR == 0 & Infl == 0 ~ "Queenless Worker",
     QR == 1 & Queen == 0 ~ "Queenright Worker",
     Queen == 1 ~ "Queen",
-    QR == 0 & Infl == 1 ~ "Influencer"
+    QR == 0 & Infl == 1 ~ "Hub Bee"
   )) %>%
-  mutate(worker_v_infl = factor(worker_v_infl, levels = c("Queenless Worker", "Queenright Worker", "Queen", "Influencer")))
+  mutate(worker_v_infl = factor(worker_v_infl, levels = c("Queenless Worker", "Queenright Worker", "Queen", "Hub Bee")))
 
 bds_ql <- bds_ql %>%
   filter(TimeOfDay == "Day") %>%
   mutate(Day_Zeit = paste(Day, Zeit, sep = "_"))
 
-# Get number of influencers
-num_influencers <- bds_ql %>%
+# Get number of hub bees
+num_hub_bees <- bds_ql %>%
   filter(Infl == 1)
-  summarise(num_influencers = n_distinct(Bee))
+  summarise(num_hub_bees = n_distinct(Bee))
 
 # List of features to test
 features <- c("Degree", "move_perc", "mean_vel", "N90.Day4", "Initiation.Freq", "Close", "Between", "clust", "OvaryIndex")
