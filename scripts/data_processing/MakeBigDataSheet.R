@@ -392,7 +392,7 @@ BigDataSheet <- BigDataSheet %>%
 
 BigDataSheet$DayTime <- paste(BigDataSheet$ExpDay, BigDataSheet$TimeOfDay, sep = "_")
 
-# Influencers
+# Hub Bees
 
 BDSMeansNoOv <- aggregate(cbind(Degree, Close, Eigen, Between, QR, Queen, boutDegree, boutBetween, boutClose, boutEigen, bodyDegree, bodyBetween, bodyClose, bodyEigen, AverageBoutLength, Presence, AntPresence, mean_vel, move_perc, N90.Day4, MRSD.Day4, Initiation.Freq, clust) ~ Bee, BigDataSheet, mean)
 BDSMeansNoOv$Trial <- str_extract(BDSMeansNoOv$Bee, ".+?(?=_)")

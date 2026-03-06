@@ -31,20 +31,20 @@ numerical_data$Trial <- bds_means[complete.cases(numerical_data), ]$Trial
 pca_scores <- data.pca$scores
 data_with_pca <- data.frame(bds_means[complete.cases(bds_means[, focal_columns]), ], PC1 = pca_scores[, 1], PC2 = pca_scores[, 2])
 
-# Modify data for plotting - use Q_QRW_QLW_Keystone to include influencers
+# Modify data for plotting - use Q_QRW_QLW_Keystone to include hub bees
 data_with_pca$PointSize <- ifelse(data_with_pca$Q_QRW_QLW_Keystone %in% c("Queen", "Keystone"), "big", "small")
 data_with_pca$Alpha <- ifelse(data_with_pca$Q_QRW_QLW_Keystone %in% c("Queen", "Keystone"), 1, 0.4)
 data_with_pca$Alpha <- as.numeric(data_with_pca$Alpha)
 data_with_pca$PointShape <- ifelse(data_with_pca$Q_QRW_QLW_Keystone == "Keystone", "diamond", "circle")
 
-# Create a grouping variable for PCA ellipses that includes influencers with queenless workers
+# Create a grouping variable for PCA ellipses that includes hub bees with queenless workers
 data_with_pca$PCA_Group <- case_when(
   data_with_pca$Q_QRW_QLW_Keystone == "Queen" ~ "Queen",
   data_with_pca$Q_QRW_QLW_Keystone == "Queenright" ~ "Queenright",
   data_with_pca$Q_QRW_QLW_Keystone %in% c("Keystone", "Queenless") ~ "Queenless"
 )
 
-# Create PCA plot with legend on top, highlighting influencers
+# Create PCA plot with legend on top, highlighting hub bees
 pca_plot <- ggplot(data_with_pca, aes(x = PC1, y = PC2, color = Q_QRW_QLW_Keystone, size = PointSize, shape = PointShape)) +
   geom_point(alpha = data_with_pca$Alpha, stroke = 0.5) +
   scale_size_manual(values = c("big" = 2.5, "small" = 1.5), guide = "none") +
@@ -77,15 +77,15 @@ data_with_pca_worker <- data_with_pca %>%
 data_with_pca_queen <- data_with_pca %>%
   filter(Queen == 1)
 
-# Create beeswarm plot for ovary index, including influencers as separate group
+# Create beeswarm plot for ovary index, including hub bees as separate group
 plot_degree <- ggplot(data_with_pca_worker, aes(x = Q_QRW_QLW_Keystone, y = ovary_idx, fill = Q_QRW_QLW_Keystone, color = Q_QRW_QLW_Keystone)) +
   geom_beeswarm(alpha = 0.7, size = 1.5) +
   scale_fill_manual(
-    labels = c("Queenright Worker", "Keystone/Influencer", "Queenless Worker"), 
+    labels = c("Queenright Worker", "Keystone/Hub Bee", "Queenless Worker"), 
     values = c("Queenright" = Q_QRW_KEY_QLW$QRW, "Keystone" = Q_QRW_KEY_QLW$KEY, "Queenless" = Q_QRW_KEY_QLW$QLW)
   ) +
   scale_color_manual(
-    labels = c("Queenright Worker", "Keystone/Influencer", "Queenless Worker"), 
+    labels = c("Queenright Worker", "Keystone/Hub Bee", "Queenless Worker"), 
     values = c("Queenright" = Q_QRW_KEY_QLW$QRW, "Keystone" = Q_QRW_KEY_QLW$KEY, "Queenless" = Q_QRW_KEY_QLW$QLW)
   ) +
   scale_x_discrete(labels = c("Queenright" = "QR", "Keystone" = "Key", "Queenless" = "QL")) +

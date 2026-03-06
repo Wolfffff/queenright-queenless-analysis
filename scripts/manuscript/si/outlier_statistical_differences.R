@@ -162,8 +162,8 @@ plot_oi <- ggplot(bds_means %>% filter(QR_Queen_Condition != "Queen"), aes(x = Q
   scale_x_discrete(labels = c(
     "Queen" = "Queen",
     "Queenright\nWorker" = "Queenright\nWorker",
-    "Queenless\nInfluencer" = "Queenless\nInfluencer",
-    "Queenless\nNon-Influencer\nWorker" = "Queenless\nNon-\nInfluencer\nWorker"
+    "Queenless\nHub Bee" = "Queenless\nHub Bee",
+    "Queenless\nNon-Hub Bee\nWorker" = "Queenless\nNon-\nHub Bee\nWorker"
   )) +
   theme_minimal() +
   CONSISTENT_THEME_NO_ASPECT +

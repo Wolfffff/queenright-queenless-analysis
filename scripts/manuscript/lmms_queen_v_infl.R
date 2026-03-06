@@ -11,12 +11,12 @@ source("scripts/manuscript/load_data.R")
 
 bds$OvaryIndex <- bds$AverageOvaryWidth / bds$AverageWingLength
 
-# Filter for queens and influencers only, during day
+# Filter for queens and hub bees only, during day
 bds_queen_infl <- bds %>%
   filter(TimeOfDay == "Day") %>%
   filter(Queen == TRUE | (QR == 0 & Infl == 1)) %>%
-  mutate(Type = ifelse(Queen == TRUE, "Queen", "Influencer"),
-         Type = factor(Type, levels = c("Queen", "Influencer")),
+  mutate(Type = ifelse(Queen == TRUE, "Queen", "Hub Bee"),
+         Type = factor(Type, levels = c("Queen", "Hub Bee")),
          Day_Zeit = paste(Day, Zeit, sep = "_"))
 
 # List of features to test

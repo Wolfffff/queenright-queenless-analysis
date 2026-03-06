@@ -37,24 +37,24 @@ bds_means_of_means_Q_QRW_QLW_Keystone <- bds_means_of_means_Q_QRW_QLW_Keystone %
   mutate(Q_QRW_QLW_Keystone = fct_recode(Q_QRW_QLW_Keystone,
     "Queen" = "Queen",
     "Queenright Worker" = "Queenright",
-    "Queenless Influencer" = "Keystone",
-    "Queenless Non-Influencer Worker" = "Queenless"
+    "Queenless Hub Bee" = "Keystone",
+    "Queenless Non-Hub Bee Worker" = "Queenless"
   ))
 
 bds_means <- bds_means %>%
   mutate(Q_QRW_QLW_Keystone = fct_recode(Q_QRW_QLW_Keystone,
     "Queen" = "Queen",
     "Queenright Worker" = "Queenright",
-    "Queenless Influencer" = "Keystone",
-    "Queenless Non-Influencer Worker" = "Queenless"
+    "Queenless Hub Bee" = "Keystone",
+    "Queenless Non-Hub Bee Worker" = "Queenless"
   ))
 
 bds_means_of_means_Q_QRW_QLW_Keystone <- bds_means_of_means_Q_QRW_QLW_Keystone %>%
   mutate(Q_QRW_QLW_Keystone = fct_recode(Q_QRW_QLW_Keystone,
     "Queen" = "Queen",
     "Queenright Worker" = "Queenright",
-    "Queenless Influencer" = "Keystone",
-    "Queenless Non-Influencer Worker" = "Queenless"
+    "Queenless Hub Bee" = "Keystone",
+    "Queenless Non-Hub Bee Worker" = "Queenless"
   ))
 
 # Set the factor levels with line breaks for plotting for both dataframes
@@ -63,14 +63,14 @@ bds_means$Q_QRW_QLW_Keystone <- factor(
   levels = c(
     "Queen",
     "Queenright Worker",
-    "Queenless Influencer",
-    "Queenless Non-Influencer Worker"
+    "Queenless Hub Bee",
+    "Queenless Non-Hub Bee Worker"
   ),
   labels = c(
     "Queen",
     "Queenright Worker",
-    "Queenless Influencer",
-    "Queenless\nNon-Influencer Worker"
+    "Queenless Hub Bee",
+    "Queenless\nNon-Hub Bee Worker"
   )
 )
 
@@ -79,14 +79,14 @@ bds_means_of_means_Q_QRW_QLW_Keystone$Q_QRW_QLW_Keystone <- factor(
   levels = c(
     "Queen",
     "Queenright Worker",
-    "Queenless Influencer",
-    "Queenless Non-Influencer Worker"
+    "Queenless Hub Bee",
+    "Queenless Non-Hub Bee Worker"
   ),
   labels = c(
     "Queen",
     "Queenright Worker",
-    "Queenless Influencer",
-    "Queenless\nNon-Influencer Worker"
+    "Queenless Hub Bee",
+    "Queenless\nNon-Hub Bee Worker"
   )
 )
 
@@ -162,8 +162,8 @@ plot_oi <- ggplot(bds_means %>% filter(QR_Queen_Condition != "Queen"), aes(x = Q
   scale_x_discrete(labels = c(
     "Queen" = "Queen",
     "Queenright\nWorker" = "Queenright\nWorker",
-    "Queenless\nInfluencer" = "Queenless\nInfluencer",
-    "Queenless\nNon-Influencer\nWorker" = "Queenless\nNon-\nInfluencer\nWorker"
+    "Queenless\nHub Bee" = "Queenless\nHub Bee",
+    "Queenless\nNon-Hub Bee\nWorker" = "Queenless\nNon-\nHub Bee\nWorker"
   )) +
   theme_minimal() +
   CONSISTENT_THEME_NO_ASPECT +
