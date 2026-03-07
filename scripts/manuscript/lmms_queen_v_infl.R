@@ -61,4 +61,4 @@ significant_features <- comprehensive_summary_table %>%
 print(significant_features)
 
 # Save results
-write_csv(comprehensive_summary_table, "results/queen_vs_influencer_lmm.csv")
+write_csv(comprehensive_summary_table, "results/queen_vs_hub_bee_lmm.csv")

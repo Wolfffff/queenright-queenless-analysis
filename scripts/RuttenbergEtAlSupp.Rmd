@@ -2061,11 +2061,11 @@ anova(fm, fm.null)
 print(fm)
 
 
-influencers <- data_with_pca_ql[data_with_pca_ql$PC1 > cutoff1, ]
+hub_bees <- data_with_pca_ql[data_with_pca_ql$PC1 > cutoff1, ]
 
-BigDataSheet$Infl <- BigDataSheet$Bee %in% influencers$Bee
-BDSMeansNoOv$InflText <- BDSMeansNoOv$Bee %in% influencers$Bee
-BDSMeans$InflText <- BDSMeans$Bee %in% influencers$Bee
+BigDataSheet$Infl <- BigDataSheet$Bee %in% hub_bees$Bee
+BDSMeansNoOv$InflText <- BDSMeansNoOv$Bee %in% hub_bees$Bee
+BDSMeans$InflText <- BDSMeans$Bee %in% hub_bees$Bee
 BDSMeansNoOv$Infl <- ifelse(BDSMeansNoOv$InflText, 1, 0)
 BDSMeans$Infl <- ifelse(BDSMeans$InflText, 1, 0)
 

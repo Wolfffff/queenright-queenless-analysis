@@ -450,5 +450,5 @@ cutoff2 <- quantile(data_with_pca_qr$PC2, 1)
 print(cutoff1)
 print(cutoff2)
 
-influencers <- data_with_pca_ql[data_with_pca_ql$PC1 > cutoff1 & data_with_pca_ql$Rank >= 40, ]
-BigDataSheet$Infl <- BigDataSheet$Bee %in% influencers$Bee
+hub_bees <- data_with_pca_ql[data_with_pca_ql$PC1 > cutoff1 & data_with_pca_ql$Rank >= 40, ]
+BigDataSheet$Infl <- BigDataSheet$Bee %in% hub_bees$Bee
