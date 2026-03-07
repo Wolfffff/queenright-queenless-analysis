@@ -161,7 +161,7 @@ bds_means_of_means_Q_QRW_QLW_Keystone$Q_QRW_QLW_Keystone <- factor(
 plot_oi <- ggplot(bds_means %>% filter(QR_Queen_Condition != "Queen"), aes(x = Q_QRW_QLW_Keystone, y = ovary_idx)) +
   geom_line(data = bds_means_of_means_Q_QRW_QLW_Keystone, aes(group = Trial), color = "darkgray", linewidth = 0.2) +
   geom_point(data = bds_means_of_means_Q_QRW_QLW_Keystone %>% filter(Queen == 1), aes(color = Trial, fill = Trial), size = 3, shape = 21, stroke = 0.2, color = "black") +
-  geom_beeswarm(aes(color = Trial), stroke = 0, size = 1, alpha = .2, method = "hex") +
+  geom_beeswarm(aes(color = Trial), stroke = 0, size = 1.5, alpha = .4, method = "hex") +
   geom_point(data = bds_means_of_means_Q_QRW_QLW_Keystone %>% filter(Queen == 0), aes(color = Trial, fill = Trial), size = 3, shape = 21, stroke = 0.2, color = "black") +
   scale_color_manual(
     values = COLONY_COLORS

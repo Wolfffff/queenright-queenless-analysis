@@ -46,6 +46,11 @@ perform_variance_analysis <- function(value_column) {
 
   # Plot dispersion estimates
   disp_df <- as.data.frame(disp_emm)
+  # Column names vary by emmeans version; use lower.CL/upper.CL or asymp.LCL/asymp.UCL
+  if (!"asymp.LCL" %in% names(disp_df)) {
+    names(disp_df)[names(disp_df) == "lower.CL"] <- "asymp.LCL"
+    names(disp_df)[names(disp_df) == "upper.CL"] <- "asymp.UCL"
+  }
 
   p <- ggplot(disp_df, aes(x = QR_Queen_Condition, y = emmean)) +
     geom_point(size = 3) +
