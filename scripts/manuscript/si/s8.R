@@ -43,15 +43,15 @@ pca_scores <- data.pca$scores
 data_with_pca <- data.frame(bds_means, PC1 = pca_scores[, 1], PC2 = pca_scores[, 2])
 
 # Modify data for plotting
-data_with_pca$PointSize <- ifelse(data_with_pca$IsInfluencer, "hub_bee",
+data_with_pca$PointSize <- ifelse(data_with_pca$IsHubBee, "hub_bee",
               ifelse(data_with_pca$PointSize == "big", "big", "small"))
 
 data_with_pca$Alpha <- ifelse(data_with_pca$QR_Queen_Condition %in% c("Queen"), 1, 0.4)
 data_with_pca$Alpha <- as.numeric(data_with_pca$Alpha)
 
 # Add hub bee highlighting
-data_with_pca$IsInfluencer <- data_with_pca$Infl == 1
-data_with_pca$PointShape <- ifelse(data_with_pca$IsInfluencer, "diamond", "circle")
+data_with_pca$IsHubBee <- data_with_pca$Infl == 1
+data_with_pca$PointShape <- ifelse(data_with_pca$IsHubBee, "diamond", "circle")
 pca_plot <- ggplot(data_with_pca, aes(x = PC1, y = PC2, color = Trial, size = PointSize, shape = PointShape)) +
   geom_point(alpha = data_with_pca$Alpha, stroke = 0.5) +
   scale_shape_manual(values = c("diamond" = 17, "circle" = 16), guide = "none") +
