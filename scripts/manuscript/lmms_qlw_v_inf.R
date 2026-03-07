@@ -29,7 +29,7 @@ bds_ql <- bds_ql %>%
 
 # Get number of hub bees
 num_hub_bees <- bds_ql %>%
-  filter(Infl == 1)
+  filter(Infl == 1) %>%
   summarise(num_hub_bees = n_distinct(Bee))
 
 # List of features to test
