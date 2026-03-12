@@ -43,29 +43,36 @@ pca_scores <- data.pca$scores
 data_with_pca <- data.frame(bds_means, PC1 = pca_scores[, 1], PC2 = pca_scores[, 2])
 
 # Modify data for plotting
-data_with_pca$PointSize <- ifelse(data_with_pca$QR_Queen_Condition %in% c("Queen"), "big", "small")
+data_with_pca$PointSize <- ifelse(data_with_pca$IsHubBee, "hub_bee",
+              ifelse(data_with_pca$PointSize == "big", "big", "small"))
+
 data_with_pca$Alpha <- ifelse(data_with_pca$QR_Queen_Condition %in% c("Queen"), 1, 0.4)
 data_with_pca$Alpha <- as.numeric(data_with_pca$Alpha)
 
-# Create PCA plot
-pca_plot <- ggplot(data_with_pca, aes(x = PC1, y = PC2, color = Trial, size = PointSize)) +
-  geom_point(alpha = data_with_pca$Alpha, stroke = 0) +
-  scale_size_manual(values = c("big" = 2.5, "small" = 1.5), guide = "none") +
+# Add hub bee highlighting
+data_with_pca$IsHubBee <- data_with_pca$Infl == 1
+data_with_pca$PointShape <- ifelse(data_with_pca$IsHubBee, "diamond", "circle")
+pca_plot <- ggplot(data_with_pca, aes(x = PC1, y = PC2, color = Trial, size = PointSize, shape = PointShape)) +
+  geom_point(alpha = data_with_pca$Alpha, stroke = 0.5) +
+  scale_shape_manual(values = c("diamond" = 17, "circle" = 16), guide = "none") +
+  scale_size_manual(
+  values = c("hub_bee" = 2.5, "big" = 2.5, "small" = 1.5),
+  guide = "none"
+  ) +
   scale_color_manual(
-    labels = c("Col 1", "Col 2", "Col 3", "Col 4", "Col 5"),
-    values = COLONY_COLORS,
-    guide = guide_legend(direction = "horizontal", title = "")
+  labels = c("Col 1", "Col 2", "Col 3", "Col 4", "Col 5"),
+  values = COLONY_COLORS,
+  guide = guide_legend(direction = "horizontal", title = "", order = 1)
   ) +
   labs(x = paste0("Principal Component 1 (", round(100 * pve[1], 2), "%)"), y = paste0("Principal Component 2 (", round(100 * pve[2], 2), "%)")) +
   CONSISTENT_THEME +
-  stat_ellipse(alpha = 1, type = "t", level = 0.95, linetype = "dashed", size = 0.5) +
+  stat_ellipse(aes(x = PC1, y = PC2, group = Trial, color = Trial), alpha = 1, type = "t", level = 0.95, linetype = "dashed", size = 0.5, inherit.aes = FALSE) +
   scale_alpha_continuous() +
   theme(
-    plot.margin = unit(c(0, 0, 0, 0), "cm"),
-    legend.position = "top",
-    legend.direction = "horizontal",
+  plot.margin = unit(c(0, 0, 0, 0), "cm"),
+  legend.position = "top",
+  legend.direction = "horizontal",
   ) +
   REMOVE_HASH_MARKS
-
 
 ggsave("figures/manuscript/si/figure_s8.jpeg", pca_plot, width = 4.5, height = 4.5, units = "in", dpi = 600)

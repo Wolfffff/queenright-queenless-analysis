@@ -1,22 +1,22 @@
 # Load necessary libraries
-library(lme4)
+library(glmmTMB)
 library(tidyverse)
 library(stringr)
 library(ggplot2)
 library(broom.mixed)
-library(lmerTest)
+library(emmeans)
 
 source("scripts/manuscript/constants.R")
 source("scripts/manuscript/load_data.R")
 
 bds$OvaryIndex <- bds$AverageOvaryWidth / bds$AverageWingLength
 
-# Filter for queens and influencers only, during day
+# Filter for queens and hub bees only, during day
 bds_queen_infl <- bds %>%
   filter(TimeOfDay == "Day") %>%
   filter(Queen == TRUE | (QR == 0 & Infl == 1)) %>%
-  mutate(Type = ifelse(Queen == TRUE, "Queen", "Influencer"),
-         Type = factor(Type, levels = c("Queen", "Influencer")),
+  mutate(Type = ifelse(Queen == TRUE, "Queen", "Hub Bee"),
+         Type = factor(Type, levels = c("Queen", "Hub Bee")),
          Day_Zeit = paste(Day, Zeit, sep = "_"))
 
 # List of features to test
@@ -25,10 +25,18 @@ features <- c("Degree", "move_perc", "mean_vel", "N90.Day4", "Initiation.Freq", 
 # Function to fit and summarize the model for each feature
 fit_and_summarize <- function(feature) {
   formula <- as.formula(paste(feature, "~ 1 + Type + (1 | Trial) + (1 | Day_Zeit)"))
-  model <- lmer(formula, data = bds_queen_infl)
+  model <- glmmTMB(formula, data = bds_queen_infl, family = gaussian(), dispformula = ~ Type)
   tidy_model <- tidy(model, effects = "fixed", conf.int = TRUE) %>%
-    mutate(feature = feature, 
+    mutate(feature = feature,
            model_spec = paste(deparse(formula), collapse = " "))
+
+  # Compare dispersion estimates between Type groups using emmeans
+  disp_emm <- emmeans(model, ~ Type, component = "disp")
+  disp_contrast <- pairs(disp_emm)
+  cat("\n--- Dispersion comparison for", feature, "---\n")
+  print(summary(disp_emm))
+  print(summary(disp_contrast))
+
   return(tidy_model)
 }
 
@@ -53,4 +61,4 @@ significant_features <- comprehensive_summary_table %>%
 print(significant_features)
 
 # Save results
-write_csv(comprehensive_summary_table, "results/queen_vs_influencer_lmm.csv")
+write_csv(comprehensive_summary_table, "results/queen_vs_hub_bee_lmm.csv")

@@ -57,7 +57,7 @@ interaction_df = pd.DataFrame(
 bds = pd.read_csv("data/BigDataSheet.csv", index_col=0)
 bds["Trial"] = bds["Bee"].str.extract(r"(.+?)(?=_)")
 
-# Classify bees based on QR and Influencer status
+# Classify bees based on QR and Hub Bee status
 bds["QR_Queen_Inf"] = bds.apply(
     lambda row: (
         "Queenless Worker"
@@ -68,7 +68,7 @@ bds["QR_Queen_Inf"] = bds.apply(
             else (
                 "Queen"
                 if row["Queen"] == 1
-                else "Influencer"
+                else "Hub Bee"
                 if row["QR"] == 0 and row["Infl"] == 1
                 else None
             )
@@ -78,7 +78,7 @@ bds["QR_Queen_Inf"] = bds.apply(
 )
 bds["QR_Queen_Inf"] = pd.Categorical(
     bds["QR_Queen_Inf"],
-    categories=["Queenless Worker", "Queenright Worker", "Queen", "Influencer"],
+    categories=["Queenless Worker", "Queenright Worker", "Queen", "Hub Bee"],
 )
 
 # Filter the dataset for the Rooibos Trial
