@@ -1,4 +1,4 @@
-library(lme4)
+library(glmmTMB)
 library(tidyverse)
 library(dplyr)
 library(stringr)
@@ -6,7 +6,7 @@ library(wesanderson)
 library(ggnewscale)
 library(ggplot2)
 library(broom.mixed)
-library(lmerTest)
+library(emmeans)
 
 source("scripts/manuscript/constants.R")
 source("scripts/manuscript/load_data.R")
@@ -45,9 +45,17 @@ features <- c("Modularity", "GlobalEfficiency", "Transitivity", "Average.Cluster
 # Function to fit and summarize the model for each feature
 fit_and_summarize <- function(feature) {
   formula <- as.formula(paste(feature, "~ 1 + QR + (1 | Trial) + (1 | Day_Zeit)"))
-  model <- lmer(formula, data = nwp_Pooled)
+  model <- glmmTMB(formula, data = nwp_Pooled, family = gaussian(), dispformula = ~ QR)
   tidy_model <- tidy(model, effects = "fixed", conf.int = TRUE) %>%
     mutate(feature = feature, model_spec = paste(deparse(formula), collapse = " "))
+
+  # Compare dispersion estimates between QR groups using emmeans
+  disp_emm <- emmeans(model, ~ QR, component = "disp")
+  disp_contrast <- pairs(disp_emm)
+  cat("\n--- Dispersion comparison for", feature, "---\n")
+  print(summary(disp_emm))
+  print(summary(disp_contrast))
+
   return(tidy_model)
 }
 

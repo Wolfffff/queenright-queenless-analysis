@@ -1702,7 +1702,7 @@ ggplot(BDSRanked, aes(x = Rank, y = Degree)) +
   geom_point(data = subset(BDSRanked, Queen == 1), color = "purple", size = 3) +
   facet_wrap(~Trial, scales = "free_y")
 ```
-```{r influencer identification}
+```{r hub bee identification}
 data_with_pca <- data_with_pca %>%
   arrange(ID, Degree) %>%
   group_by(ID) %>%
@@ -1715,10 +1715,10 @@ cutoff2 <- quantile(data_with_pca_qr$PC2, 0.9)
 print(cutoff1)
 print(cutoff2)
 
-influencers <- data_with_pca_ql[data_with_pca_ql$PC1 > cutoff1 & data_with_pca_ql$Rank >= 40, ]
+hub_bees <- data_with_pca_ql[data_with_pca_ql$PC1 > cutoff1 & data_with_pca_ql$Rank >= 40, ]
 
-BDSMeansNoOv$InflText <- BDSMeansNoOv$Bee %in% influencers$Bee
-BDSMeans$InflText <- BDSMeans$Bee %in% influencers$Bee
+BDSMeansNoOv$InflText <- BDSMeansNoOv$Bee %in% hub_bees$Bee
+BDSMeans$InflText <- BDSMeans$Bee %in% hub_bees$Bee
 BDSMeansNoOv$Infl <- ifelse(BDSMeansNoOv$InflText, 1, 0)
 BDSMeans$Infl <- ifelse(BDSMeans$InflText, 1, 0)
 
@@ -1727,20 +1727,20 @@ BDSMeans <- BDSMeans %>%
     QR == 0 & Infl == 0 ~ "Queenless Worker",
     QR == 1 & Queen == 0 ~ "Queenright Worker",
     Queen == 1 ~ "Queen",
-    QR == 0 & Infl == 1 ~ "Influencer",
+    QR == 0 & Infl == 1 ~ "Hub Bee",
     TRUE ~ NA_character_ # This handles any other case, which shouldn't exist in your scenario
   )) %>%
-  mutate(QR_Queen_Inf = factor(QR_Queen_Inf, levels = c("Queenless Worker", "Queenright Worker", "Queen", "Influencer")))
+  mutate(QR_Queen_Inf = factor(QR_Queen_Inf, levels = c("Queenless Worker", "Queenright Worker", "Queen", "Hub Bee")))
 
 BDSMeansNoOv <- BDSMeansNoOv %>%
   mutate(QR_Queen_Inf = case_when(
     QR == 0 & Infl == 0 ~ "Queenless Worker",
     QR == 1 & Queen == 0 ~ "Queenright Worker",
     Queen == 1 ~ "Queen",
-    QR == 0 & Infl == 1 ~ "Influencer",
+    QR == 0 & Infl == 1 ~ "Hub Bee",
     TRUE ~ NA_character_ # This handles any other case, which shouldn't exist in your scenario
   )) %>%
-  mutate(QR_Queen_Inf = factor(QR_Queen_Inf, levels = c("Queenless Worker", "Queenright Worker", "Queen", "Influencer")))
+  mutate(QR_Queen_Inf = factor(QR_Queen_Inf, levels = c("Queenless Worker", "Queenright Worker", "Queen", "Hub Bee")))
 BDSMeans$ID <- paste(BDSMeans$Trial, BDSMeans$QR_Queen_Inf)
 BDSMeansNoOv$ID <- paste(BDSMeansNoOv$Trial, BDSMeansNoOv$QR_Queen_Inf)
 BDSMeanOfMean <- aggregate(cbind(Degree, Close, Eigen, Between, QR, Queen, boutDegree, boutBetween, boutClose, boutEigen, bodyDegree, bodyBetween, bodyClose, bodyEigen, AverageBoutLength, Presence, AntPresence, mean_vel, move_perc, N90.Day4, MRSD.Day4, Initiation.Freq, clust, Infl) ~ ID, BDSMeansNoOv, mean)
@@ -1751,12 +1751,12 @@ BDSMeanOfMean <- BDSMeanOfMean %>%
     QR == 0 & Infl == 0 ~ "Queenless Worker",
     QR == 1 & Queen == 0 ~ "Queenright Worker",
     Queen == 1 ~ "Queen",
-    QR == 0 & Infl == 1 ~ "Influencer",
+    QR == 0 & Infl == 1 ~ "Hub Bee",
     TRUE ~ NA_character_ # This handles any other case, which shouldn't exist in your scenario
   )) %>%
-  mutate(QR_Queen_Inf = factor(QR_Queen_Inf, levels = c("Queenless Worker", "Queenright Worker", "Queen", "Influencer")))
+  mutate(QR_Queen_Inf = factor(QR_Queen_Inf, levels = c("Queenless Worker", "Queenright Worker", "Queen", "Hub Bee")))
 
-ggplot(BDSMeanOfMean, aes(x = factor(QR_Queen_Inf, levels = c("Queen", "Influencer", "Queenright Worker", "Queenless Worker")), y = Degree)) +
+ggplot(BDSMeanOfMean, aes(x = factor(QR_Queen_Inf, levels = c("Queen", "Hub Bee", "Queenright Worker", "Queenless Worker")), y = Degree)) +
   geom_line(aes(group = Trial), color = "darkgray") +
   geom_point(aes(color = Trial), size = 5) +
   scale_color_manual(values = wes_palette("Cavalcanti1")) +
@@ -1781,7 +1781,7 @@ ggplot(BDSMeanOfMean, aes(x = factor(QR_Queen_Inf, levels = c("Queen", "Influenc
   ) +
   guides(color = guide_legend(title.position = "top", title.hjust = 0.5))
 
-ggplot(BDSMeanOfMean, aes(x = factor(QR_Queen_Inf, levels = c("Queen", "Influencer", "Queenright Worker", "Queenless Worker")), y = move_perc)) +
+ggplot(BDSMeanOfMean, aes(x = factor(QR_Queen_Inf, levels = c("Queen", "Hub Bee", "Queenright Worker", "Queenless Worker")), y = move_perc)) +
   geom_line(aes(group = Trial), color = "darkgray") +
   geom_point(aes(color = Trial), size = 5) +
   scale_color_manual(values = wes_palette("Cavalcanti1")) +
@@ -1806,7 +1806,7 @@ ggplot(BDSMeanOfMean, aes(x = factor(QR_Queen_Inf, levels = c("Queen", "Influenc
   ) +
   guides(color = guide_legend(title.position = "top", title.hjust = 0.5))
 
-ggplot(BDSMeanOfMean, aes(x = factor(QR_Queen_Inf, levels = c("Queen", "Influencer", "Queenright Worker", "Queenless Worker")), y = clust)) +
+ggplot(BDSMeanOfMean, aes(x = factor(QR_Queen_Inf, levels = c("Queen", "Hub Bee", "Queenright Worker", "Queenless Worker")), y = clust)) +
   geom_line(aes(group = Trial), color = "darkgray") +
   geom_point(aes(color = Trial), size = 5) +
   scale_color_manual(values = wes_palette("Cavalcanti1")) +
@@ -1831,7 +1831,7 @@ ggplot(BDSMeanOfMean, aes(x = factor(QR_Queen_Inf, levels = c("Queen", "Influenc
   ) +
   guides(color = guide_legend(title.position = "top", title.hjust = 0.5))
 
-ggplot(BDSMeanOfMean, aes(x = factor(QR_Queen_Inf, levels = c("Queen", "Influencer", "Queenright Worker", "Queenless Worker")), y = N90.Day4)) +
+ggplot(BDSMeanOfMean, aes(x = factor(QR_Queen_Inf, levels = c("Queen", "Hub Bee", "Queenright Worker", "Queenless Worker")), y = N90.Day4)) +
   geom_line(aes(group = Trial), color = "darkgray") +
   geom_point(aes(color = Trial), size = 5) +
   scale_color_manual(values = wes_palette("Cavalcanti1")) +
@@ -1856,7 +1856,7 @@ ggplot(BDSMeanOfMean, aes(x = factor(QR_Queen_Inf, levels = c("Queen", "Influenc
   ) +
   guides(color = guide_legend(title.position = "top", title.hjust = 0.5))
 
-ggplot(BDSMeanOfMean, aes(x = factor(QR_Queen_Inf, levels = c("Queen", "Influencer", "Queenright Worker", "Queenless Worker")), y = Initiation.Freq)) +
+ggplot(BDSMeanOfMean, aes(x = factor(QR_Queen_Inf, levels = c("Queen", "Hub Bee", "Queenright Worker", "Queenless Worker")), y = Initiation.Freq)) +
   geom_line(aes(group = Trial), color = "darkgray") +
   geom_point(aes(color = Trial), size = 5) +
   scale_color_manual(values = wes_palette("Cavalcanti1")) +
@@ -1890,13 +1890,13 @@ BDSMeanOfMean <- BDSMeanOfMean %>%
     QR == 0 & Infl == 0 ~ "Queenless Worker",
     QR == 1 & Queen == 0 ~ "Queenright Worker",
     Queen == 1 ~ "Queen",
-    QR == 0 & Infl == 1 ~ "Influencer",
+    QR == 0 & Infl == 1 ~ "Hub Bee",
     TRUE ~ NA_character_ # This handles any other case, which shouldn't exist in your scenario
   )) %>%
-  mutate(QR_Queen_Inf = factor(QR_Queen_Inf, levels = c("Queenless Worker", "Queenright Worker", "Queen", "Influencer")))
+  mutate(QR_Queen_Inf = factor(QR_Queen_Inf, levels = c("Queenless Worker", "Queenright Worker", "Queen", "Hub Bee")))
 
 
-ggplot(BDSMeanOfMean, aes(x = factor(QR_Queen_Inf, levels = c("Queen", "Influencer", "Queenright Worker", "Queenless Worker")), y = OvaryIndex)) +
+ggplot(BDSMeanOfMean, aes(x = factor(QR_Queen_Inf, levels = c("Queen", "Hub Bee", "Queenright Worker", "Queenless Worker")), y = OvaryIndex)) +
   geom_line(aes(group = Trial), color = "darkgray") +
   geom_point(aes(color = Trial), size = 5) +
   scale_color_manual(values = wes_palette("Cavalcanti1")) +

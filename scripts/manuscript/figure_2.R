@@ -135,3 +135,14 @@ final_plot <- plot_grid(plots[[2]], top_row, ncol = 1, rel_heights = c(1, 1))
 # Save the combined plot
 # Adjust the plot saving command to include margins
 ggsave("figures/manuscript/figure_2.jpeg", plot = final_plot, width = 8.5, height = 6, dpi = 600)
+
+ggsave(
+  "figures/degree_over_time.jpeg",
+  plot = degree_over_time +
+    ylab("Std. Time Interacting\n per Hour (s)") +
+    coord_cartesian(ylim = c(0, 600)) +
+    theme(plot.margin = unit(c(.1, 0.1, .1, .1), "cm")),
+  width = 8.5,
+  height = 2,
+  dpi = 600
+)

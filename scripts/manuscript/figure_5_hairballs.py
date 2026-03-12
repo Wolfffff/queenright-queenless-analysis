@@ -8,7 +8,7 @@ FILENAMES = [
     "data/gmls/RooibosTea_QL_1216_1646_Time.daysonly.gml",
 ]
 
-# First is queenright, second is queenless influencers
+# First is queenright, second is queenless hub bees
 FOCAL_NODES = [
     ["ArUcoTag#52"],
     [
@@ -167,7 +167,7 @@ def plot_hairball(
             [0],
             marker="o",
             color="w",
-            label="Queen" if title == "Queenright" else "Queenless Influencer",
+            label="Queen" if title == "Queenright" else "Queenless Hub Bee",
             markerfacecolor=focal_color,
             markersize=10,
         ),
@@ -179,7 +179,7 @@ def plot_hairball(
             label=(
                 "Queenright Worker"
                 if title == "Queenright"
-                else "Queenless Non-Influencer Worker"
+                else "Queenless Non-Hub Bee Worker"
             ),
             markerfacecolor=non_focal_color,
             markersize=10,

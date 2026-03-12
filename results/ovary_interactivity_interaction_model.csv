@@ -1,0 +1,5 @@
+effect,component,term,estimate,std.error,statistic,p.value,conf.low,conf.high,model_specification
+fixed,cond,(Intercept),3141.9240512276624,404.6716507005369,7.7641318481010515,8.220634774695614e-15,2348.7821902902374,3935.0659121650874,Degree ~ QR_Queen_Condition * ovary_idx + (1 | Trial)
+fixed,cond,QR_Queen_ConditionQueenless,-706.592420430442,366.20317549163553,-1.9295092662203888,0.05366767085011431,-1424.3374554182483,11.152614557364473,Degree ~ QR_Queen_Condition * ovary_idx + (1 | Trial)
+fixed,cond,ovary_idx,-1698.1697905125047,1280.6685276771336,-1.3260025945922413,0.18483883796476053,-4208.233980893623,811.8943998686141,Degree ~ QR_Queen_Condition * ovary_idx + (1 | Trial)
+fixed,cond,QR_Queen_ConditionQueenless:ovary_idx,10541.09111710837,1642.1029836649677,6.4192631168490895,1.3693555421594628e-10,7322.628410219269,13759.55382399747,Degree ~ QR_Queen_Condition * ovary_idx + (1 | Trial)

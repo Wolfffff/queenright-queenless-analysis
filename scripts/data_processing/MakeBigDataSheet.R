@@ -392,7 +392,7 @@ BigDataSheet <- BigDataSheet %>%
 
 BigDataSheet$DayTime <- paste(BigDataSheet$ExpDay, BigDataSheet$TimeOfDay, sep = "_")
 
-# Influencers
+# Hub Bees
 
 BDSMeansNoOv <- aggregate(cbind(Degree, Close, Eigen, Between, QR, Queen, boutDegree, boutBetween, boutClose, boutEigen, bodyDegree, bodyBetween, bodyClose, bodyEigen, AverageBoutLength, Presence, AntPresence, mean_vel, move_perc, N90.Day4, MRSD.Day4, Initiation.Freq, clust) ~ Bee, BigDataSheet, mean)
 BDSMeansNoOv$Trial <- str_extract(BDSMeansNoOv$Bee, ".+?(?=_)")
@@ -450,5 +450,5 @@ cutoff2 <- quantile(data_with_pca_qr$PC2, 1)
 print(cutoff1)
 print(cutoff2)
 
-influencers <- data_with_pca_ql[data_with_pca_ql$PC1 > cutoff1 & data_with_pca_ql$Rank >= 40, ]
-BigDataSheet$Infl <- BigDataSheet$Bee %in% influencers$Bee
+hub_bees <- data_with_pca_ql[data_with_pca_ql$PC1 > cutoff1 & data_with_pca_ql$Rank >= 40, ]
+BigDataSheet$Infl <- BigDataSheet$Bee %in% hub_bees$Bee

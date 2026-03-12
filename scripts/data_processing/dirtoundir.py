@@ -1,3 +1,6 @@
+#INPUT: Undirected Interactions file, and the h5 file of bee body part positions
+#OUTPUT: Directed Interactions file
+
 from __future__ import division
 
 import math

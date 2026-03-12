@@ -1,0 +1,19 @@
+feature,model_spec,term,estimate,std.error,statistic,p.value
+Between,Between ~ 1 + Type + (1 | Trial) + (1 | Day_Zeit),(Intercept),0.1893201004763946,0.015245296771591999,12.41826271490973,2.0802990661216132e-35
+Between,Between ~ 1 + Type + (1 | Trial) + (1 | Day_Zeit),TypeHub Bee,-0.10878292904998958,0.011310801379839292,-9.617614649646974,6.737543312753012e-22
+Close,Close ~ 1 + Type + (1 | Trial) + (1 | Day_Zeit),(Intercept),87.74192432205108,10.58102428958579,8.292384737119422,1.1100021297356649e-16
+Close,Close ~ 1 + Type + (1 | Trial) + (1 | Day_Zeit),TypeHub Bee,29.795451356882495,2.3267691975452434,12.805503609174854,1.527317178728967e-37
+Degree,Degree ~ 1 + Type + (1 | Trial) + (1 | Day_Zeit),(Intercept),41.56334996111235,NA,NA,NA
+Degree,Degree ~ 1 + Type + (1 | Trial) + (1 | Day_Zeit),TypeHub Bee,1511.7520706901394,234.21385156006673,6.454580122484488,1.0851935249303982e-10
+Initiation.Freq,Initiation.Freq ~ 1 + Type + (1 | Trial) + (1 | Day_Zeit),(Intercept),0.2862873555815058,0.02181037841994976,13.126198457870005,2.3306615402709737e-39
+Initiation.Freq,Initiation.Freq ~ 1 + Type + (1 | Trial) + (1 | Day_Zeit),TypeHub Bee,0.15557611384036213,0.01215123347334716,12.803318624533627,1.5709158327007382e-37
+N90.Day4,N90.Day4 ~ 1 + Type + (1 | Trial) + (1 | Day_Zeit),(Intercept),0.637520951713835,NA,NA,NA
+N90.Day4,N90.Day4 ~ 1 + Type + (1 | Trial) + (1 | Day_Zeit),TypeHub Bee,16.28026039376889,0.7035060763937585,23.1416059364023,1.766139665687805e-118
+OvaryIndex,OvaryIndex ~ 1 + Type + (1 | Trial) + (1 | Day_Zeit),(Intercept),14.805377402695397,NA,NA,NA
+OvaryIndex,OvaryIndex ~ 1 + Type + (1 | Trial) + (1 | Day_Zeit),TypeHub Bee,0.08674280593448358,NA,NA,NA
+clust,clust ~ 1 + Type + (1 | Trial) + (1 | Day_Zeit),(Intercept),0.04271669896648087,0.004521494545738357,9.447473293259334,3.471081811473591e-21
+clust,clust ~ 1 + Type + (1 | Trial) + (1 | Day_Zeit),TypeHub Bee,0.010237134099745571,0.002269164440796891,4.511411299989554,6.4397712072604525e-6
+mean_vel,mean_vel ~ 1 + Type + (1 | Trial) + (1 | Day_Zeit),(Intercept),3.626890649641332,0.41411625778502636,8.758146007211584,1.9848796007747278e-18
+mean_vel,mean_vel ~ 1 + Type + (1 | Trial) + (1 | Day_Zeit),TypeHub Bee,2.204658148395198,0.14652163859379178,15.046638636817777,3.632268718577754e-51
+move_perc,move_perc ~ 1 + Type + (1 | Trial) + (1 | Day_Zeit),(Intercept),0.6285761118366343,0.024550665317082804,25.603221082536592,1.4046093905608632e-144
+move_perc,move_perc ~ 1 + Type + (1 | Trial) + (1 | Day_Zeit),TypeHub Bee,0.004834637756744032,0.00954244592079148,0.5066455494612887,0.6124035423080058
