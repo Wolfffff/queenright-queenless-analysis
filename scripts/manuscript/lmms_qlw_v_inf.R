@@ -11,19 +11,17 @@ library(emmeans)
 source("scripts/manuscript/constants.R")
 source("scripts/manuscript/load_data.R")
 
-# Remove queens
+# Keep only queenless workers (non-hub + hub)
 bds_ql <- bds %>%
-  filter(QR == FALSE)
+  filter(QR == FALSE, Queen == FALSE)
 
 bds_ql$OvaryIndex <- bds_ql$AverageOvaryWidth / bds_ql$AverageWingLength
 bds_ql <- bds_ql %>%
   mutate(worker_v_infl = case_when(
-    QR == 0 & Infl == 0 ~ "Queenless Worker",
-    QR == 1 & Queen == 0 ~ "Queenright Worker",
-    Queen == 1 ~ "Queen",
-    QR == 0 & Infl == 1 ~ "Hub Bee"
+    Infl == 0 ~ "Queenless Worker",
+    Infl == 1 ~ "Hub Bee"
   )) %>%
-  mutate(worker_v_infl = factor(worker_v_infl, levels = c("Queenless Worker", "Queenright Worker", "Queen", "Hub Bee")))
+  mutate(worker_v_infl = factor(worker_v_infl, levels = c("Queenless Worker", "Hub Bee")))
 
 bds_ql <- bds_ql %>%
   filter(TimeOfDay == "Day") %>%
