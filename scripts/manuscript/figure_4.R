@@ -1,5 +1,4 @@
 # Load necessary libraries
-library(lme4)
 library(tidyverse)
 library(stringr)
 library(wesanderson)

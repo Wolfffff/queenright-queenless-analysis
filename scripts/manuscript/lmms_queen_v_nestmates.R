@@ -1,4 +1,6 @@
 # Load necessary libraries
+library(lme4)
+library(lmerTest)
 library(glmmTMB)
 library(tidyverse)
 library(stringr)
@@ -24,30 +26,33 @@ daytime_filtered_data <- queenright_data %>%
 # Separate list of metrics to test for the Queen model
 metrics_for_queen_model <- c("Degree", "move_perc", "mean_vel", "N90.Day4", "Initiation.Freq", "Close", "Between", "clust", "OvaryIndex")
 
-# Function to fit and summarize the Queen model for each metric
-fit_and_summarize_queen_model <- function(metric) {
+# Function to fit lme4 model for fixed effects (Wald chi-squared)
+fit_lme4_queen <- function(metric) {
+  formula <- as.formula(paste(metric, "~ 1 + Queen + (1 | Trial) + (1 | DayTimePeriod)"))
+  model <- lmer(formula, data = daytime_filtered_data)
+  tidy_model <- tidy(model, effects = "fixed", conf.int = TRUE) %>%
+    mutate(metric = metric, model_specification = paste(deparse(formula), collapse = " "))
+  return(tidy_model)
+}
 
+# Function to fit glmmTMB model for dispersion comparison
+fit_dispersion_queen <- function(metric) {
   formula <- as.formula(paste(metric, "~ 1 + Queen + (1 | Trial) + (1 | DayTimePeriod)"))
   model <- glmmTMB(formula, data = daytime_filtered_data, family = gaussian(), dispformula = ~ Queen)
 
-  tidy_model <- tidy(model, effects = "fixed", conf.int = TRUE) %>%
-    mutate(metric = metric, model_specification = paste(deparse(formula), collapse = " "))
-
-  # Compare dispersion estimates between Queen groups using emmeans
   disp_emm <- emmeans(model, ~ Queen, component = "disp")
   disp_contrast <- pairs(disp_emm)
   cat("\n--- Dispersion comparison for", metric, "---\n")
   print(summary(disp_emm))
   print(summary(disp_contrast))
-
-  return(tidy_model)
 }
 
-# Fit and summarize Queen models for each metric
-queen_model_summary_list <- lapply(metrics_for_queen_model, fit_and_summarize_queen_model)
-
-# Combine Queen model summaries into a single data frame
+# Fit lme4 models for fixed effects
+queen_model_summary_list <- lapply(metrics_for_queen_model, fit_lme4_queen)
 combined_queen_model_summary <- bind_rows(queen_model_summary_list)
+
+# Fit glmmTMB models for dispersion comparisons
+lapply(metrics_for_queen_model, fit_dispersion_queen)
 
 # Display Queen model summaries
 print(combined_queen_model_summary)
