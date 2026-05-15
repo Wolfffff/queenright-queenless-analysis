@@ -1,5 +1,6 @@
 # Load necessary libraries
 library(lme4)
+library(glmmTMB)
 library(tidyverse)
 library(stringr)
 library(wesanderson)
@@ -12,6 +13,39 @@ library(ggrepel)
 
 source("scripts/manuscript/constants.R")
 source("scripts/manuscript/load_data.R")
+
+# Fit the same glmmTMB interaction model reported in the manuscript
+# (see scripts/manuscript/ovary_interactivity_interaction_model.R).
+# Workers only (queens dropped), QR_Queen_Condition has 2 levels (QR vs QL).
+workers_interaction <- bds_means %>%
+  filter(QR_Queen_Condition != "Queen") %>%
+  droplevels()
+
+ovary_interaction_model <- glmmTMB(
+  Degree ~ QR_Queen_Condition * ovary_idx + (1 | Trial),
+  data = workers_interaction,
+  family = gaussian()
+)
+
+# Build prediction grid: 200 points spanning ovary_idx within each condition.
+# Predict at the population level (re.form = NA) so the ribbon reflects the
+# fixed-effect mean and its SE, not trial-specific intercepts.
+ovary_pred_grid <- workers_interaction %>%
+  group_by(QR_Queen_Condition) %>%
+  summarise(
+    ovary_idx = list(seq(min(ovary_idx, na.rm = TRUE), max(ovary_idx, na.rm = TRUE), length.out = 200)),
+    .groups = "drop"
+  ) %>%
+  unnest(ovary_idx)
+
+ovary_pred_se <- predict(ovary_interaction_model, newdata = ovary_pred_grid, se.fit = TRUE, re.form = NA)
+ovary_pred_display <- ovary_pred_grid %>%
+  mutate(
+    fit = ovary_pred_se$fit,
+    se = ovary_pred_se$se.fit,
+    lo = fit - 1.96 * se,
+    hi = fit + 1.96 * se
+  )
 
 SHARED_THEME <- theme(
   panel.spacing = unit(1, "lines"),
@@ -78,8 +112,22 @@ plot_cleveland <- ggplot(loadings_pc1, aes(x = PC1, y = variables)) +
 # Ovary Index by Degree with linear models (flipped x and y, removed queens)
 plot_lm <- ggplot(bds_means %>% filter(Q_QRW_QLW_Keystone != "Queen"), aes(x = ovary_idx, y = Degree, color = Q_QRW_QLW_Keystone)) +
   geom_point(aes(size = Q_QRW_QLW_Keystone %in% c("Keystone")), stroke = 0.2, alpha = .75) +
-  geom_smooth(data = subset(bds_means, Q_QRW_QLW_Keystone %in% c("Queenright") & Q_QRW_QLW_Keystone != "Queen"), method = "lm", se = TRUE, color = "#642076") +
-  geom_smooth(data = subset(bds_means, Q_QRW_QLW_Keystone %in% c("Queenless", "Keystone") & Q_QRW_QLW_Keystone != "Queen"), method = "lm", se = TRUE, color = "#E68200") +
+  geom_ribbon(
+    data = ovary_pred_display %>% filter(QR_Queen_Condition == "Queenright"),
+    aes(x = ovary_idx, ymin = lo, ymax = hi), fill = "#642076", alpha = 0.2, inherit.aes = FALSE
+  ) +
+  geom_ribbon(
+    data = ovary_pred_display %>% filter(QR_Queen_Condition == "Queenless"),
+    aes(x = ovary_idx, ymin = lo, ymax = hi), fill = "#E68200", alpha = 0.2, inherit.aes = FALSE
+  ) +
+  geom_line(
+    data = ovary_pred_display %>% filter(QR_Queen_Condition == "Queenright"),
+    aes(x = ovary_idx, y = fit), color = "#642076", linewidth = 0.8, inherit.aes = FALSE
+  ) +
+  geom_line(
+    data = ovary_pred_display %>% filter(QR_Queen_Condition == "Queenless"),
+    aes(x = ovary_idx, y = fit), color = "#E68200", linewidth = 0.8, inherit.aes = FALSE
+  ) +
   scale_color_manual(
     labels = c("Queenright Worker", "Queenless\nHub Worker", "Queenless Non-Hub Worker"),
     values = c(Q_QRW_KEY_QLW$QRW, Q_QRW_KEY_QLW$KEY, Q_QRW_KEY_QLW$QLW)
