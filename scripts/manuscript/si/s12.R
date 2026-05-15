@@ -1,5 +1,4 @@
 # Load necessary libraries
-library(lme4)
 library(tidyverse)
 library(stringr)
 library(wesanderson)
@@ -17,7 +16,7 @@ degree_over_time <- ggplot(total_nwp_key_assort_per, aes(x = as.integer(Hour), y
   scale_x_continuous(breaks = c(0, seq(24, 96, by = 24)), limits = c(0, NA), expand = c(0, 0)) + # Expand limits to include 0
   labs(color = "") +
   xlab("Hour") +
-  ylab("Degree Assortativity Percentile") +
+  ylab("Hub Bee Assortativity Percentile") +
   scale_color_manual(values = COLONY_COLORS) +
   theme_minimal() +
   theme(
@@ -43,4 +42,4 @@ degree_over_time <- ggplot(total_nwp_key_assort_per, aes(x = as.integer(Hour), y
   ) +
   guides(alpha = "none", size = "none")
 
-ggsave("figures/manuscript/si/figure_s12.jpeg", width = 8.5, height = 4.5, units = "in", dpi = 600)
+ggsave("manuscript/figures/si/keystone_assortativity.jpeg", width = 8.5, height = 4.5, units = "in", dpi = 600)
