@@ -83,3 +83,24 @@ Page 7: "A strong association between behavioral variation and reproductive phys
 Page 7, Figure 5a: What is an "influencer" - should this say "hub bee"?
 
 Page 7: "Queens are substantially larger and express a distinct cuticular chemistry that reflects reproductive status..." Consider adding "Bombus" before "Queens" as Apis was described in the previous sentence.
+
+
+================================================================================
+ROUND 2 REVIEWS
+================================================================================
+
+
+Reviewer #1 (Remarks to the Author):
+
+The authors addressed my own and other reviewers' comments with great attention and in my opinion the article is ready for publication. There are still a few spots in the paper where "influencer" appears instead of "hub bee" which probably requires some minor editing but otherwise the paper is ready to go.
+
+
+
+
+Reviewer #2 (Remarks to the Author):
+
+I would like to thank the authors for revising the manuscript and taking my suggestions into account. I still have two concerns which have not been fully resolved in the previous revision.
+
+(1) I have previously suggested to model treatment differences in variance with a linear model because the presence of treatment differences in variance can lead to inaccurate estimates of uncertainty and therefore bias p-values. The authors have now used a linear gaussian model to model treatment-specific variance, which I appreciate. However, the authors are still using the p-values from the previous linear model, which does not account for treatment-specific variance, to compare treatment means. The comparisons of treatment-specific means and variances should occur in the same model to avoid biasing p-values, even if this means that some of the previously significant effects will "disappear". That means there should be just one model that models both the means and the variances.
+
+(2) The authors now use an interaction model for the results corresponding to Figure 5C, which again I appreciate. I am however confused that the model predictions shown in Figure 5C do not seem to have changed at all (the figures in the old and new version of the manuscript seem identical). This makes me wonder what is shown in the figure. The figure should optimally show the mean and 95% confidence interval of the mean that comes directly from the interaction model, which should also be explained in the figure caption. I would encourage the authors to show the model predictions from the interaction model (and not a separate fit from geom_smooth or someg alike), if that is not yet done, since this allows the reader to also evaluate how well the model fits the data.
