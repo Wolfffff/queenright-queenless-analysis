@@ -172,5 +172,6 @@ plot_oi <- ggplot(bds_means %>% filter(QR_Queen_Condition != "Queen"), aes(x = Q
   theme(axis.text.x = element_text(size = 7, angle = 45, vjust = 1, hjust = 1))
 
 # Create SI figure with first three plots (remove ovary index only)
-si_plot <- plot_grid(plot_degree, plot_disp, plot_between, ncol = 3, align = "hv", axis = "tb")
+si_plot <- plot_grid(plot_degree, plot_disp, plot_between, ncol = 3, align = "hv", axis = "tb",
+                     labels = c("a.", "b.", "c."), label_fontface = "bold", label_size = 14)
 ggsave("figures/manuscript/outlier_statistical_differences.jpg", si_plot, width = 8.5, height = 4, dpi = 600)
